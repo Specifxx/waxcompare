@@ -106,7 +106,7 @@ jobs:
         options: >-
           --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 12
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/wax
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/wax?schema=sealed&options=-c%20search_path%3Dsealed"
       DB_SOURCE_NAME: actions-postgres
 
     steps:
