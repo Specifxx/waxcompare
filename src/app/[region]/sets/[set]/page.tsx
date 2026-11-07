@@ -18,7 +18,7 @@ import { lastCheckedAt, marketsWithSet, productsBySet, setTcgplayerTiles, type P
 import { cardOpen } from "@/lib/compact";
 import { gridPageHasRoomForFooter } from "@/lib/ebay-ads";
 import { money, timeAgo } from "@/lib/format";
-import { cheapestWayIn, prevNextSet, releaseChip, setDescription, setFacts, setIntro, shortDate, soldWithoutBox, titleText } from "@/lib/hub-copy";
+import { cheapestWayIn, prevNextSet, releaseChip, seenSinceKnown, setDescription, setFacts, setIntro, shortDate, soldWithoutBox, titleText } from "@/lib/hub-copy";
 import { thumb } from "@/lib/images";
 import { cheapestPerPackByType, type PerPackPick } from "@/lib/per-pack";
 import { isPreorderSet } from "@/lib/release";
@@ -282,7 +282,7 @@ function SetChips({ s, pre, open, total }: { s: MtgSet; pre: boolean; open: numb
       <li>
         <span className={`inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ${pre ? "bg-pre-soft text-pre" : "bg-raised text-ink ring-1 ring-line"}`}>
           <Icon name="calendar" size={14} />
-          <time dateTime={s.releaseDate}>{releaseChip(s)}</time>
+          {seenSinceKnown(s) ? <time dateTime={s.releaseDate}>{releaseChip(s)}</time> : releaseChip(s)}
         </span>
       </li>
       {total > 0 && (
