@@ -18,7 +18,7 @@ export const GATED_MAX_USD = 600;
 /** Always worth their own listings (when they clear US$25): the products whose price is real money. */
 export const ALWAYS_TYPES: ReadonlySet<TypeKey> = new Set<TypeKey>(["hobby-box", "jumbo-box", "fotl-box", "breakers-delight", "choice-box", "fast-break-box", "super-box", "hobby-case"]);
 /** Worth them only at US$50 or more (core), or between US$25 and 50 when the budget reaches (extension). */
-export const GATED_TYPES: ReadonlySet<TypeKey> = new Set<TypeKey>(["hybrid-box", "lite-box", "mega-box", "monster-box", "blaster-box", "display-box", "factory-set", "tin"]);
+export const GATED_TYPES: ReadonlySet<TypeKey> = new Set<TypeKey>(["hybrid-box", "lite-box", "mega-box", "monster-box", "blaster-box", "value-box", "display-box", "factory-set", "tin"]);
 // Single packs, hangers, cellos and value packs are never eligible.
 
 export type Tier = "core" | "extension" | "no";

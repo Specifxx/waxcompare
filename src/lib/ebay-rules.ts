@@ -99,7 +99,8 @@ export function refusedForType(title: string, type: TypeKey): boolean {
     "mega-box": /\bmega\b/,
     "blaster-box": /\bblaster\b/,
     "hanger-box": /\bhanger\b/,
-    "value-pack": /\bvalue\b|\bfat\s+pack\b/,
+    "value-pack": /\bvalue\s+packs?\b|\bfat\s+packs?\b/,
+    "value-box": /\bvalue\s+box(?:es)?\b/,
     "cello-pack": /\bcello\b/,
   };
   const own = word[type];

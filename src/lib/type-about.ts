@@ -20,6 +20,7 @@ export const TYPE_ABOUT: Readonly<Record<string, string>> = {
   "blaster-boxes": "A blaster box is the everyday retail format of a release: a few packs, often with a retail-only parallel or insert.",
   "hanger-boxes": "A hanger box is a small retail format made to hang on a store peg: one or a few packs.",
   "value-packs": "Value packs and fat packs are single retail packs with more cards than a standard retail pack.",
+  "value-boxes": "A value box is a retail box of a release's value or fat packs, sold as one sealed unit.",
   "cello-packs": "Cello packs are clear-wrapped retail packs with more cards than a standard pack.",
   tins: "Tins are retail products sold in a metal tin, usually with packs and sometimes an exclusive card.",
   "display-boxes": "A retail display box is a sealed box of a release's retail packs, as it is shipped to stores.",

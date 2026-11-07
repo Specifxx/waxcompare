@@ -3,6 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { LIVE_REGIONS } from "../src/lib/regions";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { findBannedCopy } from "../src/lib/copy-rules";
@@ -88,7 +89,7 @@ test("the published file, once the imports have written it: readable, every mark
   const h = readPriceHistory();
   if (h) {
     assert.ok(isPriceHistory(h), "data/public/price-history.json");
-    assert.ok(Object.keys(h.series).length >= 7, "every market");
+    assert.ok(Object.keys(h.series).length >= LIVE_REGIONS.length, "every market");
   }
   const src = readFileSync("scripts/export-public-data.ts", "utf8");
   assert.match(src, /updatePriceHistory\(prevHistory, todayRows, dayOf\(new Date\(\)\)\)/, "each export folds in its day");

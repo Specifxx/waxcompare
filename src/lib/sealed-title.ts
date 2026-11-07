@@ -36,6 +36,7 @@ export type TypeKey =
   | "blaster-box"
   | "hanger-box"
   | "value-pack"
+  | "value-box"
   | "cello-pack"
   | "tin"
   | "display-box"
@@ -77,6 +78,7 @@ export const PRODUCT_TYPES: ProductTypeInfo[] = [
   { key: "blaster-box", label: "Blaster Box", plural: "Blaster Boxes", slug: "blaster-boxes", kind: "set", channel: "retail", floorUsdCents: 1500 },
   { key: "hanger-box", label: "Hanger Box", plural: "Hanger Boxes", slug: "hanger-boxes", kind: "set", channel: "retail", floorUsdCents: 800 },
   { key: "value-pack", label: "Value Pack", plural: "Value & Fat Packs", slug: "value-packs", kind: "set", channel: "retail", floorUsdCents: 500 },
+  { key: "value-box", label: "Value Box", plural: "Value Boxes", slug: "value-boxes", kind: "set", channel: "retail", floorUsdCents: 1500 },
   { key: "cello-pack", label: "Cello Pack", plural: "Cello Packs", slug: "cello-packs", kind: "set", channel: "retail", floorUsdCents: 300 },
   { key: "tin", label: "Tin", plural: "Tins", slug: "tins", kind: "set", channel: "retail", floorUsdCents: 1000 },
   { key: "display-box", label: "Display Box", plural: "Retail Display Boxes", slug: "display-boxes", kind: "set", channel: "retail", floorUsdCents: 2500 },
@@ -150,7 +152,7 @@ const FOREIGN =
 
 // Singles, slabs, breaks and anything that isn't a factory-sealed product.
 const NOT_SEALED =
-  /\b(?:psa|cgc|bgs|beckett\s*graded|sgc|graded|slab|slabbed)\b|\bgem\s*mint\b|\bsingles?\b|\bsingle\s*cards?\b|\bbase\s*cards?\b|#\s*\d{1,4}\b|\brookie\s*card\b|\brc\s*(?:lot|card)\b|\b(?:box|case|group|team|pack|live|personal|hit)\s*breaks?\b|(?<!\bfast\s)\bbreaks?\b|\bspots?\b|\brandom\s*(?:team|division|player|serial|hit|letter|number)s?\b|\bpick\s*your\b|\b(?:pyt|pyd|pyp)\b|\bhit\s*draft\b|\brip\s*(?:&|and|n)\s*ship\b|\brepack(?:ed|s)?\b|\bmystery\b|\blucky\s*(?:dip|bag|box)\b|\bgrab\s*bag\b|\bhit\s*parade\b|\bfanatics\s*(?:mystery|fest)\b|\bresealed\b|\bopened\b|\bempty\b|\bbox\s*only\b|\bwrappers?\b|\bdamaged\b|\bdented\b|\bcrushed\b|\btorn\b|\bcustom\b|\bproxy\b|\breprints?\b|\btopps\s*now\b|\bliving\s*set\b|\bon\s*-?\s*demand\b|\bteam\s*set\b|\bsigned\b|\bautographed\s*(?:ball|jersey|photo|helmet|bat)\b|\bdigital\b|\bcode\b|\bgift\s*card\b|\bvoucher\b|\bdeposit\b/i;
+  /\b(?:psa|cgc|bgs|beckett\s*graded|sgc|graded|slab|slabbed)\b|\bgem\s*mint\b|\bsingles?\b|\bsingle\s*cards?\b|\bbase\s*cards?\b|#\s*\d{1,4}\b|#\s*[a-z]{1,5}\s*-\s*\d{1,4}\b|\bssp\b|\bcase\s*hits?\b|\bauto\s*$|\brookie\s*card\b|\brc\s*(?:lot|card)\b|\b(?:box|case|group|team|pack|live|personal|hit)\s*breaks?\b|(?<!\bfast\s)\bbreaks?\b|\bspots?\b|\brandom\s*(?:team|division|player|serial|hit|letter|number)s?\b|\bpick\s*your\b|\b(?:pyt|pyd|pyp)\b|\bhit\s*draft\b|\brip\s*(?:&|and|n)\s*ship\b|\brepack(?:ed|s)?\b|\bmystery\b|\blucky\s*(?:dip|bag|box)\b|\bgrab\s*bag\b|\bhit\s*parade\b|\bfanatics\s*(?:mystery|fest)\b|\bresealed\b|\bopened\b|\bempty\b|\bbox\s*only\b|\bwrappers?\b|\bdamaged\b|\bdented\b|\bcrushed\b|\btorn\b|\bcustom\b|\bproxy\b|\breprints?\b|\btopps\s*now\b|\bliving\s*set\b|\bon\s*-?\s*demand\b|\bteam\s*set\b|\bsigned\b|\bautographed\s*(?:ball|jersey|photo|helmet|bat)\b|\bdigital\b|\bcode\b|\bgift\s*card\b|\bvoucher\b|\bdeposit\b/i;
 
 // Accessories and merchandise. Albums and stickers are products only in the sticker lines (Panini Stickers, Match Attax), read later.
 const ACCESSORY =
@@ -158,10 +160,17 @@ const ACCESSORY =
 
 // Store-made multiples and lots: priced for several units, so never comparable with one.
 const MULTIPLE =
-  /\(\s*pair\s*\)|\bpairs?\b|\b(?:set|bundle|lot)\s*of\s*(?:[2-9]|[1-9]\d|two|three|four|five|six)\b|\blots?\b|\bbundles?\b|\bcombo\b|\bbulk\b|^\s*[2-9]\d?\s*x\b|\bx\s*[2-9]\d?\s*\)?\s*$|[([]\s*[2-9]\d?\s*x\s*[)\]]|[([]\s*x\s*[2-9]\d?\s*[)\]]|\b(?:[2-9]|[1-9]\d|two|three|four|five|six)\s*(?:x\s*)?(?:hobby\s*|blaster\s*|mega\s*|value\s*|jumbo\s*)?boxes\b|\bhalf\s*case\b|\b(?:[2-9]|[1-9]\d)\s*x\s*(?:hobby|blaster|mega|value|jumbo|cello|hanger)?\s*(?:packs?|boxes?)\b|\s\+\s/i;
+  /\(\s*pair\s*\)|\bpairs?\b|\b(?:set|bundle|lot)\s*of\s*(?:[2-9]|[1-9]\d|two|three|four|five|six)\b|\blots?\b|\bbundles?\b|\bcombo\b|\bbulk\b|^\s*[2-9]\d?\s*x\b|\bx\s*[2-9]\d?\s*\)?\s*$|[([]\s*[2-9]\d?\s*x\s*[)\]]|[([]\s*x\s*[2-9]\d?\s*[)\]]|\b(?:[2-9]|[1-9]\d|two|three|four|five|six)\s*(?:x\s*)?(?:hobby\s*|blaster\s*|mega\s*|value\s*|jumbo\s*)?boxes\b|\bhalf\s*case\b|\b[2-9]\s*-?\s*tins?\b|\b(?:[2-9]|[1-9]\d)\s*x\s*(?:hobby|blaster|mega|value|jumbo|cello|hanger)?\s*(?:packs?|boxes?)\b|\s\+\s/i;
 
 // A retailer's own edition (different parallels from the hobby or plain retail product): never merged with it.
-const RETAIL_EDITION = /\bwalmart\b|\btarget\b|\bcostco\b|\bsam'?s\s*club\b|\bmeijer\b|\bdollar\s*general\b|\bbest\s*buy\b|\bamazon\s*exclusive\b|\bkmart\b|\bbig\s*w\b|\btesco\b|\basda\b|\bsmyths\b|\bfanatics\s*exclusive\b|\bretail\s*exclusive\b/i;
+const RETAIL_EDITION = /\bwalmart\b|\btarget\b|\bcostco\b|\bsam'?s\s*club\b|\bmeijer\b|\bdollar\s*general\b|\bbest\s*buy\b|\bamazon\s*exclusive\b|\bkmart\b|\bbig\s*w\b|\btesco\b|\basda\b|\bsmyths\b|\bfanatics\s*exclusive\b|\bexclusive\b/i;
+
+// Words that make a title a different product from the line it matched, read once that line's own words are out: a sub-brand
+// (Cosmic, Sapphire, No Huddle, Monopoly, Bowman University…), another league's edition (EuroLeague, NBL, Overtime Elite, USA), a
+// second line (Stadium Club Chrome), a premium or "extra" version, a hobby-only "Preferred" box. Refused, never merged into the base
+// release (found by the first import, 2026-11-07: a EuroLeague box was the cheapest "Prizm Basketball" hobby box).
+const VARIANT =
+  /\bcosmic\b|\bsapphire\b|\bno\s*huddle\b|\bstars\s*(?:&|and)\s*stripes\b|\busa\s*(?:baseball|basketball|national)\b|\bteam\s*usa\b|\beuro\s*league\b|\bturkish\s*airlines\b|\bebl\b|\bnbl\b|\bovertime\s*elite\b|\bote\b|\bmonopoly\b|\bblack\s*diamond\b|\bpreferred\b|\buniversity\b|\bbowman\b|\bstadium\s*club\b|\bpulse\b|\baura\b|\bupdate\b|\bextra\b|\beco\s*pack\b|\bpremium\b|\bsuper\s*jumbo\b|\bbest\s*u\b|\bu\b/i;
 
 // ── release: year, line, sport, competition ──────────────────────────────────
 
@@ -298,7 +307,7 @@ const STICKER_LINES = new Set(["panini-stickers", "topps-stickers", "match-attax
 
 /** The box type a title describes, or null when it isn't one we compare. Reads the lowercased, normalised title. */
 export function readType(t: string, lineKey?: string): TypeKey | null {
-  const s = t.toLowerCase();
+  const s = t.toLowerCase().replace(/,/g, " "); // "Hobby, Pack", "Fat, Pack": a store's comma is not a word
   const stickers = lineKey ? STICKER_LINES.has(lineKey) : false;
   if (/\bcase\b/.test(s)) {
     if (/\binner\s*case\b|\bdisplay\s*case\b|\bcard\s*case\b|\bcase\s*breaks?\b/.test(s)) return null;
@@ -310,7 +319,9 @@ export function readType(t: string, lineKey?: string): TypeKey | null {
   if (/\bfast\s*break\b/.test(s)) return "fast-break-box";
   if (/\bchoice\b/.test(s)) return "choice-box";
   if (/\bh2\b|\bhybrid\b/.test(s)) return "hybrid-box";
-  if (/\bjumbo\s*(?:packs?|value|fat|retail)\b|\bvalue\s*(?:box|pack)\b|\bfat\s*packs?\b|\bmulti\s*-?\s*packs?\b/.test(s)) return "value-pack";
+  if (/\bvalue\s*box(?:es)?\b/.test(s)) return "value-box";
+  if (/\bcello\s*box(?:es)?\b/.test(s)) return null;
+  if (/\bjumbo\s*(?:packs?|value|fat|retail)\b|\bvalue\s*packs?\b|\bfat\s*packs?\b|\bmulti\s*-?\s*packs?\b/.test(s)) return "value-pack";
   if (/\bhta\b|\bjumbo\b/.test(s)) return "jumbo-box";
   if (/\bhobby\s*lite\b|\blite\s*box\b/.test(s)) return "lite-box";
   if (/\bsuper\s*box\b/.test(s)) return "super-box";
@@ -436,6 +447,7 @@ export function identify(title: string, opts: { strict?: boolean } = {}): Sealed
 
   const r = readRelease(t);
   if (typeof r !== "object") return r === "two-years" || r === "two-sports" || r === "two-competitions" ? "vague" : "no-set";
+  if (VARIANT.test(t.replace(r.line.re, " "))) return "vague";
   const stickers = STICKER_LINES.has(r.line.key);
   if (!stickers && /\balbums?\b|\bstickers?\b/i.test(t)) return "accessory";
   const type = readType(t, r.line.key);

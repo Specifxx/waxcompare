@@ -1284,3 +1284,21 @@ needs year, maker, line, sport and type), its own eBay keyset at 2,500 calls a d
 
 **Later (weeks 2–3, in the plan):** the chase list and player pages, a Topps Now drops page, a weekly blog and sourced release dates.
 
+
+## 2026-11-07: the first import's wrong merges, refused (sub-brands, other leagues, value boxes)
+
+The first import (5,076 products, 21,617 store prices) was checked for groups whose in-stock prices spread more than about 2x
+around their median. 71 groups did, and most were wrong merges, not store pricing: a EuroLeague Prizm box was the cheapest
+"2024-25 Panini Prizm Basketball" hobby box, Cosmic Chrome and Sapphire boxes sat on Topps Chrome, Bowman University and Overtime
+Elite on Topps Chrome Football and Basketball, an NBL (Australian league) blaster on the NBA one, value boxes on value packs.
+
+- `VARIANT` in `sealed-title.ts`: once the matched line's own words are taken out of the title, a word that names a sub-brand,
+  another league's edition, a second line or a premium version (Cosmic, Sapphire, No Huddle, Monopoly, Stars & Stripes, Team USA,
+  EuroLeague / Turkish Airlines / EBL, NBL, Overtime Elite, Bowman, University, "Best U", Stadium Club, Pulse, Aura, Update, Extra,
+  Eco Pack, Premium, Super Jumbo, Preferred) refuses the title ("vague"). Lines that carry the word in their own name (Cosmic
+  Chrome, Chrome Sapphire, Chrome Update, Bowman Chrome University, Stadium Club) still read, because their match is removed first.
+- `value-box` is its own type (a box of value packs, US$15 floor, an eBay "gated" type like the blaster): never the pack.
+- A store's comma is not a word ("Hobby, Pack" is a pack), a "Cello Box" is refused, and "3-Tin", "Exclusive", "SSP", "Case Hit",
+  a lettered card number ("#AK-38") and a title ending in "Auto" are refused as multiples, editions or singles.
+- On the probe's own titles this costs little: shared keys US 1,675, CA 1,473, AU 444, UK 207, EU 210 (from 1,644 / 1,498 / 452 /
+  222 / 217; the US gains from value boxes splitting off). Every title is in `tests/sealed-title.test.ts`.

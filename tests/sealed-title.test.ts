@@ -39,7 +39,7 @@ test("the box types of one release never merge", () => {
     "2025 Topps Chrome Baseball Hobby Pack": "hobby-pack",
     "2025 Topps Chrome Baseball Blaster Box": "blaster-box",
     "2025 Topps Chrome Baseball Mega Box": "mega-box",
-    "2025 Topps Series 1 Baseball Value Box": "value-pack",
+    "2025 Topps Series 1 Baseball Value Box": "value-box",
     "2024-25 Panini Prizm Basketball Choice Box": "choice-box",
   } as const;
   for (const [t, type] of Object.entries(types)) assert.equal((identify(t) as SealedIdentity).type, type, t);
@@ -124,7 +124,7 @@ test("lines the 2026-11-07 store probe found, in the shops' own wordings", () =>
   assert.equal(key("2025-26 Topps NBA Hoops Basketball Hanger Box"), "2025-26|topps-hoops|basketball|hanger-box", "Topps' Hoops is not Panini's");
   assert.equal(key("2025-26 Topps Signature Class Basketball Blaster Box"), "2025-26|signature-class|basketball|blaster-box");
   assert.equal(key("2025-26 Topps Holiday Basketball Mega Box"), "2025-26|topps-holiday|basketball|mega-box");
-  assert.equal(key("2024 Topps Resurgence Football Value Box"), "2024|resurgence|football|value-pack");
+  assert.equal(key("2024 Topps Resurgence Football Value Box"), "2024|resurgence|football|value-box");
   assert.equal(key("2026 Topps Heritage Football Hobby Box"), "2026|heritage|football|hobby-box");
   assert.equal(key("2025 Topps Stadium Club UFC Mega Box"), "2025|stadium-club|ufc|mega-box");
   assert.equal(key("Topps Chrome Update 2025-26 Series Basketball Hobby Box"), "2025-26|chrome-update|basketball|hobby-box");
@@ -133,4 +133,49 @@ test("lines the 2026-11-07 store probe found, in the shops' own wordings", () =>
   assert.equal(key("2025 Panini Select WNBA Basketball Blaster Box"), "2025|select|wnba|blaster-box");
   assert.equal(key("2026 Leaf Metal Football Hobby Box"), "2026|leaf-metal|football|hobby-box");
   assert.equal(key("2026 Leaf Metal Draft Edition Baseball Hobby Box"), "2026|leaf-metal-draft|baseball|hobby-box", "Metal Draft is not Metal");
+});
+
+test("a sub-brand, another league's edition or a single never lands on the base release (the first import's wrong merges, 2026-11-07)", () => {
+  // Each of these was priced on a base release's page by the first import: refused now, never merged.
+  for (const t of [
+    "EBL 2024-25 Panini Turkish Airlines Euroleague Prizm Basketball Hobby Box",
+    "2025-26 Panini Select EuroLeague Basketball Hobby Box",
+    "Topps Chrome NBL 2024/2025 Basketball Trading Cards - Value Blaster Box",
+    "Topps Overtime Elite Basketball Chrome 2023-24 Hobby Box",
+    "2025 Topps Chrome Cosmic Baseball Hobby Box",
+    "*LAST CASE* 2026 Topps Chrome Baseball Sapphire Edition, 10 Box Case",
+    "2025 Panini Prizm No Huddle Football Hobby Box",
+    "2026 Panini USA Stars & Stripes Prizm Baseball Mega Box",
+    "Panini Prizm 2023-24 Monopoly Basketball Blaster Box",
+    "2025 Topps Bowman Chrome Football Blaster Box",
+    "2025 Bowman University Chrome Football Blaster Box",
+    "2024 Bowman Best U Hobby Box",
+    "2025/26 Topps UEFA Champions League Stadium Club Chrome Hobby",
+    "Topps Chrome NBA Update Series Basketball - 2025/26 - Value Box",
+    "2026 Panini Prizm FIFA World Cup Soccer Hobby Preferred Box",
+    "2024 Upper Deck AEW Black Diamond Hobby Box",
+    "2026 Pulse Aura Chrome Football Hobby Box",
+    "2025 Bowman Draft Baseball Super Jumbo, Pack",
+    "2025-26 Topps UCC Match Attax Extra 2026 - Eco Pack",
+    "2025 Panini Adrenalyn XL FIFA 365 Premium Gold Pack",
+    "2026 Topps Holiday Baseball Hobby Collector 3-Tin Box",
+    "2026 Panini FIFA World Cup Soccer Sticker Album - Canada Exclusive (1 of 2026)",
+    "COLSON MONTGOMERY 2026 Topps Update Series Rookie All Kings Case Hit SSP #AK-38",
+    "2026 Ethan Conrad Bowman Chrome Mega Box Auto",
+    "2021 Panini Prizm Football Cello Box",
+  ])
+    assert.equal(typeof identify(t), "string", t);
+  // The base releases and the lines that carry those words in their own names still read.
+  const k = (t: string) => { const r = identify(t); return typeof r === "object" ? r.groupKey : r; };
+  assert.equal(k("2025 Topps Chrome Baseball Hobby Box (USA Seller)"), "2025|chrome|baseball|hobby-box");
+  assert.equal(k("2025 Topps Cosmic Chrome Baseball Hobby Box"), "2025|cosmic-chrome|baseball|hobby-box");
+  assert.equal(k("2025 Topps Chrome Sapphire Edition Baseball Hobby Box"), "2025|chrome-sapphire|baseball|hobby-box");
+  assert.equal(k("2025 Bowman Chrome University Football Hobby Box"), "2025|bowman-chrome-university|football|hobby-box");
+  assert.equal(k("2025 Topps Chrome Update Baseball Hobby Box"), "2025|chrome-update|baseball|hobby-box");
+  assert.equal(k("2025 Topps Stadium Club Baseball Hobby Box"), "2025|stadium-club|baseball|hobby-box");
+  // A value box is a box of value packs, never the pack; a store's comma is not a word.
+  assert.equal(k("2026 Topps Heritage Football Value Box"), "2026|heritage|football|value-box");
+  assert.equal(k("Topps - Update Series - MLB Baseball - 2026 - Fat Pack"), "2026|update|baseball|value-pack");
+  assert.equal(k("2025 Panini Luminance Football Hobby, Pack"), "2025|luminance|football|hobby-pack");
+  assert.equal(k("2025 Panini Prizm Football Fat, Pack (Green Flash)"), "2025|prizm|football|value-pack");
 });

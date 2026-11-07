@@ -106,10 +106,10 @@ test("real product pages: valid JSON-LD, and every price, count and currency it 
 test("one real page of each kind: type, set, deals and guide pages carry valid BreadcrumbList / ItemList / Article / FAQPage", { skip: NO_DATA }, async () => {
   await setup();
   const pages: [string, () => Promise<React.ReactElement>][] = [
-    ["type", async () => (await import("../src/app/[region]/type/[type]/page")).default({ params: { region: "us", type: "play-booster-boxes" } } as never)],
-    ["set", async () => (await import("../src/app/[region]/sets/[set]/page")).default({ params: { region: "au", set: "bloomburrow" } } as never)],
+    ["type", async () => (await import("../src/app/[region]/type/[type]/page")).default({ params: { region: "us", type: "hobby-boxes" } } as never)],
+    ["set", async () => (await import("../src/app/[region]/sets/[set]/page")).default({ params: { region: "au", set: "2024-25-panini-prizm-basketball" } } as never)],
     ["deals", async () => (await import("../src/app/[region]/deals/page")).default({ params: { region: "uk" } } as never)],
-    ["guide", async () => (await import("../src/app/[region]/guides/[slug]/page")).default({ params: { region: "us", slug: "cheapest-way-to-buy-magic-packs" } } as never)],
+    ["guide", async () => (await import("../src/app/[region]/guides/[slug]/page")).default({ params: { region: "us", slug: "hobby-vs-blaster-vs-mega-box" } } as never)],
   ];
   for (const [kind, render] of pages) {
     const html = renderToStaticMarkup(await render());
@@ -118,7 +118,7 @@ test("one real page of each kind: type, set, deals and guide pages carry valid B
     if (kind === "type" || kind === "set" || kind === "deals") assert.ok(types.has("ItemList"), `${kind}: ItemList`);
     if (kind === "guide") {
       assert.ok(types.has("Article"), "guide: Article");
-      assert.ok(types.has("FAQPage"), "guide: FAQPage");
+      // A FAQPage is checked by checkPage when a guide has one; none of the launch guides does.
     }
   }
 });

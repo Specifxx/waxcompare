@@ -149,7 +149,7 @@ test("missing tables, database errors, unknown products: empty, no error text", 
 
 test("bad region or context: 400, no data, no error text, nothing read", async () => {
   const f = fake(feedRows("EBAY_AU|chase", 6, 1));
-  for (const [region, c] of [["xx", "chase"], ["AU", "chase"], ["au", "set:not-a-set"], ["au", "home"], ["au", "../../etc/passwd"], ["au", "set:2025-topps-chrome-baseball%27;DROP TABLE"], ["au", "set:2025-topps-chrome-baseball"], ["au", "item:" + "a".repeat(200)], ["au", ""], ["../au", "chase"]] as const) {
+  for (const [region, c] of [["xx", "chase"], ["AU", "chase"], ["au", "set:not-a-set"], ["au", "home"], ["au", "../../etc/passwd"], ["au", "set:2025-topps-chrome-baseball%27;DROP TABLE"], ["au", "set:2099-topps-chrome-baseball"], ["au", "item:" + "a".repeat(200)], ["au", ""], ["../au", "chase"]] as const) {
     const res = await call(f.deps, region, c);
     assert.equal(res.status, 400, `${region} ${c}`);
     assert.deepEqual(Object.keys(await res.json()).sort(), ["feed", "fetchedAt", "items", "maxAgeMs", "reason"]);

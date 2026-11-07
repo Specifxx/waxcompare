@@ -88,6 +88,7 @@ const HIGH_OUTLIER: Partial<Record<TypeKey, number>> = {
   "hobby-pack": 4,
   "cello-pack": 4,
   "value-pack": 4,
+  "value-box": 3,
   "hanger-box": 4,
   "blaster-box": 3,
   "mega-box": 3,

@@ -35,7 +35,17 @@ export function seoTitleText(t: SeoTitle): string {
 
 /** The first candidate that fits in 60 characters (the last one when none does), with the suffix when that still fits. */
 export function fitFirst(...candidates: string[]): SeoTitle {
-  return seoTitle(candidates.find((c) => c.length <= SEO_TITLE_MAX) ?? candidates[candidates.length - 1]);
+  const fit = candidates.find((c) => c.length <= SEO_TITLE_MAX);
+  if (fit) return seoTitle(fit);
+  // A release name too long for every candidate (sports names run long): the last one, cut at a word.
+  return seoTitle(cutAtWord(candidates[candidates.length - 1], SEO_TITLE_MAX));
+}
+
+/** `s` cut at a word to at most `max` characters, trailing punctuation dropped. */
+function cutAtWord(s: string, max: number): string {
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max + 1);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,:;&–—-]+$/, "");
 }
 
 /** The first description that fits in 160 characters, else the last candidate cut at a word. */
@@ -197,6 +207,7 @@ export const seoCopy = {
         `${name} pre-orders in ${r.inName}`,
         `${set.name} pre-orders in ${r.inName}`,
         `${set.name} pre-orders`,
+        `${cutAtWord(set.name, SEO_TITLE_MAX - " pre-orders".length)} pre-orders`,
       );
     }
     if (o.withoutBox) return fitFirst(`${name} sealed prices in ${r.inName}`, `${set.name} sealed prices in ${r.inName}`, `${set.name} prices in ${r.inName}`, `${set.name} sealed prices`, `${set.name} prices`);
@@ -207,6 +218,7 @@ export const seoCopy = {
       `${set.name} sealed prices in ${r.inName}`,
       `${set.name} prices in ${r.inName}`,
       `${set.name} sealed prices`,
+      `${set.name} prices`,
     );
   },
 

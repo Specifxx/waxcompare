@@ -69,6 +69,7 @@ export const SWEEP_QUERIES: readonly SweepQuery[] = [
   { key: "blaster", q: "blaster box", types: ["blaster-box"] },
   { key: "hanger", q: "hanger box", types: ["hanger-box"] },
   { key: "value", q: "value pack", types: ["value-pack"] },
+  { key: "valuebox", q: "value box", types: ["value-box"] },
   { key: "case", q: "hobby case", types: ["hobby-case"] },
 ];
 
@@ -93,6 +94,7 @@ export const HOT_TYPE_QUERY: Readonly<Record<TypeKey, { key: string; phrase: str
   "blaster-box": { key: "blaster", phrase: "blaster box" },
   "hanger-box": { key: "hanger", phrase: "hanger box" },
   "value-pack": { key: "value", phrase: "value pack" },
+  "value-box": { key: "valuebox", phrase: "value box" },
   "cello-pack": { key: "cello", phrase: "cello pack" },
   tin: { key: "tin", phrase: "tin" },
   "display-box": { key: "display", phrase: "display box" },

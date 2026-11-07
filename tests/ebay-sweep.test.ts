@@ -91,7 +91,8 @@ test("sweep matching: breaks, repacks, lots, several units, foreign editions, da
 test("filler: seller and shipping words are filler; the words that tell sports products apart never", () => {
   for (const w of ["fast", "nib", "express", "factory", "sealed", "trading", "sports"]) assert.ok(isFiller(w), w);
   for (const w of ["hobby", "jumbo", "blaster", "mega", "fotl", "breakers", "choice", "case", "pack", "box", "chrome", "update", "sapphire", "cello"]) assert.ok(!isFiller(w), w);
-  assert.deepEqual([...setWordsIn("2025 Topps Chrome Baseball Hobby Box")], [], "no dated release yet: no set words");
+  const words = setWordsIn("2025 Topps Chrome Baseball Hobby Box");
+  for (const w of ["chrome", "hobby", "box"]) assert.ok(!words.has(w), `a release name never makes "${w}" filler`);
 });
 
 test("collector: a 'New other' or 'Like New' condition is not a sealed product", () => {

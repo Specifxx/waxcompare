@@ -50,7 +50,7 @@ test("the page renders from real data: parseable JSON-LD, no banned copy, the re
     assert.match(text, /Black Friday is 27 November 2026|Black Friday weekend|Black Friday 2026 was/);
     for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) assert.doesNotThrow(() => JSON.parse(m[1]));
     if (region === "au") assert.match(text, /A\$/);
-    assert.match(html, new RegExp(`href="/${region}/cheapest-packs"`));
+    assert.doesNotMatch(html, new RegExp(`href="/${region}/cheapest-packs"`), "WaxCompare has no per-pack page: no pack counts");
   }
   assert.ok(REGIONS.au);
 });

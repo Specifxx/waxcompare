@@ -221,7 +221,7 @@ const MULTI_UNIT: readonly RegExp[] = [
 // "N-pack" is the product itself for a bundle, a prerelease kit or a starter ("9-Pack Bundle", "6 Pack Prerelease Kit").
 const CASE_TYPES = new Set<TypeKey>(["hobby-case"]);
 // "N-pack" is the product itself for a value pack, a hanger or a retail display ("3-Pack Value Box", "24-pack display").
-const PACK_COUNT_OK = new Set<TypeKey>(["value-pack", "hanger-box", "display-box", "cello-pack"]);
+const PACK_COUNT_OK = new Set<TypeKey>(["value-pack", "value-box", "hanger-box", "display-box", "cello-pack"]);
 
 /** Does the title sell several units (or a multi-pack of a single-unit product)? */
 export function multiUnit(title: string, type: TypeKey): boolean {
