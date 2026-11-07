@@ -357,9 +357,11 @@ function SetCard({ r, s, items: all }: { r: RegionInfo; s: MtgSet; items: Produc
           )}
           <span className="min-w-0">
             <span className="block font-display text-lg font-bold leading-tight group-hover:text-brand">{s.name}</span>
-            <span className="block text-xs text-faint">
-              {pre ? "Releases" : "Released"} {formatRelease(s.releaseDate)}
-            </span>
+            {s.dateKnown && (
+              <span className="block text-xs text-faint">
+                {pre ? "Releases" : "Released"} {formatRelease(s.releaseDate)}
+              </span>
+            )}
           </span>
         </span>
         {pre ? (

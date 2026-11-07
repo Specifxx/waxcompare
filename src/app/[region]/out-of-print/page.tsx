@@ -65,7 +65,8 @@ export default async function OutOfPrintPage({ params }: { params: { region: str
                   </Link>
                 </h2>
                 <span className="text-sm text-muted">
-                  Released {formatRelease(g.set.releaseDate)} · {plural(g.items.length, "product")} in stock
+                  {g.set.dateKnown ? `Released ${formatRelease(g.set.releaseDate)} · ` : ""}
+                  {plural(g.items.length, "product")} in stock
                 </span>
               </div>
               <ol className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-[repeat(2,minmax(0,1fr))]">

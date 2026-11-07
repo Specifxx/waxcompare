@@ -61,9 +61,17 @@ export function isoDay(now: Date = new Date()): string {
   return now.toISOString().slice(0, 10);
 }
 
+/**
+ * The first day the import read any store (2026-11-07). A release first seen on or before it was already in stores when WaxCompare
+ * started, so its first-seen day says nothing about when it came out: no "In stores since" for it.
+ */
+export const FIRST_IMPORT_DAY = "2026-11-07";
+/** Is the set's undated `releaseDate` a real first-seen day (seen after the first import), not the day the site started? */
+export const seenSinceKnown = (set: Pick<MtgSet, "releaseDate" | "dateKnown">) => set.dateKnown || set.releaseDate > FIRST_IMPORT_DAY;
+
 /** "Pre-order · out in 23 days" / "Out tomorrow" / "Released 16 Sep 2026": the set's release chip. */
 export function releaseChip(set: Pick<MtgSet, "code" | "releaseDate" | "dateKnown">, now: Date = new Date()): string {
-  if (!isPreorderSet(set.code, now)) return set.dateKnown ? `Released ${shortDate(set.releaseDate)}` : `In stores since ${shortDate(set.releaseDate)}`;
+  if (!isPreorderSet(set.code, now)) return set.dateKnown ? `Released ${shortDate(set.releaseDate)}` : seenSinceKnown(set) ? `In stores since ${shortDate(set.releaseDate)}` : "In stores now";
   const rel = relativeDay(set.releaseDate, isoDay(now)); // "in 23 days" | "tomorrow"
   return `Pre-order · out ${rel}`;
 }
@@ -107,7 +115,7 @@ export function lowestOpen(products: ProductCardData[]): number | null {
 export function setDescription(set: MtgSet, r: Pick<RegionInfo, "inName" | "market">, products: ProductCardData[], now: Date = new Date()): string {
   const pre = isPreorderSet(set.code, now);
   const name = withMtg(set.name);
-  const when = set.dateKnown ? `${pre ? "out" : "released"} ${shortDate(set.releaseDate)}` : `in stores since ${shortDate(set.releaseDate)}`;
+  const when = set.dateKnown ? `${pre ? "out" : "released"} ${shortDate(set.releaseDate)}` : seenSinceKnown(set) ? `in stores since ${shortDate(set.releaseDate)}` : "in stores now";
   if (!products.length) return `${name} sealed prices in ${r.inName}: no store we track lists it yet; ${when}.`;
   const open = products.filter(cardOpen).length;
   const parts = [`${plural(products.length, "product")}, ${open} ${pre ? "open for pre-order" : "in stock"} today`];
@@ -139,7 +147,9 @@ export function setIntro(set: MtgSet, r: Pick<RegionInfo, "inName" | "adjective"
       ? `${name} is an upcoming ${set.series.toLowerCase()} card release from ${set.maker}, out on ${date} (${relativeDay(set.releaseDate, isoDay(now))}).`
       : set.dateKnown
         ? `${name} is a ${set.series.toLowerCase()} card release from ${set.maker}, released on ${date}.`
-        : `${name} is a ${set.series.toLowerCase()} card release from ${set.maker}. The card shops we compare have listed it since ${date}.`,
+        : seenSinceKnown(set)
+          ? `${name} is a ${set.series.toLowerCase()} card release from ${set.maker}. The card shops we compare have listed it since ${date}.`
+          : `${name} is a ${set.series.toLowerCase()} card release from ${set.maker}.`,
   );
   const open = products.filter(cardOpen).length;
   const low = lowestOpen(products);
@@ -195,8 +205,9 @@ export function setFacts(set: MtgSet, listed?: Iterable<string>, market?: string
   const facts: SetFact[] = [
     { term: "Sport", detail: set.series },
     { term: "Maker", detail: set.maker },
-    set.dateKnown ? { term: "Release date", detail: `${formatRelease(set.releaseDate)}${pre ? " (pre-order)" : ""}` } : { term: "In stores since", detail: formatRelease(set.releaseDate) },
   ];
+  if (set.dateKnown) facts.push({ term: "Release date", detail: `${formatRelease(set.releaseDate)}${pre ? " (pre-order)" : ""}` });
+  else if (seenSinceKnown(set)) facts.push({ term: "In stores since", detail: formatRelease(set.releaseDate) });
   if (soldWithoutBox(set)) facts.push({ term: "Hobby box", detail: "Not sold as a hobby box" });
   const lines: [TypeKey, string][] = [
     ["hobby-box", "Hobby Box"],

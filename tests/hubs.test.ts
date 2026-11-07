@@ -13,6 +13,7 @@ import {
   hubTitle,
   nextSet,
   prevNextSet,
+  FIRST_IMPORT_DAY,
   releaseChip,
   releasesTitle,
   renderedTitle,
@@ -130,17 +131,23 @@ import { partsOf, releaseFor } from "../src/lib/sets";
 const chrome = releaseFor(partsOf("2025|chrome|baseball")!, "2026-10-01");
 const dated = { ...chrome, releaseDate: "2026-12-03", dateKnown: true };
 
-test("a release read from store titles has no date: its pages say 'in stores since', never 'released' or a pre-order", () => {
+test("a release read from store titles has no date: its pages say 'in stores since' (or 'now' for one already out when the site began), never 'released' or a pre-order", () => {
   assert.equal(chrome.dateKnown, false);
   assert.equal(chrome.name, "2025 Topps Chrome Baseball");
   assert.equal(chrome.slug, "2025-topps-chrome-baseball");
   assert.equal(chrome.series, "Baseball");
   assert.equal(chrome.maker, "Topps");
-  assert.equal(releaseChip(chrome, TODAY), `In stores since ${shortDate(chrome.releaseDate)}`);
-  assert.match(setDescription(chrome, REGIONS.us, [], TODAY), /in stores since/);
-  assert.doesNotMatch(setDescription(chrome, REGIONS.us, [], TODAY), /released/i);
-  const facts = setFacts(chrome, [], "US", TODAY);
-  assert.deepEqual(facts.slice(0, 3).map((f) => f.term), ["Sport", "Maker", "In stores since"]);
+  // Seen by the first import (7 Nov 2026): already in stores, its first-seen day is no date at all.
+  const atStart = { ...chrome, releaseDate: FIRST_IMPORT_DAY };
+  assert.equal(releaseChip(atStart, TODAY), "In stores now");
+  assert.match(setDescription(atStart, REGIONS.us, [], TODAY), /in stores now/);
+  assert.doesNotMatch(setDescription(atStart, REGIONS.us, [], TODAY), /released|since/i);
+  assert.ok(!setFacts(atStart, [], "US", TODAY).some((f) => f.term === "In stores since" || f.term === "Release date"));
+  // First seen later: that day is a fact (the stores we compare have listed it since then).
+  const later = { ...chrome, releaseDate: "2026-12-02" };
+  assert.equal(releaseChip(later, new Date("2027-01-01T00:00:00Z")), `In stores since ${shortDate("2026-12-02")}`);
+  assert.match(setDescription(later, REGIONS.us, [], new Date("2027-01-01T00:00:00Z")), /in stores since/);
+  assert.deepEqual(setFacts(later, [], "US", new Date("2027-01-01T00:00:00Z")).slice(0, 3).map((f) => f.term), ["Sport", "Maker", "In stores since"]);
 });
 
 test("a dated release says 'Released' with its date", () => {
