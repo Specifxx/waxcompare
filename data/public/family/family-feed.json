@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-07T03:43:12.365Z",
+ "generatedAt": "2026-11-07T15:16:03.482Z",
  "links": {
   "AU": {
    "deals": "https://waxcompare.app/au/deals"
@@ -128,20 +128,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "US",
-   "title": "2026 Topps Series 1 Baseball Value Pack",
-   "url": "https://waxcompare.app/us/p/2026-topps-series-1-baseball-value-pack-2",
-   "cents": 699,
-   "currency": "USD",
-   "store": "jawbreakers",
-   "image": "https://cdn.shopify.com/s/files/1/0586/3758/2489/files/2026_Topps_Series_1_Hanging_Pack.png?v=1770827136",
-   "refCents": 1225,
-   "refLabel": "median store price",
-   "savingPct": 43
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "US",
    "title": "2026 Topps Update Baseball Hanger Box",
    "url": "https://waxcompare.app/us/p/2026-topps-update-baseball-hanger-box",
    "cents": 999,
@@ -151,6 +137,20 @@
    "refCents": 1750,
    "refLabel": "median store price",
    "savingPct": 43
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "US",
+   "title": "2026 Topps Series 1 Baseball Value Pack",
+   "url": "https://waxcompare.app/us/p/2026-topps-series-1-baseball-value-pack-2",
+   "cents": 699,
+   "currency": "USD",
+   "store": "jawbreakers",
+   "image": "https://cdn.shopify.com/s/files/1/0586/3758/2489/files/2026_Topps_Series_1_Hanging_Pack.png?v=1770827136",
+   "refCents": 1200,
+   "refLabel": "median store price",
+   "savingPct": 42
   },
   {
    "kind": "deal",
@@ -184,13 +184,13 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "US",
-   "title": "2026 Topps Update Baseball Value Pack",
-   "url": "https://waxcompare.app/us/p/2026-topps-update-baseball-value-pack",
-   "cents": 599,
+   "title": "2025 Topps Stadium Club UFC Blaster Box",
+   "url": "https://waxcompare.app/us/p/2025-topps-stadium-club-ufc-blaster-box",
+   "cents": 1500,
    "currency": "USD",
-   "store": "Lake Hartwell Collectibles",
-   "image": "https://cdn.shopify.com/s/files/1/0700/9570/0058/files/2026-topps-update-series-baseball-value-box.jpg?v=1791941239",
-   "refCents": 999,
+   "store": "Bunk's Card Corner",
+   "image": "https://cdn.shopify.com/s/files/1/0578/9148/7924/files/2025_Topps_Stadium_Club_UFC_Value_Blaster_Box.png?v=1769645258",
+   "refCents": 2499,
    "refLabel": "median store price",
    "savingPct": 40
   },
@@ -366,20 +366,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
-   "title": "2026 Topps Holiday Football Mega Box",
-   "url": "https://waxcompare.app/eu/p/2026-topps-holiday-football-mega-box",
-   "cents": 2999,
-   "currency": "EUR",
-   "store": "PUSHDICH-TCG",
-   "image": "https://cdn.shopify.com/s/files/1/0483/6543/7089/files/1040489_004_102026.jpg?v=1793233011",
-   "refCents": 4999,
-   "refLabel": "median store price",
-   "savingPct": 40
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
    "title": "2026 Topps Chrome UFC Value Box",
    "url": "https://waxcompare.app/eu/p/2026-topps-chrome-ufc-value-pack",
    "cents": 2500,
@@ -445,6 +431,20 @@
    "refCents": 37000,
    "refLabel": "median store price",
    "savingPct": 22
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2025-26 Topps UEFA Club Competitions Hanger Box",
+   "url": "https://waxcompare.app/eu/p/2025-26-topps-uefa-club-competitions-hanger-box",
+   "cents": 1200,
+   "currency": "EUR",
+   "store": "deichcards.de",
+   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsUEFAClubCompetitions202526-HangerBox.png?v=1768905723",
+   "refCents": 1500,
+   "refLabel": "median store price",
+   "savingPct": 20
   }
  ]
 }
