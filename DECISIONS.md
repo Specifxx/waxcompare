@@ -1305,3 +1305,12 @@ Elite on Topps Chrome Football and Basketball, an NBL (Australian league) blaste
   still spread past 2x, and those read as real old-stock or store pricing, not merges.
 - On the probe's own titles this costs little: shared keys US 1,675, CA 1,473, AU 444, UK 207, EU 210 (from 1,644 / 1,498 / 452 /
   222 / 217; the US gains from value boxes splitting off). Every title is in `tests/sealed-title.test.ts`.
+
+## Black Friday strip and guide (2026-11-07)
+
+Ported from MTG Compare's Black Friday strip (DECISIONS.md there, 2026-11-07): one line under the header on every region page
+from 1 November to the day after Cyber Monday, linking the region's Black Friday page and then its Cyber Monday page
+(`saleStrip`), never a pop-up or a countdown; Cyber Monday joins the side menu in season and the footer. New guide
+`sports-cards-black-friday-2026`: the dates, today's cheapest hobby, mega and blaster boxes as the prices to read a Black
+Friday price against, and five checks; the sale pages link it. Both sale pages were already in the sitemap and the daily
+IndexNow run.
