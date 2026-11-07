@@ -1,0 +1,1286 @@
+# Decisions
+
+Newest at the bottom. WaxCompare starts at the entry of 2026-11-07, the last one. Everything above it is MTG Compare's log (and,
+through it, DexCompare's), copied with the engine on purpose: the engine's rules (one release a day, CDN not ISR, eBay's licence,
+the pinned marketplace rows, the cart) were decided there, and the reasons still hold. Where an entry names Magic, Wizards,
+TCGplayer or a Pokémon product, read it as the rule it set, not as something this site sells.
+
+## 2026-10-21 — MTG Compare becomes sealed-only, a port of DexCompare
+
+**Owner:** "there's too many cards in Magic the Gathering … make the site MTG compare exactly like dex compare … get rid of all the
+cards … only focus on sealed products … price all the sealed products comparing stores across the globe … eBay and TCG affiliates
+… we still want the blog posts … I want all the data on the GitHub, ideally."
+
+- The repository was replaced with DexCompare's sealed app (`Specifxx/CompareEmpire` `apps/dexcompare-sealed` at `25ba16b`),
+  adapted for Magic: the title classifier, the product types and sets, the store list (`src/data/stores.json`, built from the old
+  registry and DexCompare's stores by probing each store's Magic sealed collections), TCGplayer's Magic sealed catalogue, the eBay
+  queries, the brand (Arcane Ink: amethyst and brass), the guides, and the blog (the old posts that make sense for sealed product,
+  same slugs).
+- Removed with the singles site: the card catalogue (Scryfall/TCGCSV), accounts, Stripe Plus/Premium, alerts, collections, decks,
+  price history, the admin panels, the Neon data plane and the weekly release cadence.
+- **Data on GitHub** (as DexCompare): the imports commit `data/public/` to `main` and the site reads the bundled files. Neon stays
+  only as the importers' working store, in a new schema `sealed` of the existing database, so the old tables are not touched.
+- **Releases are daily again**: the evening import's data commit carries `[deploy]`, because a data refresh is now a commit (the
+  weekly-release rule existed for the Neon data plane, which needed no deploy).
+- **eBay calls default to 1,500 a day** (`ebay-import.yml`), not DexCompare's 2,500: the keyset has been shared with RiftCompare.
+- RiftCompare has no Magic section, so the product page's price-history link is off (`src/lib/riftcompare.ts` `RIFT_SECTION`).
+
+## 2026-10-22 — Vercel cost cut to the bone
+
+**Owner:** "I don't want MTG Compare doing more than like $1 a day … reduce any cost features."
+
+- **Vercel Web Analytics is off** (`src/components/SiteAnalytics.tsx` renders nothing, `src/lib/track.ts` is a no-op, the
+  `@vercel/analytics` package is removed): it bills page views and custom events.
+- **Link prefetching is off by default** (`src/components/Link.tsx` wraps `next/link`): every page is force-dynamic, so each
+  prefetched link was a billed server render, whether or not anyone clicked it.
+- **The eBay strip API is cached 6 hours at the CDN** (was 1): its data changes once a day.
+- **More crawlers are refused in robots.txt**: SEO-tool crawlers (Ahrefs, Semrush) and AI-training crawlers, which render the long
+  tail and send no visitors. Search engines and AI search crawlers still read the site.
+- Unchanged and already cheap: no database reads from pages, no crons, no ISR writes, no image optimisation, one release a day.
+
+## 2026-10-23: titles at 60 characters, built in lib/seo-titles.ts; eight data-driven guides
+
+- Every price page's `<title>` (with " | MTG Compare" only when it still fits) is at most 60 characters and every description at most
+  160 (`src/lib/seo-titles.ts`, `tests/seo-titles.test.ts`). Titles are candidate lists, most specific first; long names and regions
+  lose the extras (the from-price, the box wording), never the query. A long store title is tidied and cut at a word, never rewritten.
+  The page bodies' copy (hub-copy, deals, product-copy) is unchanged; only `generateMetadata` reads the new builders.
+- Eight new guides read live data through `src/content/guides/more-data.ts`. Per-pack figures use lib/packs.ts counts only. The gift
+  guide's cap is a round figure in each region's own currency (GIFT_CAP), stated as such: never a conversion of US$50.
+- The weekly market wrap prints only real week-over-week moves from `data/public/price-history.json` (2+ stores on both days, moves of
+  5–50%); with no file or under eight days of snapshots it says so and shows no numbers.
+- Guide sitemap lastmod is the guide's editorial `updated` date (blog posts and the by-country guide likewise), never the import time.
+
+## 2026-10-23 — DexCompare's newer interface, ported (owner: "make mtgcompare.app look and convert as well as dexcompare.app")
+
+- The landing page is force-dynamic and CDN-cached a day (it renders the US "In stock today" grid on the server), no longer
+  prerendered; other regions load through `/api/picks/<region>` (one-day CDN cache). The region is chosen in the browser: the
+  saved region, then the browser language and time zone, and `/api/geo` only when those cannot decide (cost).
+- Pre-order banner (the next real upcoming set), Black Friday page and banner (1 November to a week after Cyber Monday), MSRP
+  badge (only Wizards' published prices in `rrp.ts`), "checked … ago", price history (chart from 7 days; the export writes it,
+  nothing in `data/public` by hand), two tools only (value checker, eBay selling-fee calculator).
+- GA4 events (region select, search without its words, store click, affiliate click) go through `src/lib/gtag.ts`, a no-op until
+  `NEXT_PUBLIC_GA_ID` is set; GA4 sets cookies, so the privacy page must change before it is.
+- Not ported, on purpose: Speed Insights, Vercel Analytics, the `/go` redirect (a billed function per click), the Discord/Telegram
+  feed, DexCompare's Pokémon guides and tools.
+- Store combos sold as "BUNDLE: …, …" are refused, and a set's own code ("Fra Reality Fracture Bundle") never names a bundle.
+
+## 2026-10-23 — Retarget the landing page at sealed queries; the sister-site row becomes "Compare other TCGs"
+
+- Search Console (28 days) showed the site found mostly for singles queries ("mtg card prices", "magic card prices") it no longer
+  answers. The landing page now leads with the sealed queries: title "MTG Booster Box & Commander Deck Prices | MTG Compare", H1
+  "MTG booster box, bundle & Commander deck prices, cheapest first", a description naming the four product kinds and the regions
+  (under 60 and 155 characters, `tests/home-report.test.ts`). Region homes say "booster box, bundle & Commander deck prices"; the
+  guides index is "MTG booster box price guides in <region>".
+- The singles searches get a plain answer, not a redirect: `SinglesNote` ("Looking for MTG card prices?") on the landing page and
+  every guides index says the site compares sealed product only and links the sealed guides of the region.
+- The landing page carries a written market report (`src/components/home/MarketReport.tsx`, `src/lib/home-report.ts`): price ranges
+  of the four kinds in the US, the cheapest of each today, a region table and a line per region in its own currency, and the share of
+  listed products open per region. It reads the public data files through the guides' capped reads at render (no new data file),
+  says "today", and prints week-on-week moves only from `price-history.json` (until a week of snapshots exists it says so). An empty
+  read renders nothing. "Restock" talk stays within `copy-rules.ts`: the report describes the release cycle and the twice-daily
+  reads, never "back in stock".
+- Three guides answer "<product> price <country>" queries: `mtg-booster-box-prices`, `collector-booster-box-prices` and
+  `mtg-bundle-prices`. A guide may set `titleIn` ("MTG booster box prices in {in}"): its H1, `<title>`, breadcrumb and Article
+  headline name the region (`guideTitleIn`); `title` stays the registry's unique name. A Bundle gets no per-pack price.
+- The landing FAQ's questions are `<h3>`s (the FAQPage JSON-LD unchanged); the landing page, the region homes and the about,
+  contact, privacy and terms pages gained a BreadcrumbList (a visible trail, except the landing page's single crumb). Organization
+  and WebSite stay in the root layout, once per page. The Product + AggregateOffer of product pages already matched camcompare's
+  (it is a superset: offer count, low/high, currency, availability, condition), so nothing was ported.
+- `SISTER_SITES` lists the three other games only, with the words each is found by as the anchor: Riftbound (riftcompare.com),
+  One Piece (opcompare.app) and Pokémon (www.dexcompare.app). The old row linked mtgcompare.app to itself and had no Pokémon site.
+
+## 2026-10-24: Halloween on the landing page, off by itself on 1 November
+
+The owner asked for the site to be Halloween-themed like RiftCompare, reverting automatically afterwards. Ported RiftCompare's
+mechanism (`src/lib/season.ts`): 16-31 October in the VISITOR's local time, decided in the browser by `SEASON_BOOT_SCRIPT`, which
+stamps `data-season="halloween"` on `<html>` before first paint (`?season=halloween|off` previews). The client decides because every
+page is one CDN copy for a day and reads no cookie or header (`tests/cache-ttl.test.ts`); a server date check would switch the theme
+up to a day late. The server only decides whether the season's markup is in the HTML at all (`seasonMarkupLive`, a day of slack
+either side), and CSS hides it outside the attribute, so 1 November needs no deploy; the markup drops out of the HTML on the first
+render after 1 November. Magic flavour, brand kept: an amethyst moonlit sky on the landing hero, cobwebs, bats in the strip above
+the content, candlelit jack-o'-lanterns in the bottom corners, and "Night falls on Innistrad" linking to the US store search for
+Innistrad (the hero form's own GET search, no new data read). Decoration is behind the content, takes no pointer events, sits only
+in the hero's padding and corners on a phone, and reduced motion gets no bats and no flicker. `tests/season.test.ts`. To remove the
+season: delete `HalloweenDecor`, `InnistradComing`, their calls and the `.mc-` CSS block.
+
+## 2026-10-24: Set-reveal posts (Star Trek and Reality Fracture chase cards and Collector Boosters)
+
+Four blog posts in RiftCompare's best-performing format (query-led title, real counts, card list, FAQ): Star Trek chase cards,
+Star Trek Collector Booster contents, Reality Fracture chase cards, Reality Fracture Collector Booster and products. A "chase card"
+is defined by Wizards' own rarity and print-run numbers (mythic rares, Signed Headliners, serialized cards), never a card price: the
+site has no singles data. Card lists are Scryfall's (`src/content/set-reveals.ts`, main-set mythics, images hotlinked unmodified),
+product facts Wizards' Collecting articles; each post ties the cards to the boxes that carry them and shows live sealed prices.
+
+## 2026-10-24: Dark theme by default; blog thumbnails and product tiles
+
+- Dark is the default for a visitor with no saved choice (owner). `lib/theme.ts` `THEME_BOOT_SCRIPT` stamps `data-theme` on
+  `<html>` before first paint from localStorage `mc-theme`; the header's `ThemeToggle` saves the choice. globals.css keys the dark
+  palette on `:root:not([data-theme="light"])`, never `prefers-color-scheme`, so no-JS is dark too and the server reads nothing
+  (pages stay one CDN copy). `tests/theme.test.ts` pins it.
+- /blog cards carry a thumbnail like RiftCompare's: three of the set's mythics (Scryfall's whole-card "normal" images, hotlinked
+  unmodified) for a set post, else the post's own share image. Card grids in posts use the "normal" image (the "small" one blurs).
+- `ByMarket` leads with the site's own `ProductCard` tiles for the US (live price and stock only; nothing invented).
+
+## The landing page, cut short (2026-10-25)
+
+User feedback: the home page was too long. It is now the hero (headline, one line, "Continue to <region>", search), one paragraph on
+how ranking is fair (linking /about), "Most stocked in <region> today" (five products: the newest Play and Collector Booster Boxes
+ordered by in-stock store count, lib/picks.ts, region switcher kept, fixed-size slots) and six hot buttons for that region (Deals,
+Play / Collector Booster Boxes, a set's pre-orders while one is open else Commander decks, Guides, Stores), then the footer.
+Moved, not dropped: the FAQ and its FAQPage JSON-LD, "What we compare", the region/currency notes and the country guide link to
+/about; the market report to each region home (its own region's figures); the guides grid lives on the guides index; "Popular right
+now" became the hot buttons. The landing eBay strip is gone (the page is too short to carry a unit), and /about's eBay list says so.
+
+## 2026-10-25: Measured shipping on the price table, a "Price + shipping" ranking, and a tax line
+
+User feedback: shipping (and tax) differ by country AND by area within one; a store $10 cheaper that charges $20 more to post is not
+cheaper. So:
+- **Measured, never guessed.** `scripts/probe-shipping-rates.ts` (weekly, `.github/workflows/shipping-rates.yml`, one runner per market,
+  3 stores at once, ≥1 s between a store's requests) asks each Shopify store's own storefront for a quote: one item a cart (its
+  cheapest sealed item, then items near 40/80/150/300 in its currency), quoted to 8 AU capitals, 4 NZ cities (both islands), 4 US/UK/CA
+  cities, 4 eurozone capitals and Singapore. Ported from the old singles site's probe, cut down to single items. Output:
+  `src/data/shipping-rates.json`, bundled (no Neon, no runtime fetch); committed WITHOUT `[deploy]`, it rides the next daily release.
+  A store not measured this week keeps its measurement 42 days, then drops out. WooCommerce stores and TCGplayer have no figure.
+- **A row's figure** (`lib/shipping-quote.ts` quoteAt): per address, the measured item at or under the row's price; when the next
+  measured item up was quoted differently (a free-over-$X threshold, a bigger parcel) the address gets the range between; under the
+  store's cheapest measured item: unknown. The row shows the range across addresses ("+ $10.95–$14.95 shipping", "Free shipping",
+  "free at $150"), and "Shipping at checkout" without a measurement.
+- **The ranking rule is unchanged** (price, then stock). "Price + shipping" is the visitor's choice (localStorage, read only in the
+  browser: pages stay CDN-cacheable): open rows with measured shipping by price + cheapest measured shipping, then open rows without
+  one, then the rest. The eBay row's shipping is never compared: in that ranking it sits among the unknown rows and is never the best
+  price. The best-price card stacks its two tops in one cell (no layout shift).
+- **Tax**: one line per region (`RegionInfo.taxNote`): US and CA prices exclude sales tax (state/province, added at checkout); AU, NZ,
+  UK, EU and SG listed prices include GST/VAT. Cross-border duties: one sentence, no numbers (`DUTIES_NOTE`).
+
+## Stock first, and three stock pages (2026-10-25)
+
+Owner's creator feedback: stock matters more than price for Magic boxes (often only at LGS); prices move on select products of
+popular sets; Reality Fracture was out but Star Trek was leading; older product (LTR Collector boxes) is still at stores.
+
+- Cards, the hero's "Hot right now", the latest-set rows, the landing picks and the product page's best-price card lead with stock
+  before price: "In stock at 12 of 15 stores" (`lib/stock.ts stockHeadline`, ProductCard `cardStockLabel`). "of N" is the
+  independent stores that LIST the product, not every store in the region (a store that never carried it is not "sold out" of it).
+  TCGplayer is "+ TCGplayer", never counted. A sold-out product page now says so in the price slot.
+- `/<region>/back-in-stock`: from `data/public/price-history.json`, nothing open in one daily snapshot then open in a later one
+  (last 7 days) and open in the latest. A product's first snapshot is never a return (that is "Newly listed", deals.ts
+  newlyTracked, shown below). A day with more than max(25, 10% of the market) returns is treated as a failed read the day before
+  and dropped. Under 2 days: "Not enough history yet". `copy-rules.ts` keeps "back in stock" banned everywhere except
+  history-built pages and links to them (`findBannedCopy(text, { history: true })`).
+- `/<region>/price-moves`: cheapest in-stock price today vs 7 days ago, both open, at least 10% and 5.00, ratio within x2, only
+  the headline types of popular sets (`popularSetCodes`: released HOT_SETS, the 6 newest released, the 8 most stocked). Empty
+  state until 8 days of snapshots (MTG had 2 on 2026-10-25).
+- `/<region>/out-of-print` ("Older sets in stock"): headline types from sets released 18+ months ago with an independent store in
+  stock, grouped by set, most store stock first. The copy says only "released more than 18 months ago": we do not know print
+  status, and never say anything about future value.
+- "In stock only" on type and set pages is a client toggle (`StockFilter`), ON by default; both lists are in the one cached HTML.
+  The browse grid's existing toggle stays OFF by default: turning it on loads the whole region index on every visit.
+- Featuring is by date (`release.ts featureOrder/featureSort`, `popular.ts hotSetsByFeature/featureRank`): the newest released set
+  leads, the pre-order set second. `hotRank` (the eBay importer's spending order) is unchanged: it is the owner's priority list.
+- sealed-title: a box's own bracketed pack count ("Play Booster Box (30x Packs)") is no longer read as a lot.
+
+## 2026-10-25 — Vercel Web Analytics back on, page views only
+
+**Owner:** "it says zero visitors when there's clearly been visitors." It had been off since 2026-10-22 (cost). Page views are
+counted again (`src/components/VercelPageViews.tsx`, query strings stripped); custom events stay off (`src/lib/track.ts` no-op),
+so the bill is one event per page view. The project's Analytics tab must be enabled in Vercel for the script's data to be kept.
+- 2026-10-25, later: buy clicks too. `src/lib/track.ts` sends `buy_click` (retailer, placement) and drops every other event name;
+  search and share events stay off.
+
+## 2026-10-25: Amazon Australia (Amazon Associates) links
+
+- `src/lib/amazon.ts` builds direct amazon.com.au links: `/dp/<ASIN>?tag=` when `src/data/amazon-asins.json` has the product's slug
+  (filled by hand, never guessed), else `/s?k=<searchTerms(name), "MTG " prefixed when it lacks MTG/Magic>&tag=`. The tag is
+  `AMAZON_AU_TAG` read on the server (default `compareempire-22`); no NEXT_PUBLIC variable. rel is exactly
+  `sponsored nofollow noopener` (owner spec; the eBay/TCGplayer REL_SPONSORED keeps noreferrer).
+- Shown in AU, NZ and SG only ("Amazon Australia (ships to NZ)" with "may ship…; check delivery"), never US/UK/CA/EU. A marketplace
+  link with no Amazon price, rating or stock: never a store, never in the offer table, never best price. Product page: its own card
+  after the marketplaces; type, set and deals pages: one "Also check Amazon AU" line; the two AU guides: a column per product row.
+- Clicks go through OutboundLink: Vercel gets buy_click (retailer "Amazon AU", `amazon-*` placements), GA4 also gets
+  `amazon_click {product, region, page}`. No new Vercel event names.
+- The footer carries "As an Amazon Associate I earn from qualifying purchases." and links `/affiliate-disclosure` on every page;
+  `/about#money` now says three kinds of affiliate links.
+- The two new guides are AU-only (their titles name Australia). "Best" Commander precons means only what our data shows: cheapest in
+  stock, and stocked by the most stores.
+
+## 2026-10-26 — SEO audit fixes
+
+- Product titles keep the region (its code when long: "…price, AU") and the product type, and shorten the set name to its code
+  or keep the name's last words before cutting what tells siblings apart; Secret Lair drops lead with the drop's own words. Over the
+  catalogue × 7 regions, colliding titles fell from 2,773 to 245 (mostly duplicate products the next import merges).
+- The classifier ignores store notes that had split one product into two pages: purchase limits ("One per customer", "Limit
+  One" — "Limit Break VII" stays a deck name), dates ("Nov 6th"), "delayed until".
+- The Organization JSON-LD names a mailbox only when NEXT_PUBLIC_CONTACT_EMAIL is set (the fallback is another brand's).
+- Workflows read the canonical origin from the SITE_URL repository variable, so moving to www is configuration, not code.
+
+## 2026-10-26: Star Trek classifier cleanup and the "Coming soon" block
+
+- The Star Trek catalogue had 70 products for about 26 real ones. `identify()` now drops release-date notes before the signature
+  ("(VVK - 06.11.2026)", "Vorverkauf", dd.mm.yyyy, "(Approx …)", "(Available …)", "(Delays Expected)", "Release Date: …"). It also
+  drops a set's own code ("Star Trek TRK Commander Deck", "SOS Commander Deck - …"), "Fat Pack"/"special" in a special bundle's name,
+  and two store spellings ("Divergent Timelines", "We Are The Bog"). A Commander deck or Scene Box sold as "Assorted"/"random"/"ea."
+  names no product, so it is refused. A "(DE/EN)" bilingual print counts as foreign. "1 of each", "set of all", "display of N" and
+  "Commander Deck Set" mean the set's commander-deck-set. A BARE "Carton" is refused: one US store prices its Star Trek "Commander
+  Deck Carton" at $69.99, one deck's price. Prerelease EVENTS (a weekday, a time, "event") are refused, but "1 per event" is a
+  purchase limit. "Rare/Uncommon/Mythic Bundle" are store lots of singles. "Fat Pack Bundle: Gift Edition" is the Gift Bundle.
+- Across all of offers.json this changes 37 Star Trek titles and 168 others. The others are the same rules applied to older sets,
+  mostly set-code merges and assorted, event or carton refusals. No two different products merged in the before/after review.
+- `setOfferGroups`' product cap went from 30 to 60: Star Trek had 36 products in CA, and the cap (with no order) silently dropped some
+  from the pre-order hub.
+- The "Coming soon" block (`lib/coming-soon.ts`, `components/ComingSoon.tsx`) covers the next set by sets.ts dates, not by name. For
+  each headline product it shows the cheapest open STORE pre-order (never TCGplayer) and the number of stores taking pre-orders, with
+  US MSRP only from rrp.ts. It is hidden from release day. On the landing page it sits between the hero and "Most stocked". All seven
+  regions are computed on the server and the visitor's suggested region is picked with no fetch, at a fixed height. The region
+  homes show it where the PreorderBanner was. Because it links the hub, the landing page's hot buttons keep their Commander decks
+  button.
+
+## 2026-10-26: eBay and TCGplayer pinned at the top of the price table, as ordinary rows
+
+- The owner: eBay and TCGplayer earn the affiliate money, so their rows should blend in with the store rows ("literally just a button
+  that's a different colour"), eBay at the very top, TCGplayer second, then the stores cheapest first. This reverses 2026-10-24's
+  "marketplaces after the store rows" and 2026-10-11's eBay row ranked by price among the stores.
+- Every row has the store rows' grid (`OfferRows.tsx` ROW_GRID). The eBay row lost its sponsored tint, blue edge and thumbnail; it keeps
+  the small "Ad" label and the affiliate note. Four buttons tell the rows apart: eBay blue (`.btn-ad`), TCGplayer ink (`.btn-tcg`), the
+  cheapest store red (`.btn-primary`), the other stores soft.
+- The cheapest row of the whole table is tinted and says "Best price", whichever it is. eBay qualifies under the old rule (a new listing in
+  the stores' currency, not a pre-order). TCGplayer qualifies only where its price is in the region's currency (the US). When either wins,
+  the cheapest store keeps its red button and reads "Best store price". Under "Price + shipping" only the stores re-rank and only a store
+  can be the best price, because eBay's and TCGplayer's shipping are not measured.
+- Outside the US, TCGplayer's row is its US$ offer (usMarketplace) or a TCGplayer search. It is labelled US$ and never compared.
+- The in-stock page's Marketplaces panel under the table is gone, since it repeated both rows. The sold-out callout stays. The best-price
+  card is unchanged.
+
+## One family of sites — 2026-10-26
+
+Owner, after the strategy review: "execute on all the recommended items". One of
+them: one family of sites people recognise, without moving any domain. The
+footer's sister-sites block now names the Compare Empire family, and every live
+sister site is in it (Gundam Compare and Lorcana Compare joined MTG Compare's and
+DexCompare's lists the same day). YGO Compare joins once it is public.
+
+## 2026-10-27: a new mark (five colour orbs)
+
+The two-rhombus mark read as nothing in a browser tab and on Vercel's dashboard. The new mark is five orbs in Magic's five colours
+in colour-pie order on a brass ring, with a spark in the middle, on the same night-purple tile (`LogoMark`, `src/app/icon.svg`,
+`public/logo.svg`, the PNG icons, and a 16/32/48 `src/app/favicon.ico`, which Vercel's dashboard and some crawlers ask for first).
+It stays an original abstract mark: no mana symbol, no Planeswalker symbol, no Wizards of the Coast logo.
+
+## 2026-10-27: every site links the whole family
+
+The owner, once YGO Compare existed: "our website should all have all of our
+compare websites now in the suite of websites … just try to backlink all of
+it." Every site's footer now links the other eight: RiftCompare, OP Compare,
+DexCompare, MTG Compare, Gundam Compare, Lorcana Compare, YGO Compare
+(ygocompare.com), CamCompare (www.camcompare.app) and Compare Empire
+(www.compareempire.com, Australian tech prices), each on the host it already
+uses (no apex or www change). Plain followed links, never sponsored: they are
+our own sites. The link text says what each compares ("Yu-Gi-Oh! card prices",
+"Camera and lens prices"), with the site's name after it, rather than the
+brand alone. MTG Compare is sealed-only since 2026-10-21, so its anchor now
+says "Magic: The Gathering sealed prices" everywhere.
+
+Footer only. In-page blocks ("Compare other TCGs" on card and product pages,
+the article blocks) keep to card games, and the two sites that are not card
+games are labelled as the wider family, so nine look-alike sites linked from
+every page body never read as a link network.
+
+This supersedes "YGO Compare joins once it is public" above. The footer
+heading is now "More price comparison · the Compare Empire family".
+
+## One family page and "Searching another game?" instead of a hub domain — 2026-10-28
+
+The owner asked whether a separate hub site (tcgcompare.app or "TCG Empire")
+should proxy all the compare sites to win generic queries like "compare TCG
+card prices". Not built. A proxy that shows the same card pages would copy
+the sister sites and split their rankings (the split-query problem fixed on
+RiftCompare the day before). A link-only hub on a new domain has no authority
+and no card pages to rank with. TCGPriceEmpire, a full multi-game site, was
+built once and never launched (archived in CompareEmpire on 2026-10-27).
+Buying the domain is the owner's call and is on hold.
+
+What shipped instead, at no cost:
+
+- **"Searching another game?"** Under a search on each of the seven
+  card-game sites, a line links the same words to every other card-game site's
+  own search (its SearchAction target). Someone typing "Charizard" on
+  RiftCompare is pointed to DexCompare instead of a dead end. These are search
+  links, so they're `nofollow`: a results page is noindex everywhere. Nothing
+  is fetched from the other sites.
+- **One `/tcg-price-comparison` page, on RiftCompare only.** It lists every
+  game we compare, has a search box that sends the words to that game's site,
+  and is linked from RiftCompare's "Compare other TCGs" footer heading. One page
+  on the strongest domain, never a copy per site, so the family never competes
+  with itself for the generic query.
+
+## DexCompare's indexing round and "All sealed" menu, ported — 2026-10-28
+
+The owner wants MTG Compare to earn like DexCompare. The two run the same code
+(MTG was ported from Dex on 2026-10-21), and MTG's catalogue is no smaller where
+it counts: 383 stores to Dex's 390, and more in-stock US and Canadian offers.
+What MTG missed is the work Dex got after the port. Two pieces of it are
+brought over here:
+
+- **Index tiers** (`src/lib/index-tiers.ts`). The sitemap listed every
+  comparable product, 5,616 regional product pages, most of them one store's
+  listing inside our template. On Dex that same shape got 5,332 URLs "Crawled,
+  currently not indexed" and 194 indexed. Now one rule decides both the
+  sitemap and the robots tag: *strong* pages (two or more stores in stock, one
+  in stock of three listing, or a headline format that three list) are in the
+  sitemap; *thin* pages (fewer than two listings) are noindex; the rest are
+  indexable but left out of the sitemap. On today's data that's 2,738 strong,
+  1,143 middle, 3,390 thin. The headline formats are `MOVE_TYPES` (play,
+  collector, draft and set booster boxes, bundles, Commander decks). Set and
+  type pages are listed from three comparable products, and an empty one is
+  now a real 404 instead of an empty 200. Deals, cheapest per pack and price
+  moves are noindex and out of the sitemap when thin (`lib/section-thin.ts`).
+  The region switcher's links to another region's deep pages are nofollow.
+  Product pages get "Questions about …", answered only from the page's own
+  data (`lib/product-faq.ts`), and the region home lists every set and type it
+  carries, so every set page is two clicks from it.
+- **The desktop "All sealed" dropdown** (`components/ShopMenu.tsx`, Dex
+  CompareEmpire #68): by product, by set (newest released first, a pre-order
+  labelled), by value. It's CSS only, made of plain links, with no new page
+  and no extra read.
+
+Left out on purpose: Dex's apex/www host rules (MTG has always been served
+from the apex) and its Japanese section.
+
+## 266 more stores, from the sister sites' registries — 2026-10-28
+
+Every store DexCompare, OP Compare, RiftCompare and the Gundam, Lorcana and YGO
+sites list that MTG Compare didn't (610 of them) went through
+`scripts/probe-stores.ts` in GitHub Actions: right currency, a public feed,
+and three or more products that `identify()` accepts as Magic sealed. 266
+passed, which takes the registry from 383 stores to 649 (AU 88, CA 170, EU 43,
+NZ 13, SG 12, UK 83, US 240).
+
+The probe's fallback collection list was still DexCompare's Pokémon handles
+(`pokemon-sealed`, `pokemon`…), so a store whose sitemap named no Magic
+collection was read for Pokémon and found nothing. It now tries the common
+Magic handles first (`magic-the-gathering`, `mtg-sealed`…). That one change
+found 146 of the 266.
+
+Left out on purpose: five storefronts that are the same shop as one already
+listed (derpycards.ca, the Card Caster and Plenty of Games myshopify hosts,
+board-game.co.uk for Zatu, and nortontcg.co.uk, which carries the same 115
+products as The TCG Group). The same stock under two names would count as two
+stores. The new stores show "Shipping at checkout" until the weekly shipping
+probe measures them.
+
+## A TCGplayer strip of real sealed products — 2026-10-28
+
+**Owner:** "more TCGplayer ads and more eBay ads … with the actual cards there",
+on every site but RiftCompare. The eBay side already has its image strips
+(EbayStrip); TCGplayer had only rows and text search links.
+
+* `TcgplayerStrip` (server-rendered, `lib/data.ts tcgplayerTiles`): real sealed
+  products with their photo and TCGplayer's own in-stock price, each linking to
+  the product on TCGplayer through the Impact deep link, plus a "Shop
+  TCGplayer" tile. Labelled Ad, disclosed under it, no pop-up.
+* Placements `tcgplayer-strip-home` (region home, after the second box rail),
+  `tcgplayer-strip-set` (after a set page's products) and
+  `tcgplayer-strip-product` (after "More from <set>"): always below a page's
+  comparison, never between a buyer and a price.
+* Tiles: the newest sets first, headline types first, at most three per set
+  site-wide; a set or product page shows its set's own, topped up with the
+  newest sets'. The read is scoped to TCGplayer and to one set or the ten newest
+  (the egress guard flagged the unscoped one at 0.7 MB).
+* Outside the US the price stays US$ and the strip says "The US marketplace".
+  TCGplayer Direct reached Australia on 2026-10-07 for singles only, so nothing
+  claims sealed ships there.
+
+## Navigation from the first page: no region step, a sidebar, a full phone menu — 2026-10-28
+
+**Owner:** the "Continue to Australia" button before any navigation was a
+barrier; the wide desktop's left side was empty; the phone menu on the landing
+page listed only regions.
+
+* The pages with no region of their own (`/`, About, the blog, the legal pages,
+  404s) draw the whole header now: sections, the "All sealed" dropdown, search
+  and the region button. The server's HTML is built for the default region (the
+  US, one CDN copy, no cookie or header read); the browser moves every link to
+  the visitor's region (`useSoftRegion`: saved, language, time zone, then
+  `/api/geo`, as before). Never a redirect: `/` stays the x-default landing page
+  with its own canonical and hreflang.
+* A region picked on such a page (header, phone menu, the landing grid's chips)
+  switches the whole page in place (`pickRegion`) and is remembered; the links
+  still go to each region's home without script.
+* The hero's "Continue to <region>" button became five shortcuts (Play booster
+  boxes, Collector boxes, Commander decks, Bundles, Deals) in the visitor's
+  region.
+* From xl (1280px) a sticky sidebar (`components/SideNav.tsx`) lists every
+  product type, the eight newest sets, the deal pages and the rest
+  (`lib/nav.ts navGroups`); the shell widens to 1480px so the page keeps its
+  1200px. The phone menu draws the same groups, then the regions. Static links
+  only: no read, no page that doesn't exist. Region pages never run the
+  suggestion (it would cost a `/api/geo` call per view).
+
+## Store audit: 165 stores added, 5 dead ones out — 2026-10-28
+
+**Owner:** check every site's store health and make sure the latest stores
+are on it.
+
+* **Health.** The stores that stopped reading were re-probed. Five are gone
+  (no public feed any more, or no Magic sealed left): More Than Meeples, TCG
+  Company, The Haven Tabletop, Celly Sports, Remi Card Trader. Screen Free
+  Games and Nutmeg Games read again from their main Magic collection. Obsession
+  Gaming and Kuma Cards started blocking on 2026-10-27 on every sister site and
+  stay for now, in case it is temporary.
+* **New stores (649 → 809)** come from the official Riftbound store
+  registry's Shopify and WooCommerce game stores, probed from a GitHub runner in
+  each market with the real `identify()`: added only with 3+ Magic sealed
+  products, at least one in stock, prices in the market's currency, and not a
+  second address or name of a store already listed. A store readable only
+  through a "new arrivals" collection is left out: it would drop products as
+  they age off the page.
+* Postage for the new stores comes with the weekly shipping run; until then
+  their rows say "Shipping at checkout".
+
+## Small eBay + TCGplayer pair on product pages, TCGplayer on every page (2026-10-29)
+
+Owner: the eBay and TCGplayer image strips should also show "near the top, but much smaller so it's not intrusive" on product pages, and on every other page (pre-orders, lists…). Two additions:
+- `MiniSealedAds` (EbayStrip.tsx), under a product page's best price: one slim box with 56px tiles in two rows. The eBay row is the product's own listings through the same `useListings` request its strip makes, so no extra fetch. The TCGplayer row is the set's products, the same tiles as the strip further down. Every height is fixed (CLS 0), and an eBay row with nothing to list keeps its height as a search link. Placements `listings-product-mini` and `tcgplayer-strip-mini`.
+- `PreFooterTcgplayer`, the TCGplayer strip beside the eBay pre-footer strip on every region page without one of its own (the home, product and set pages have one). It reads `tcgplayerTiles()` in the region layout at request time (files mode, never at build). Placement `tcgplayer-strip-footer`.
+
+The eBay pre-footer strip already covered every page.
+
+## L'Atelier TCG listed in Canada, its second storefront left out (2026-10-29)
+
+L'Atelier TCG (Laval, QC) asked by email to be listed on MTG Compare. It runs its own platform but serves Shopify's
+feed format for its whole catalogue at `/products.json` (1,716 products on 2026-10-29, every game, CAD, 356 of them
+Magic sealed), so the collection handle `"*"` now means that whole feed, read strictly like any non-Magic collection,
+and a feed `url` on the store's origin replaces Shopify's `/products/<handle>` (ported from DexCompare, where the same
+store has been listed since 2026-10-26). It also asked for its second storefront, CCC (ccctcg.ca, Dorval): every one
+of its 284 products is one of L'Atelier's, at the same price and availability, so it stays out. One stock shown as two
+stores would mislead buyers and inflate the store count.
+
+## One eBay campaign for every Compare site, hard-coded — 2026-10-30
+
+**Decided (owner).** Every Compare site now sends eBay clicks to ONE EPN campaign, 5339155912 (RiftCompare's,
+already set up), hard-coded in the code: no variable overrides it any more, so a forgotten secret or Vercel
+value can't split the sites again. The sites are told apart by the `customid` prefix alone, which comes first
+in every tag; this site's is `mtg-<region>`. The importer enforces the same id on every stored listing URL.
+Replaced: 5339155911 (WargameCompare, FigureCompare, Compare Empire, K Young), 5339231473 (Lorcana),
+5339231474 (Gundam), 5339234013 (YGO). Old secrets/variables (`EBAY_AFFILIATE_CAMPAIGN`,
+`NEXT_PUBLIC_EBAY_CAMPAIGN_ID`, `EBAY_CAMPAIGN_ID`) are no longer read and can be deleted.
+
+## A creators page, starting with Kevin Lepage — 2026-10-30
+
+The owner asked for a creators section like RiftCompare's, with Kevin Lepage (@kevin_altered_mtg, altered-card illustrator) as
+the first. `/creators` lists the creators in `src/lib/creators.ts` (a hand-edited array: no database, no form, no account, since this
+site has none), the newest as a big spotlight, and the homepage carries one compact strip into it under the hero's paragraph
+(`components/home/CreatorsTeaser.tsx`), as RiftCompare's homepage does. The page reads no data, so it is prerendered at build like
+`/about`; it is in the sitemap, the footer and the sidebar's "More". `/creators` used to 301 to `/about` (an old singles-site page);
+that rule is gone and `/creators/<anything>` now goes to the hub, which is why photos live in `public/img/creators/`, not
+`public/creators/` (the redirect would catch them). Creator links are followed and keep the referrer (`rel="noopener"`): showing a
+creator that we send them visitors is the deal. Only links the creator shows publicly: his Facebook ("Kevin Altered") is left out
+until we have its URL. Unlike RiftCompare there is no tip button or creator code (no Pro here); "get featured" is an email.
+
+## 2026-10-30: quick view on every product card (from K Young)
+
+Owner: "I really like the kaeyoung quick view pop ups, can we do that for dexcompare, mtgcompare and all the other sites".
+A plain click on a product card now opens K Young's quick view at once with what the card shows (photo, type, name),
+then the product page's own price rows load from `/api/quick/<region>/<slug>`: a function response Vercel's CDN keeps
+for a day like every page (the data only changes with a release), fetched ahead when a mouse rests on a card. The rows
+come from `offerRowsData()`, the function `OfferTable` itself now uses, and are drawn by the table's own
+`OfferRowsWithEbay`, so the quick view cannot disagree with the page: eBay first, then TCGplayer and Amazon, then the
+stores, the eBay row fetched exactly as on the page. Store buttons carry the new `quickview-table` placement. The card
+is still a real link, so crawlers, new tabs and modified clicks reach the product page, whose server HTML keeps every
+price.
+
+## 2026-10-31: wrong-price reports and store suggestions go to a private GitHub repo
+
+**Owner:** "for all of these websites … we must have the ability to report any prices that are wrong, for users to
+suggest a store … it's just stored within the GitHub … a daily job that checks for that."
+
+* Every Compare Empire site now has the same two forms: **Report a wrong price** (a quiet link under the price table
+  that opens in place, never a pop-up) and **Suggest a store**. Both POST to `/api/report`
+  (`src/lib/reports-github.ts`, `src/components/ReportForms.tsx`: the same two files in every site repo).
+* They are filed in ONE **private** repository, `Specifxx/compare-reports`: one new JSON file per report at
+  `inbox/<site>/<day>/…json`, created through GitHub's contents API with `REPORTS_GITHUB_TOKEN` (a fine-grained token
+  with Contents read/write on that repo only, Vercel only). Private because the site repos are public and a note is a
+  stranger's free text; the K Young reviews branch is public because reviews are meant to be read.
+* Nothing about the visitor is stored: no email field, no IP, no hash of one (the per-visitor limit, 6 an hour, lives
+  in the function's memory), and email addresses, IP addresses and phone-like numbers in a note are blanked before
+  the write. A honeypot field swallows bots.
+* Each write creates a new file (no read, no sha), so reports never race, and the commit subject never carries
+  `[deploy]`/`[preview]`. The route is POST only: no page view or crawler runs it, so it costs nothing at rest.
+* A daily job in that repo (`triage.yml`) keeps one issue per site listing what is still open, flags repeat
+  reports of the same product and store, and warns before the token expires. A handled report is moved to
+  `done/<site>/`. Until the token is set the route answers 503 and the form says to email the site's address.
+
+## Visitor reports live on each site's own `reports` branch, not a private repo — 2026-10-31
+
+**Owner:** "we don't need a private repo for this … just build it into each site … inside the public GitHub, it's
+fine. As long as it's not reflected on the front end." This replaces the private `Specifxx/compare-reports` repo
+of the entry before it; everything else in that entry (the forms, no email/IP, redaction, new file per report,
+POST only, 503 until the token is set) still holds.
+
+* Each site writes its reports to **its own repo**, on an orphan branch named `reports` (`SITE_REPOS` in
+  `src/lib/reports-github.ts`): `inbox/<site>/<day>/…json`, moved to `done/<site>/…` once handled. The branch is
+  never merged into `main` and never deploys: `git.deploymentEnabled.reports = false` in `main`'s `vercel.json`
+  (pinned by `tests/reports-github.test.ts`) and the branch's own `vercel.json` turns deploys off as well.
+* Nothing on any site reads the branch, so no report ever shows on a page. The branch is public with the source,
+  which is why nothing about the visitor is stored and notes are redacted before the write.
+* One token, `REPORTS_GITHUB_TOKEN` (fine-grained, Contents read/write on the twelve site repos only), set in each
+  Vercel project for Production.
+* The daily triage moved to RiftCompare (`Specifxx/TCGEmpire`): `.github/workflows/reports-triage.yml` reads all
+  twelve `reports` branches through the API and keeps one issue per site there, plus a once-a-day "Reports digest"
+  comment. Those issues are public, so they link to each report's file and never quote a note. It fails (and
+  GitHub emails the owner) when a site has no `reports` branch, or the token stops working or expires within 14
+  days (checked only when the token is also a TCGEmpire Actions secret). The ops monitor's job list watches it.
+
+## 2026-10-31 — Every product link opens the quick view
+
+Owner, 2026-10-31: "Whenever I click on any item … I want a quick view open like K Young." Only `ProductCard` carried
+`data-qv`, so the home page's lists, tables, set pages, deals rows and guides went straight to the product page (72 of
+the 104 product links on `/us`). `QuickView.tsx` now opens for any plain click on a link to `/<region>/p/<slug>`: a
+card's `data-qv` attributes when present, else the region and slug read from the href, with the link's own photo and
+text until `/api/quick` answers (it now also returns `name`, `sub` and `img`). Links inside the quick view and on the
+product's own page navigate as before; modified, middle and new-tab clicks follow the link, so the pages stay crawlable.
+
+
+## 2026-10-31 — TCG Synergy is banned, and banned stores stay out
+
+The owner reported TCG Synergy (tcgsynergy.myshopify.com, a CA Shopify store first added by the 2026-10-28 store audit)
+as a scam site. It is removed from `src/data/stores.json` and `src/data/shipping-rates.json`, and named in
+`src/lib/blocked-stores.ts`, which every path that could bring it back now checks: `STORES` drops a banned entry even if
+it reappears in the registry, `scripts/probe-stores.ts` and `scripts/registry-from-probe.ts` skip it, and the file store
+(`lib/public-data/store.ts`) drops its offers and store stats from a data export made before the ban, so it disappears
+with the next release rather than waiting for an import to delete the rows. Matching is on the key, name or any part of
+the host with punctuation removed, so a custom domain in front of the same shop is caught too
+(`tests/blocked-stores.test.ts`). To ban another store, add its key to `BLOCKED_STORES`.
+
+## eBay: local sellers and stated postage only (2026-10-31)
+
+A WargameCompare visitor's feedback (the owner passed it on for every sister site): eBay rows from overseas sellers carried postage
+that made "a lot of wasted clicks". The Browse search now asks for items located in the marketplace's own country
+(`itemLocationCountry`; eBay Germany, which stands for the EU, keeps every EU seller and the importer drops the rest,
+`localSeller`), sends the buyer's country and a central postcode as `contextualLocation` so eBay quotes real postage, and
+`baseItem` keeps no listing whose postage eBay does not state. The product's eBay row is the cheapest listing delivered (item +
+postage, `pickListing`), still shown at its item price with the postage beside it, as before. NZ and SG keep the AU and US feeds.
+Rows stored before this age out with the next import.
+
+## Christmas theme: 1 November to Boxing Day (2026-11-01)
+
+Owner, 2026-11-01: every Compare site gets a Christmas theme after the Halloween one, each its own take. Snow over the home hero, corner trees, gifts and a candy cane, a Santa hat on the logo, and a pill to booster boxes, bundles and Commander decks, cheapest first.
+
+The season window is fixed in `src/lib/season.ts`: 1 November to 26 December, every year, by the visitor's own
+date, stamped on `<html data-season>` by an inline boot script before first paint. `?season=christmas` previews it out
+of season and `?season=off` hides it in season. Every decoration is CSS-gated on that attribute, `aria-hidden`,
+`pointer-events: none`, painted under the content (never over a price or a button), animated with `transform`
+only, and stopped under `prefers-reduced-motion`. The page's content and links stay in the server HTML; the season
+adds no request, no script beyond the boot line and no database or data read. The shared rules sit between
+`xmas-common:start` and `xmas-common:end` in `globals.css` (identical on every sister site); this site's colours sit in
+the `xmas-site` block after it. Art is eight small SVGs in `public/xmas/`. To end it early, move the `to` date; after
+Boxing Day it switches itself off.
+
+## 2026-11-01 — Regional homepages lead with "MTG <region>"; no singles page for "shock lands price"
+
+Search Console (90 days to 29 Oct): "mtg nz" and "magic the gathering nz" reach `/nz` and `/nz/releases` at positions
+36–67 under "MTG booster box prices in New Zealand". Region homepages outside the US now lead with the words people type
+("MTG NZ: Magic booster box & sealed prices, N stores"; Australia, Canada, Europe and Singapore spelled out, as searched).
+The US title is unchanged. "shock lands mtg price" still shows the old singles URL `/cards/name/shock` (301'd) at position
+80+; it is a singles query and this site is sealed-only since 2026-10-21, so no page is built for it.
+
+## 2026-11-01: A beta community forum, no accounts, posts in this repo
+
+The owner asked for "user forums ... you don't need to be able to sign in ...
+put your name down ... it'll save your name ... all of this is public data ...
+keep it within each website's repository", on every site, to give the sites a
+reason to come back that search rankings alone don't. `/forum` (docs/forum.md):
+
+- **Storage:** `forum.json` on this repo's public orphan branch `forum`
+  (never deployed: its own vercel.json, plus `deploymentEnabled.forum: false`
+  here). Written only by `POST /api/forum` with the visitor-reports token;
+  a write reads the file's sha and retries when two posts race.
+- **Cost:** pages read the file from raw.githubusercontent.com inside their
+  normal cache life, never per visit; the browser fetches the newest copy from
+  GitHub directly, so a new post shows in minutes with no deploy, no function
+  and no database. Rebuilding pages for posts would have meant a build per post.
+- **Spam:** honeypot, a 2.5 s minimum on the form, per-visitor limits (4 per
+  10 min, 20 a day, 4 threads a day) and a per-instance cap, all in memory; no
+  IP, email or hash is stored, and emails/IPs/phone numbers in posts are
+  blanked. Links to other sites and slurs or strong profanity are HELD (filed
+  under `held/` and flagged in the daily reports triage), never published.
+- **Not dead when empty:** the site's topics with a line and a few prompts;
+  never an invented post.
+- **SEO:** threads are in the server HTML; a thread is noindex until it has a
+  reply, the forum page until any thread has one; indexed threads carry
+  DiscussionForumPosting JSON-LD.
+- **Moderation:** the owner asks Claude; a post is removed by an edit to
+  `forum.json` (`removeFromForum` in `src/lib/forum/core.ts`).
+
+## 2026-11-01: Creators, "How to work with us"
+
+Creators kept asking the owner how we'd like the site promoted, so /creators
+now answers it in a "How to work with us" section (`#work-with-us`). Owner's
+terms: flexible, low expectations, no contract, script or quota; any one of
+three is plenty: link the site (plus their creator code where the site has
+codes, RiftCompare only), a shout-out in their normal content, or a
+walkthrough/review of the site. They call us their **partner**, never
+"sponsor": we don't pay them for a mention. On our own pages they stay
+"featured creators" ("partners" here still means affiliate links). The
+section asks them to say it's a partnership (FTC/ASA), lightly. The
+owner's ready-to-send replies live in the project's creators playbook, not
+in the repo.
+
+## 2026-11-01 — Visitors land on their own region's pages
+
+Owner, 2026-11-01: "the default region is the region that the visitor is located in. And if they can't determine it,
+then the default should be the US." The region-less pages already followed the visitor (RegionSuggest, US in the
+server HTML), but a regional page kept whoever arrived on it: an American who clicked an /au result stayed on AUD.
+
+`REGION_BOOT_SCRIPT` (`lib/region-boot.ts`, inline in the root layout, before paint) now moves a person, never a crawler,
+link preview or audit tool, from a regional page of another region to the same page in theirs, through the page's own
+hreflang alternate (a page with no copy there stays). Their region is the one they last browsed (`mtg-region`, kept by
+RegionSwitcher), else their time zone's, else the US. `<main>` is hidden for at most 1.5 s while it decides. No request,
+no cookie: still one CDN copy per page, and every regional page stays indexable as itself.
+
+## 2026-11-01 — A beginners guide, not another gifts or product-types page
+
+Bill asked for one or two new guides per site. MTG's guides already own gifts
+(`magic-sealed-gifts-under-50`), product types and per-set prices, so the new
+one answers a query none of them targets: "best Magic product for beginners"
+(`best-magic-product-for-beginners`): which first product suits which new
+player, with the region's cheapest open Starter Kits, Commander decks and Play
+Booster packs today. It links the type hubs and the existing guides instead of
+repeating them, and makes no contents claim beyond the ones already used.
+
+
+## Contact address: compareempire@gmail.com, in the footer — 2026-11-01
+
+The owner: "the sites that they don't [have their own email], just use compareempire@gmail.com", and contact info
+"really clear on all of our websites". `CONTACT_EMAIL` falls back to the Compare Empire family inbox instead of
+riftcompare@gmail.com (another brand's), and the footer now shows it as a mailto beside the Contact link on every
+page (this reverses "no mailto in the footer", which existed only to keep the other brand's address out of the chrome).
+`NEXT_PUBLIC_CONTACT_EMAIL` still overrides it. No form and no mail service.
+## 2026-11-01: eBay and Amazon rows look like the other price rows
+
+The owner: "the ebay and amazon links should blend in and look exactly the same as the other price rows … reflect that
+change on the other sites that require it." Paid marketplace rows (eBay, Amazon, and TCGplayer where it is pinned) keep
+their place and their "Ad"/paid-link label, but lose their brand tints and brand-coloured buttons: they use the same row
+and the same button as a store. They are still never counted as a store and never re-ranked by commission. This
+reverses the 2026-10-30 "bright, catchy colour" pinned rows; eBay ad strips and panels outside the price rows keep
+their own look.
+
+## 2026-11-02 — Free price widgets
+
+`/widgets/p/<slug>?region=` is a live sealed price badge any blog, newsletter or store can put in an `<iframe>`: the
+cheapest in-stock independent store price in the region (never a marketplace) and how many stores have it. It reads
+only the public data files through `productPage`, is noindex, and is kept a day by the CDN like every data page.
+Only `/widgets/:path+` may be framed. `/widgets` shows the snippet (iframe plus one plain text link, the part search
+engines credit) with a real in-stock box, and a plain-HTML store badge. The daily outreach offers the widget instead
+of asking for a link (owner, 2026-11-02: growth must be passive). RiftCompare and the engine sites have the same at `/embed`; here `/embed` is taken by the retired singles site's redirect (old embeds on other sites still land on `/us/sealed`), so the widgets live at `/widgets`.
+
+
+## 2026-11-02 — Every set in the set list gets a pre-order page, guide or not
+
+Pre-order landings were the family's top pages in October, but here a set had one only when a session had written its
+`PreorderGuide` (sourced facts) in `src/lib/preorder-guides.ts`. Now a set in `src/lib/sets.ts` without a guide gets
+`/<region>/preorders/<slug>` from `blankGuide`: the set's name and dates, every store's price list and the generic FAQ,
+and nothing a source would have to back (no contents, prerelease, card count or sources line; those sections hide).
+Adding the next set to `sets.ts`, which the importer needs anyway, is the whole job; a guide written later fills the
+same page. `openPreorderGuides` (nav, header banner, homepage, sitemap) lists every unreleased set. A guide-less page
+stays up for 45 days after release (noindexed, saying the set is out, as before) and then 308s to the set page.
+
+## 2026-11-02 — Seasonal sale pages
+
+`/<region>/boxing-day`, `/<region>/january-sales` and `/<region>/lunar-new-year` (owner-approved growth plan,
+2026-11-02): one URL per region, kept every year like `/<region>/black-friday`, built weeks ahead so they are
+indexed before the day. One component (`src/components/SaleSeasonPage.tsx`) with exactly the Black Friday
+page's rows: furthest under the median of the region's stores, under their own 30-day typical price, and in
+the US under MSRP. Every region has its own copy, so nothing is region-locked; the intro states where the day
+is a sale day (Boxing Day: Australia, New Zealand, the UK and Canada) as a fact, not as the page's market.
+Dates, the year a page is about (it rolls over a week after the event) and the copy are pure in
+`src/lib/sale-seasons.ts`, checked against BANNED_COPY in `tests/sale-seasons.test.ts`; Lunar New Year is a
+published-date table to 2040 (6 February 2027). Footer and sitemap always; the region home shows a card from
+a few weeks before each event. Never a "was" price, a countdown or an invented sale.
+
+## 2026-11-02 — Price alerts through RiftCompare's shared service
+
+The owner chose "Yes, one shared service" for email price alerts on the sister sites. The site still has no accounts,
+no database read from a page and no mail key; the product page gains an "Email me when the price drops" form.
+
+- **The form** (`components/PriceAlertForm.tsx`, the same file on every sister site) posts
+  `{site, productId, region, email, targetCents}` straight to `https://riftcompare.com/api/sister-alerts`.
+  RiftCompare keeps the address (its own Neon project, private tables), sends one confirmation email (double opt-in)
+  and checks daily. This site stores nothing and holds no key.
+- **The prices** come from this site's own static `/alert-feed.json` (`lib/alert-feed.ts`, `force-static`, built with
+  each release from `data/public/products.json` and `product-stats.json`): each product's `lowestPriceCents` per
+  market (the cheapest open offer, TCGplayer included in the US, never eBay, never converted), with `u` =
+  `/{r}/p/<slug>` (the service fills in the region), plus up to three of the site's own deals per market (the
+  `isDeal` bar, re-stated in `feedIsDeal` because `deals.ts` reaches the database layer and this file is prerendered;
+  a test pins them equal). Another site's alert email of the same group may end with one of them.
+- The privacy page says what the form sends and links to RiftCompare's. RiftCompare's `sister-alerts.yml` fails (and
+  its ops monitor reports it) when a site with alerts serves no fresh feed.
+
+## 2026-11-02 — Share buttons
+
+The owner wants word of mouth to be a big growth driver on every site (RiftCompare's DECISIONS has the twelve-site
+entry). The product page's Share button (already the phone's share sheet, else a copied link) now sends a message
+with the real price gap in that region (`lib/share-link.ts` `priceGap`: cheapest and dearest in-stock store, never
+converted, TCGplayer left out), and the quick view has the same button (`/api/quick` returns the message). When a
+region shows a gap, the product's og:image is `/og/p/<region>/<slug>`, a share card drawing it; it is a plain
+function kept by Vercel's CDN for a day, never ISR, nothing prerendered, so only shared links cost a render. Every
+shared link carries `utm_source=share&utm_medium=<product|set>`. `share` and `share_visit` join `buy_click` as the
+only Vercel events (`lib/track.ts`): the button sends one, `ShareArrival` one per tab when a shared link brings
+someone, and RiftCompare's weekly growth report counts both. robots.txt allows `/*utm_source=share` because X's and
+Reddit's preview fetchers obey it. No shared-list page: the site has no list to share yet.
+
+## Sites that grow each other: the family feed, cluster blocks and short footers (2026-11-02)
+
+Owner, 2026-11-02: "We need each site to help each other grow as a team effort", and the
+footer family lists were "a bit convoluted … I'm wondering if it actually helps". Plan:
+"Sites that grow each other" in the consolidation doc (https://claude.ai/artifact/QjrWGrfBqH4sKctwdjwptK).
+
+- **Three clusters** (`src/lib/family-network.ts`, the same file in every repo): card games
+  (Rift, OP, Dex, MTG, Gundam, Lorcana, YGO, Cyberpunk), hobby (Wargame, Figure, Gunpla on
+  Gundam Compare) and tech (Compare Empire, CamCompare). KaeYoung stays out.
+- **The family feed.** Each site's own daily data job writes `family-feed.json` (its best real
+  deals and pre-orders today, per region) beside the data it already commits, and copies its
+  cluster sisters' feeds from raw.githubusercontent.com into `family-cluster.json`. Pages read
+  the committed file: no database of another site, no request-time fetch, no new function. A
+  feed older than four days, from the wrong site, with a link off its own host or a saving that
+  isn't the arithmetic of its two prices is dropped (`validFeed`), so a block shows less, never a guess.
+- **One block per page**, on the deals, Black Friday and pre-order pages: one tile per sister with
+  its best item in the visitor's region, else the US price in its own currency. Labels never name
+  a country. Plain followed links inside a cluster.
+- **Footers: one short line.** The sites of our own cluster by name, then one "A Compare Empire
+  site" link to https://compareempire.com/network, which lists every site. Why: nothing counts
+  footer clicks, footer links get few, and Google gives little weight to sitewide links between
+  one owner's look-alike sites (12 sites all cross-linked in every footer is the pattern it can
+  read as a link scheme). Cross-traffic should come from the price blocks, which people have a
+  reason to click.
+- Here: `src/lib/family.ts` (deals per region from `dealsInMarket`, the cheapest independent store named), `scripts/family-sync.ts` in `sealed-import.yml` before the publish, the block on `/[region]/deals`, `/[region]/black-friday` and `/[region]/releases` (pre-orders), and the footer's "Other card games" line. `SISTER_SITES` is gone.
+
+## 2026-11-02 — Amazon Associates: following the Operating Agreement's Dos and Don'ts
+
+The owner sent Amazon's own "Operating Agreement: Top Dos and Don'ts" page (2026-11-02: "make sure you
+are following these instructions for all amazon affiliates"), and every site was audited against it.
+The rules we keep, on every Compare Empire site:
+
+- **Disclosure beside every Amazon link** ("Ad" / "Paid link"), and Amazon's statement "As an Amazon
+  Associate I (we) earn from qualifying purchases." in the footer of every page.
+- **Amazon's trademark notice** in the footer of every page: "Amazon and the Amazon logo are trademarks
+  of Amazon.com, Inc. or its affiliates." No Amazon logo, screenshot, review or Amazon's own colours
+  (its orange): the page "Don't use style or color of Amazon site which may cause confusion".
+- **Links lead to a specific product** (an ASIN, or a search for that exact product's name), never a
+  category or generic search: "All the links or buttons on your site should take customers to specific
+  products on Amazon."
+- **No Amazon link in a pop-up or layer**: the quick views show none; product pages carry the row.
+- **Never Amazon prices in price tracking or alerts** ("Don't track prices or set price alerts"), and no
+  Amazon link or trademark in any email, SMS or printed material.
+- Every link tagged, rel="sponsored nofollow"; no incentive (cashback, discount) for buying through it.
+- Here: the "Also check Amazon" line on set, type and deals pages is gone (a category search); the quick
+  view sends no Amazon row; the footer carries the trademark line. Product pages and guide rows keep theirs.
+
+## 2026-11-02 — The region chooser in the hero, with drawn flags
+
+Owner: "the region switcher must be more prevalent on all sites, on the main home page hero etc … and have
+the flags as well". Every region home has a "Prices for" row of flag + code chips under its search
+(`RegionChips`: plain links to each region home, which every region has, so they are followed), and the
+landing page has the same row above its search, picking in place like the header's soft switcher
+(`pickRegion`; without script the links go to each region home). The header switcher stays.
+
+- **Flags are inline SVG (`src/components/Flag.tsx`), not the `REGIONS[].flag` emoji and not image files.**
+  Windows draws a flag emoji as two letters ("AU"); image files would be new requests and hosting. No ids or
+  clip paths, so a flag works inside the closed `<details>` menu and many times on a page. Every place that
+  drew the emoji (header switcher and its list, phone menu tiles, sidebar, footer, region grid, store and
+  product pages) now draws it; `REGIONS[].flag` stays for plain-text uses. The same file is in every Compare
+  Empire repo that has a region switcher; keep the copies identical.
+- Chips show the code, not the name: seven full names wrap even at 1280px. The name is the title and the
+  screen-reader text.
+
+## 2026-11-02 — One page per head term: "mtg booster box" is the booster box guide
+
+Search Console (25–31 Oct): "mtg booster box" at position 32. Three of our pages answered it: the region home ("MTG booster box
+prices in the US: N stores compared"), the guide `/<region>/guides/mtg-booster-box-prices` ("MTG booster box prices in the US")
+and the Play Booster Box type page. Google splits a query between a site's own pages (RiftCompare, 2026-10-27).
+
+- The guide is the landing page: it covers every box type, set by set, with the price per pack. It is now the first link under
+  "Shop by product" in every region's menu ("Booster box prices").
+- The home's title leads with "MTG sealed prices in <region>" instead. The region titles that lead with the place ("MTG NZ: …")
+  are unchanged. The Play Booster Box type page keeps "MTG Play Booster Box prices".
+
+
+## 2026-11-02: Nobody is moved to another region on a guess
+
+Since 2026-11-01 `lib/region-boot.ts` moved every visitor on another region's page to their time zone's copy in the
+browser. Crawlers were excluded, but Search Console then read regional copies as duplicates on Compare Empire, which has
+the same script, and Google's guidance is not to redirect automatically on a guessed location. Now only a visitor who
+PICKED a region (any `[data-region-pick]` link, kept in localStorage) is moved; everyone else stays on the URL they opened
+and gets one line at the top, "This page shows <X> prices. Switch to <Y> prices · Stay", linking the page's own hreflang
+alternate ("Stay" remembers the page's region). Crawlers never see the line. The script is byte-identical on MTG Compare,
+DexCompare, WargameCompare and CamCompare.
+
+## 2026-11-02 — At most one production build every 12 hours, and no branch but production deploys
+
+**Why.** The owner capped Vercel spend at $5–6 a day across every site. 1 November cost $11.82 (normally
+$2–4), and Build CPU was the largest line ($4.26), followed by CDN requests and ISR writes, which every
+build multiplies (a deploy empties the page cache, so the next crawl re-renders and re-writes every page).
+The `[deploy]` gate itself held; its premise did not: sessions landed 7–14 `[deploy]` commits a day per site
+(manual "release now" runs and `[deploy]` in merge subjects), RiftCompare, OP, MTG and DexCompare alike.
+Compare Empire's site built on every push to its production branch (84 commits that day) and CamCompare on
+every three-hourly price commit, because neither had the gate.
+
+**What.**
+- `scripts/vercel-ignore-build.sh` skips a production `[deploy]` commit when the last production
+  deployment (`VERCEL_GIT_PREVIOUS_SHA`, set by Vercel in that step) is under 12 hours old; the commit
+  rides the next release. `[urgent]` in the SUBJECT overrides it, and only when the owner says a release
+  cannot wait. An unset or unreadable last deployment builds (fail open). `tests/deploy-gap.test.ts` pins it,
+  and the file is the same in every Compare Empire repo.
+- `vercel.json` `git.deploymentEnabled` starts with `"**": false` and enables only the production branch
+  (Vercel: when a branch matches several rules, any `true` wins). No preview is built for any branch or pull
+  request, `[preview]` included; the older per-branch `false` entries stay for orphan commits' own copies.
+- So "push to prod" means land on the production branch; the release reaches visitors within a day.
+
+## 2026-11-02: an empty per-product eBay search is finished work, not a failed run
+
+**Why.** The eBay import failed on 1 and 2 November ("Only 208 of 454 planned feeds refreshed") although every search
+was answered: of 270 per-product searches, 18 found listings and 252 came back empty. Since eBay results are limited
+to local sellers with stated postage (#38, 31 October) the sweep ends sooner, so the rest of the day's calls go to
+hot-set products the sweep already looked for and did not find, and most of those are empty. The exit check counted
+only feeds that wrote rows, so a run that did its job failed and the health monitor emailed the owner.
+
+**What.** `feedsShortfall` (`src/lib/ebay-import.ts`) counts a counted per-product search that completed with no
+listing (`feedsEmpty`) as finished. Failed, skipped and unfinished searches still count against the run, an empty
+FIXED feed (set, type, chase, sealed) still does, and `BREAKER_EMPTY` still stops a run whose filter empties
+everything. Not touched today's other changes (build gate, Amazon tags, region prompt, store vetting): none of them
+reaches the eBay job.
+
+The same day's tests also caught the family block's heading "Other card games on sale" (#53) on the Black Friday
+page, where the copy rules ban "on sale"; it is now "Deals on other card games".
+
+## 2026-11-03 — Footers link only card sites to card sites; every other site lists no sisters
+
+The owner asked whether linking every Compare Empire site together helps or is a risk for search and for how the
+sites look. Verdict: a sitewide footer link between sites one person owns carries little ranking value (Google
+discounts it), and a mesh of unrelated sites (camera, appliance and figure sites in a card site's footer) can read
+as a link network and looks odd to a reader. The owner said do it.
+
+- `footerSisters()` in `lib/family-network.ts` (same file in every repo) now returns the other card sites for a card
+  site and nothing for any other site. Gundam's Gunpla side no longer pulls WargameCompare and FigureCompare into its
+  footer; the engine footer's heading is "Other card games".
+- WargameCompare, FigureCompare, CamCompare and Compare Empire show no sister list in their footers, only one
+  "A Compare Empire site" link to compareempire.com/network (Compare Empire: its own /network), the one page that
+  lists every site. KaeYoung still links none.
+- Anchors stay the brand name only, and links stay plain followed links: they are honest links between sites with
+  one owner, not paid, so no `sponsored`/`nofollow`.
+- Kept: the "Other card games" / hobby / tech price blocks on deals, Black Friday and pre-order pages
+  (`clusterSisters`). They sit on a few pages, show real prices a reader of that page may want, and are not sitewide.
+
+## 2026-11-03 — The quick view shows the product's own link
+
+**Why.** Owner: "quickview popup should have a link change as well for all sites, instead of using the same link". The
+pop-up kept the list page's URL, so a copied or bookmarked link lost the product, and Back left the page instead of
+closing the pop-up.
+
+**What.** Opening a quick view pushes the product page's own existing URL (/<region>/p/<slug>) with `history.pushState`
+(`src/lib/quick-view-url.ts`, the same file on every site). Back closes it and restores the list's URL, Forward reopens it,
+closing it (×, Escape, the backdrop) steps back, so the history never fills with pop-ups. "See price history and details"
+only hides the pop-up and navigates to the URL already shown, which Next turns into a replace: Back from the product page
+goes to the list. The entry copies Next's own history state (`__NA` and the router tree), so the app router passes the
+push through and the page under the pop-up never re-renders.
+
+**SEO.** No new URL exists: the link is the canonical product page, which a reload, a share or a crawler gets in full
+server HTML. Never a `?view=` or `#` variant (duplicate URLs, extra CDN copies). Pinned by `tests/quick-view-url.test.ts`.
+
+## 2026-11-03 — SEO audit: alt text on every image, old 301s pinned, landing stays short
+
+The owner's 2026-11-03 SEO audit of all twelve sites asked for alt text, structured data, short titles and fuller
+homepages. On MTG Compare:
+
+- Every product, set-logo, eBay, cover and family image now carries the product, set or listing name as its alt
+  (search results, eBay strip, region home, this week, cheapest packs, sets, store listing, blog covers, embeds).
+  `tests/seo-audit.test.ts` fails on an `<img>` with an empty or missing alt.
+- The old singles URLs (`/card/*`, `/sets/*`) still 301 to the sealed pages; the same test pins those redirects.
+- Product pages already had Product/AggregateOffer and BreadcrumbList; titles were already under 60 characters.
+- The landing page did NOT get the audit's FAQ block: the owner's 2026-10-25 short-landing rule (two sections, no
+  FAQPage, `tests/shell.test.ts`) stands. The FAQ and its FAQPage markup stay on `/about` and the guides.
+
+## Rate us and "What people say", run by RiftCompare (2026-11-03)
+
+The owner wanted RiftCompare's rating pop-up on every site, each site's reviews public, and every written review approved in
+RiftCompare's admin; star ratings count at once. This site stores nothing: the corner card (`components/site-reviews/RateCard.tsx`,
+mounted in the root layout) posts cross-origin to `https://riftcompare.com/api/site-reviews`, and the region home's "What people
+say" block reads the score and approved reviews from `https://riftcompare.com/api/site-reviews/mtg` in the browser (a public JSON
+the CDN keeps six hours), so no page gains a function or a data read. The card copies RiftCompare's corner card, not its rating
+drive: never on arrival, after 4 pages and 3 minutes or on return from a store tab, at most three times 14 days apart, always
+closable; "Rate us" in the footer opens it at any time. No email is asked for. Never review markup (self-serving). RiftCompare's
+DECISIONS.md, "Every site's reviews, approved in one queue".
+
+## 2026-11-03 — New sets find themselves (Scryfall), so pre-order pages appear without anyone editing sets.ts
+
+The owner (2026-11-03): "We need a fresh pipeline of new products for all our sites, that's where our demand is." The
+pre-order page, the Coming soon block, the release calendar and the set pages already followed `lib/sets.ts`
+(2026-11-02), but that list was typed by hand, so a newly announced set was missing until a session added it, and
+until then the importer refused every store pre-order that named it (no set, no product).
+
+**What.** The sealed import first runs `scripts/discover-sets.ts`: one read of Scryfall's set list (public, no key),
+kept in `data/sets/discovered.json` and committed with the data snapshot (`publish-public-data.sh`). `lib/sets.ts`
+merges it into `SETS`, so that same import files the new set's pre-orders, and the next release builds its pages.
+
+- Taken: paper, top-level (no `parent_set_code`) expansion, core, masters and commander sets, plus Horizons and
+  Jumpstart releases, due within 180 days (or out within the last 60). Left out, and listed in the job summary for a
+  hand-written row: Mystery Booster, Un-sets, a name under four letters, a name already used, and a name that is part
+  of an existing set's name ("Marvel" beside "Marvel Super Heroes"), because a bare store title would then flip sets.
+- Name and date are Scryfall's; the slug is fixed when first seen (a live URL). Series from the set type; an
+  expansion is Universes Beyond once most previewed cards carry the triangle security stamp, or before previews when
+  its name opens with a known Universes Beyond franchise. Booster lines: Play and Collector (Jumpstart for a
+  Jumpstart release, none for Commander-only).
+- A hand-written row with the same code always wins: write one to add aliases, a pattern or a guide's facts.
+- Never fails the import: an unreadable Scryfall keeps yesterday's file. `tests/set-discovery.test.ts`.
+
+First live read (2026-11-03): Nauctis: The Sunken Realm (2027-02-05, Standard) and Marvel: Darkhold Destiny (2027-04-09,
+Universes Beyond); Mystery Booster Commander Edition left out.
+
+## 2026-11-03 — The daily Price Duel, on sealed prices
+
+The card sites' share loop (Gundam, Lorcana, YGO, Cyberpunk, OP: `/daily`, a Wordle-shaped "which is worth more?") comes to
+sealed, ported from DexCompare the same day. `/<region>/daily` (`src/lib/daily.ts`, `daily-data.ts`, `components/DailyGame.tsx`):
+ten pairs of in-stock products a day, the one that costs more at the region's cheapest in-stock store price wins, an emoji grid and
+a streak to paste anywhere (`utm_medium=daily`; Vercel events `daily_done { score }` and `share { kind: "daily" }`). Why: price
+comparisons are not shared, scores are; the growth report of 3 Nov counted 14 share taps and 0 visits in a week.
+
+- Per region, not global: the answer is the region's own price, in its own currency, from the browse index the region page already
+  reads (one `marketProducts` read, CDN-cached a day with a week of puzzles inside; the client picks today's at midnight UTC).
+- A product is picked by a hash of (day, slug), so an import that adds or drops products keeps almost every pair; a pair is only
+  made from prices 1.25 to 8 times apart so a day's moves don't flip an answer; nothing under 5 units (packs, sleeves) or over
+  2,000 (cases) plays; a sold-out or TCGplayer-only row never does. Puzzle #1 is 2026-11-03; never move the epoch.
+- Linked from the sidebar's "More", the footer and the sitemap. `tests/daily.test.ts`.
+
+## The ember-fan logo, a Creators button in the hero, and an eBay + TCGplayer banner under it — 2026-11-03
+
+The owner wanted "a nicer logo that looks like the official one but is not a copy". The new mark (`components/Logo.tsx`, `app/icon.svg`,
+`public/logo.svg`, the PNG icons, `favicon.ico`, and a flat copy in `lib/og-card.tsx`) is five flame-tongue petals fanning up from a
+glowing sphere, red-orange with a lighter core, on the night-purple tile: the warm fan-shaped feel of the game's symbol, drawn as our own
+lotus of flames. Nothing is traced: the tongues are straight leaf shapes that come to a point, there is no circle around them, no curled
+tips and no planeswalker, mana or Wizards geometry. The five colour orbs (2026-10-27) are gone. When the mark changes again, re-render
+every icon (the PNGs and the ICO were drawn from `icon.svg` with headless Chromium).
+
+The featured-creators strip under the hero's paragraph (2026-10-30) is gone from the homepage; `/creators` is now a button in the hero
+("✦ Creators"), and the page, footer link, sidebar entry and sitemap entry are unchanged. In its place, straight under the hero, sits an
+eBay + TCGplayer banner (`components/home/LandingAds.tsx`): two panels side by side from md, stacked on a phone, 104px tiles with photo,
+price and name. The eBay half is the sealed feed of the region the browser suggests (fetched near the viewport, as every strip is; the
+page never fetches while rendering; blank tiles of the same size until it answers, a search button when there is nothing), placement
+`listings-landing`; the TCGplayer half is the newest sets' products in the server HTML (`lib/landing-ads.ts`, the page's one data read
+besides the picks), placement `tcgplayer-strip-landing`, each link tagged with the suggested region's sub-id. Two things that widened a
+390px phone to 814px and had to be fixed before shipping: an `auto` grid track sizes to the scroll row's content (`grid-cols-[minmax(0,1fr)]`
+and `min-w-0` on the panel), and a tile's `sr-only` span is absolutely positioned, so unless the tile is `relative` it is laid out at its
+static position in the page, outside the clipped row. Title, description, canonical, hreflang, h1 and the links are unchanged.
+
+## 2026-11-04 — Big-store gap: 5 stores from the per-region research
+
+The owner asked for every big store captured with no gaps, on every site. Research per region (the sister sites' 1,300-host
+union, retailer lists, community "where to buy" threads) named 23 Magic sealed candidates not in `stores.json`; a runner
+probe (`scripts/probe-stores.ts`, the sandbox cannot reach stores) read each the way the import does. Five read sealed
+Magic in their region's currency and are added: **Eclipse Games** (AU, `booster-boxes`: 33 sealed), **Hobbyco** (AU,
+`magic-the-gathering`: 64 sealed, 26 in stock), **Card Chasers** (CA, `mtg`: 21 in stock), **Magic Traders** (EU,
+`magic-the-gathering`: 38), **Game Roost** (NZ: 16). Read but not added: Games Haven (SG; its only Magic sealed sits in
+a rolling `new-arrivals` collection, 0 in stock), Card Giants (US; its Magic collection is repacks and mystery bags),
+Leisure Games (UK), Mind Games (AU), Cura Cards, Gumnut, Jenes, Games Paradise, Card Arena, Jeux Kingdom, OBO, Team Board
+Game, Gaming Otaku (no Magic sealed in any collection), ILAN TCG and Madatsu (WooCommerce stores that state no currency).
+Not addable, and why (the same list every card site hit): the biggest US and UK names run platforms with no public feed or a robots.txt that forbids reading — BigCommerce (Star City Games, Game Nerdz, Game Goblins, ToyWiz, Magic Madhouse), CrystalCommerce stores whose robots.txt disallows everything (Three Kings Loot, Carta Magica, Gamekeeper, The Connection, Card Titan, Collector's Cache, Nerd Rage, Pastimes), bot walls that answer 403 or a Cloudflare challenge (Chaos Cards, Big Orbit, Wayland, Firestorm, Mighty Ape AU and NZ, Gamesmen, EB Games, MTG Mate, Imaginaire, Le Valet, Bazaar of Magic, FantasyWelt, Keepseven, Nedgame, Poromagia, Dave & Adam's, Pro-Play, Pokémon Center, Red Hobby) and custom storefronts (Card Kingdom, CoolStuffInc, ABUGames, CoreTCG, Ideal808, Noble Knight, Miniature Market, Play-in, Parkage, Agora Hobby, Hobby Master NZ). A bot wall is never worked around. A BigCommerce reader would unlock the most (Star City Games, Miniature Market, Game Nerdz, Magic Madhouse, Game Goblins) and is the next adapter worth writing.
+
+## 2026-11-04 — Stores without a feed: BigCommerce and Shopware read from their category pages
+
+The big-store gap report named BigCommerce as the one platform worth an adapter. `src/lib/storefront-html.ts` (ported from OP
+Compare's `lib/bigcommerce.ts`) reads a BigCommerce Stencil category page (`/<path>/?limit=100&page=N`: one `<article class="card">`
+per product with its title, price and "Add to Cart" / "Out of stock" button) and, since Miniature Market turned out to run Shopware 6
+rather than Magento, a Shopware listing (`<div class="card product-box">`, paged with `?p=N`, a `btn-buy` button or a stock-notify
+form). The importer (`readHtmlStore`) and `scripts/probe-stores.ts` (`platform: "bigcommerce" | "shopware"`, `collections` as
+category paths) put such a store through the same `identify()`, currency, floor, outlier and staleness rules as a Shopify or WooCommerce
+read. A first page with no product grid is a failed read, never an empty category, so a theme that draws its grid in the browser can
+never empty a store's rows. The pages state a currency only sometimes ("699.95$ AUD", JSON-LD); a page that states another currency
+is refused, and one that states none is taken on the registry's word, which the probe says in its output.
+
+Sniffed from a runner the same day (bot User-Agent, robots.txt honoured): **Miniature Market** (US, Shopware, 215 Magic sealed, 118 in
+stock) and **Grand J Games** (AU, BigCommerce, 78 sealed, 59 in stock, plus its pre-order category) read and were added. Game Goblins
+(US, BigCommerce) reads but lists 7 Magic sealed products, none in stock: not added. Magic Madhouse (UK) serves a bot challenge on every
+page but its sitemap: out, never worked around. Star City Games, ToyWiz and Game Nerdz are BigCommerce stores whose grids are drawn by
+JavaScript (no product in the HTML): not readable this way, and not worth a headless browser. Their homepages and category pages were
+fetched once each for this check and nothing else.
+
+## 2026-11-04 — HBT Collectables is removed and banned: they asked not to be linked
+
+HBT Collectables (hbtcollectables.com, AU) answered the store outreach email by sending it to their lawyers as
+"unauthorised linking" under their site's terms. The owner's call: take them off every site, apologise, send them
+no more visitors. Here the store leaves `stores.json` and the shipping table, its cached offers and store stats
+leave `data/public/`, and it joins `BLOCKED_STORES` (`src/lib/blocked-stores.ts`), which also drops any row of
+theirs from an older export at read time and keeps a probe or registry sweep from adding them back. Both hosts
+are on RiftCompare's `data/store-vetting/banned.json`. Not a judgement on the store: it does not want the
+traffic, so we don't send it. The change rides the next data release.
+
+## 2026-11-04 — List your store: stores come to us
+
+The owner stopped cold email outreach ("not really doing anything") and set the aim: be popular enough that stores
+ask us, and encourage the ones that do. Every Compare Empire site now has `/list-your-store` (shared
+`ListYourStore.tsx` + the `ListStore` form in `ReportForms.tsx`), linked from the footer, `/contact` and the stores
+page: what a store gets (free, no contract, never pays to rank), what we need (a readable shop, own currency,
+established), and what happens next (checked within a few days, reply through the store's own contact details).
+The request is filed as a `suggest-store` report with `issue: "owner"`; RiftCompare's daily reports triage puts
+those first and asks for a reply within two days. No email is asked for (the reports branch is public); no pop-up,
+no cold email. RiftCompare and OP Compare keep their `/stores/suggest` page (now the owner pitch) and redirect
+`/list-your-store` to it.
+
+## 2026-11-05: Pickup-only listings are left out, never shown with a shipping price
+
+A visitor reported the Star Trek play booster box pre-order at the top of the MTG pre-orders page: a US$100 listing from 1st Capital
+Gaming shown with the store's measured postage, while the store's page says the pre-order is collected in store. The importer read
+nothing about that: Shopify's product feed carries the price, the stock and whether a variant needs shipping, and the store's note is
+injected on its page by a pre-order app, so no feed can see it (and the same note says "Shipping: Nov 6", so the store's own
+wording is ambiguous).
+
+What the feed does say is now read:
+
+- a Shopify variant with `requires_shipping: false` (pickup only, a service) is never a listing's price (`priceOf`); the posted
+  variant is, even when dearer;
+- a product whose title, tags or description say pickup only, in-store only, collection only, no shipping, cannot be shipped or
+  "this item does not ship" (`src/lib/pickup-only.ts`, Shopify and WooCommerce) is left out of the store's rows altogether.
+
+Left out, not labelled: a listing the store will not post is not a price a visitor elsewhere can pay, and the store's measured
+postage (`src/lib/shipping.ts`, which already leaves pickup rates out of every figure) does not apply to it. "Pickup available" and
+shipping policy ("cannot be shipped to PO boxes", "we do not ship internationally") are not refusals, and a rule here may only
+refuse more, never loosen: every wording is in `tests/pickup-only.test.ts`. DexCompare's sealed app (the same reader) gets the same
+change. The 1st Capital listing itself stays, since its feed says it ships and the probe measured US$9.25 postage on that
+collection; if the store writes "pickup only" into the product, the next import drops it.
+
+## 2026-11-05: Amazon's own price on the product page's Amazon row, from the Creators API
+
+The owner's US Associates account was approved today and he asked for Amazon's API prices as price rows on every site.
+Here, in two script-side steps and one reader:
+
+- `scripts/amazon-asins.ts` runs in the daily import after the export (`sealed-import.yml`), in every region with its
+  OWN Amazon (AU, US, UK, CA, DE for the eurozone; NZ and SG link to Amazon Australia as a search and stay a search, since an
+  AUD price is not a New Zealand price). It searches the region's Amazon for each in-stock product (most stores first,
+  `AMAZON_SEARCH_BUDGET` a region a day) and keeps a result ONLY when `identify()` in `lib/sealed-title.ts` reads the
+  Amazon title as the same product (the same groupKey): the rule that matches the stores matches Amazon, a wrong merge
+  being worse than a missing price. ASINs and misses go in `data/amazon/asins-<region>.json` (ASINs may be stored; a miss
+  is retried after 30 days) and ride the publish commit; `status-<region>.json` says what the last run did.
+- `scripts/fetch-amazon-prices.ts` runs first in every Vercel build, fetches today's prices for those ASINs (`getItems`,
+  ten a call, one a second, `AMAZON_BUILD_CALLS` a region, 30 by default) into the git-ignored `data/amazon-live/`, and
+  drops a price under 60% or over 160% of the product's in-stock store median. Prices are never committed: Amazon's
+  licence lets a price be kept 24 hours and shown with its time.
+- `lib/amazon-live.ts` gives the product page the item's own tagged `/dp/` link and, while under 24 hours old, the price;
+  the page passes it to the table's pinned Amazon row (`OfferTable` `pinned.amazon`), which shows it with "as of <time>
+  <region clock>" and the licence's disclaimer, and the browser hides the price after 24 hours (`AmazonPrice.tsx`) because
+  the page sits in the CDN for a day. The row stays an ad outside the store order: never ranked, never the best price,
+  never in deals, alerts, history, the feed, metadata, JSON-LD or the quick view (`tests/amazon-api.test.ts` pins the
+  reader to the product page and the client to the scripts). Both files are traced into the functions
+  (`next.config.js`).
+
+One credential serves every store: `AMAZON_CREATORS_AU_CLIENT_ID` / `_CLIENT_SECRET` / `_VERSION` as GitHub secrets and
+Vercel Production variables (the same values as Compare Empire's; `AMAZON_CREATORS_<REGION>_*` would override for one
+store). Access is per marketplace and opens by itself once that store's account has qualifying sales (about 10 in 30
+days); a refused store is skipped, so the feature costs nothing until then and switches on without a code change.
+
+## 2026-11-06 — Black Friday and Cyber Monday price watch pages
+
+The owner's October numbers (2026-11-06): the US made 73% of affiliate earnings at a US$108 average order, one US$6.4k order
+earned as much as twelve ordinary days, and eBay credits only a purchase made within 24 hours of the click. His asks: Black
+Friday and Cyber Monday "price watch" pages this week, so Google indexes them before 27 and 30 November, and the high end of
+the market (sealed, graded, vintage) in its own prominent sections, each ending in a live eBay listing. Ported from DexCompare
+the same day.
+
+- `/[region]/cyber-monday` joins `/[region]/black-friday`: ONE component (`components/HolidaySalePage.tsx`) under two URLs,
+  thin routes, `lib/black-friday.ts` `eventCopy(event)` for the words. The Black Friday page's URL, title, h1 and metadata are
+  unchanged; both pages are in the sitemap for every region and link each other.
+- Under the deals table, a **price watch** (`lib/price-watch.ts`, `#price-watch`): the dearest sealed in stock today (the
+  region's ProductStat rows, dearest first, in stock only), the week's moves down (`priceMovesData(market).down`), older sets
+  still in stock (one product per set from `olderInStockData`) and graded chase-card searches (`GRADED_SEARCHES`: Black Lotus,
+  Alpha/Beta, Mox, Reserved List, Sheoldred, BGS 10). Every row ends in a tagged eBay search button (`placement: "price-watch"`,
+  in `PLACEMENTS`), and the graded block carries the chase `EbayStrip`.
+- Why searches and strips, not listings in the HTML: a sealed-only site holds no eBay listing of a single in its server data (the
+  strips fetch at request time by design), and a graded slab is never a store row. A search link still carries the EPN tag and
+  starts the 24-hour credit window on the click.
+- The words keep `BANNED_COPY`: "down this week" and "dearest in stock", never "price drops", "was", "sale" or urgency;
+  `tests/price-watch.test.ts` renders the Cyber Monday page in `files` mode and sweeps it, and pins the sitemap entry.
+
+## 2026-11-06 — Awin: a store that accepts us pays from the next build, with no step by hand
+
+**Decision (owner: "check if we are making the most of Awin, and if it's not there, just do it"):** the family's Awin
+account (Compare Empire, publisher 3144410) is read each morning by Compare Empire's `scripts/awin-sync.ts`, which
+publishes the programmes that accepted us, with their tracked domains, in its public `data/awin/programmes.json`. This
+site copies it first in every build (`scripts/fetch-awin.ts` → `src/lib/awin-programmes.json`; the committed copy is an
+empty list). `offerLink` turns a link to a joined advertiser's own domain (Magic Madhouse, Chaos Cards, Zatu…, whichever
+accept) into its Awin deep link to the same page, `sponsored`, with the affiliate note. Order and prices never change.
+
+## 2026-11-06 — Side rails on every regular screen, scrolling through ten popular products
+
+**Decision (owner: "I do not see those ads on the left and right side of the screen … it should appear on regular 16:9
+screens … 16:10 even … scrollable … up to 10 products … popular products"):** the side rails now show from 1280px wide,
+not 1864px. Below 1864px the shell gives up 160px a side for them (`globals.css`: `.max-w-shell` and `xl:max-w-shell` are
+`min(1480px, 100vw - 320px)` from 1280px), so a 1280, 1366, 1440, 1536, 1600 or 1680px window gets a 136px rail on each
+side, 12px from the window and from the page; from 1864px the shell is its full 1480px and the rails sit just outside it as
+before. Each rail runs from under the header to the window's foot and its list scrolls through up to ten tiles, popular
+first, instead of as many as the height fitted (at most six). A window too short for one whole tile shows none.
+
+**Still true:** browser-only (mounted after a matchMedia check, nothing in the server HTML, so no SEO change), fixed (CLS
+0; the shell rule is CSS, identical in the server HTML, so nothing moves when the rails mount), labelled Ad, rel
+sponsored under their own placements, never a store, never Amazon.
+
+**Cost:** the content column is narrower between 1280 and 1864px (960px at 1280). Pages already lay out at those
+widths (a 1024px laptop gets the same), so nothing breaks; revisit if clicks per visit fall on laptops.
+
+MTG Compare had no rails until now: this ports DexCompare's (`SideAds.tsx`, placements `listings-side` and `tcgplayer-strip-side`). The eBay rail tops
+the sealed feed up from the Play Booster Box and Collector Booster Box feeds, no listing twice; the TCGplayer rail is the
+pre-footer strip's ten newest-set products.
+
+## 2026-11-06 — Store thumbs up and down, one tally shared by every site
+
+**Decision (owner: "a little mini area where you can rate a shop … thumbs up a store or thumbs down a store … across all
+the sites you can now see that these stores are trusted"):** every store row carries two tiny thumbs beside the store's
+name (`src/components/StoreVote.tsx`, the same file on every Compare Empire site), with counts once a store has votes and
+a green "Trusted" mark from 3 thumbs up and 80% of the votes. RiftCompare keeps the votes and serves one public tally
+(`riftcompare.com/api/store-votes`, CDN six hours), keyed by the store's host without "www.", so a shop listed on several
+sites shares its thumbs; this site stores nothing and fetches the tally in the browser only (no function, no build
+step). One vote per browser per store, a few per network, marketplaces (eBay, Amazon, TCGplayer…) get none. Votes never
+order prices, hide a store or decide the cheapest. RiftCompare's DECISIONS.md, 2026-11-06, has the rules; change the
+component there first and copy it.
+
+**Addendum (owner, 2026-11-06: "the home page must have this as well"):** the home page gets the same rails, in the
+visitor's suggested or picked region (`SoftSideAds`, the way its header and sidebar follow the visitor).
+
+## 2026-11-06 — Buy links open the store's checkout
+
+**Decision (owner: "for all the sites that we can, send them directly to the checkout page, with the item in the
+basket"):** an in-stock Shopify store row opens that store's checkout with the priced item in the cart, through
+Shopify's cart permalink (`/cart/<variant id>:1`), as RiftCompare (#340) and OP Compare (#99) do. `feeds.ts` keeps each
+variant's id, `priceOf` names the in-stock variant it priced, and the importer stores it as `?variant=<id>` on the
+offer URL (still the product page, with that variant picked). `offerLink` turns it into the cart link, tagged
+`utm_source=mtgcompare&utm_medium=referral&utm_content=checkout`. `offerRef` (and its SQL twin) strips the variant, so a
+listing keeps its identity across runs. Awin stores keep their tracked product link (Awin is returned first); TCGplayer,
+eBay and Amazon keep their pages; sold-out rows and WooCommerce/BigCommerce/HTML stores keep product pages.
+`buy_click` carries `link_type`. `lib/checkout-link.ts`, `tests/checkout-link.test.ts`. Revert by removing the
+`shopifyCartUrl` block in `offerLink`.
+
+## 2026-11-06 — The phone dock: the side rails' ads on screens too narrow for them
+
+Owner: "how can we have those [eBay and TCGplayer side rail ads] on mobile phone … like I have a Z Fold 7 … but also iPhones.
+How do we get those ads to show on phones in the best way that doesn't interrupt user experience, but will also potentially
+get a couple of clicks."
+
+**Pattern:** below the rails' width, one bar along the foot of the screen (`AdDock.tsx`, fed by the rails' own tiles in
+`SideAds.tsx`), the phone buy bar's size and rules: 64px plus the safe area, slides on transform only (CLS 0), never on the
+first screen (only after 60% of a screen is scrolled), hidden while any other ad unit, the footer, a dialog, the menu or the
+keyboard is in view, never on a page with the buy bar (product pages keep their own units), ✕ for the visit. On a phone it
+shows one tile at a time with a View button, eBay and TCGplayer taking turns: the next tile peeks at the edge and swipes, and
+each time the dock comes back it shows the next one (nothing animates on its own). From 640px (tablets) both sides at once.
+Nothing is in the server HTML and nothing is requested until the visitor scrolls a third of a screen: no SEO change.
+Placements `listings-dock` / `tcgplayer-strip-dock` (or the site's equivalents) so its clicks can be read on their own.
+
+**Why this pattern (viewport simulation, Playwright, a local build):** Galaxy Z Fold cover screen (411×960, ~21:9), iPhone SE,
+iPhone 16 (393×852), iPhone 16 Pro Max (440×956), iPad (820×1180); home, browse, a guide and a product page, stopping every
+half screen. Without the dock an ad unit was in view at 8–20% of stops; with it 75–90% on the home page and guides, ~70% on
+browse, 0% on product pages (by design). Never two units in a phone screen because of the dock, layout shift unchanged, the
+bar is 7% of the Fold cover screen and 10% of an iPhone SE (Better Ads' "large sticky ad" line is 30%). Rejected: an extra
+in-flow strip (the pages already have one unit per screen at most and in-flow ads are what the visitor already scrolls past),
+a corner chip that opens a sheet (an overlay, and a tap before any product shows), a ticker under the header (covers the top
+of the page, where searchers land). Split halves (eBay | TCGplayer) were tried on phones first: at 375px each title was cut to
+a word, so phones show one at a time.
+
+**Measure:** the dock's placements against the strips' in the ~11-10 / ~11-17 checks. If pages per visit drop on phones,
+raise DOCK_ARM or drop the dock from that site first.
+
+## 2026-11-06 — A cart list on every site
+
+**Decision (owner: "I really like the cart feature … all of our websites"; built on RiftCompare first, TCGEmpire
+#346):** every store price row gets an "Add to cart" button, and the header a cart with its count on every width.
+`/cart` (static, noindexed, out of the sitemap) groups the lines by store with ONE "Check out at <store>" button per
+store: Shopify's cart permalink `/cart/<variant>:<qty>,…`, which fills that store's cart and opens its checkout. The
+list lives in the visitor's browser only (`localStorage` `ce_cart_v1`): no account, no database, no function. The page
+re-checks each line's price and stock from the store's own `/products/<handle>.js` in the browser (Shopify serves it
+with CORS open) and leaves a sold-out line out. A line is cartable only when the row's own buy link already is a cart
+permalink (the single-click checkout links), so Awin and partner stores, and rows whose variant we don't know, stay
+"manual" lines on their own tracked links; eBay, Amazon, TCGplayer and Cardmarket are never lines. Shared files, the
+same in every site (port fixes by hand): `src/lib/cart-list.ts`, `src/components/cart/*` (`cart-config.ts` is the
+one per-site file; styles imported once from the root layout), `tests/cart-list.test.ts`.
+
+## 2026-11-06 — Every visitor lands on their own region, the US when we can't tell
+
+The owner, for every site: "all of our websites … should default to the US version, unless it detects the user's
+country." `lib/region-boot.ts` (byte-identical in MTG Compare, DexCompare, WargameCompare and CamCompare) now moves
+every person, never a crawler, on a regional page of another region to the same page in theirs: the region they picked
+(localStorage), else their time zone's, else the US. This reverses the 2026-11-02 rule that moved only visitors who had
+picked and offered everyone else a "Switch to <X> prices" line; Compare Empire made the same reversal earlier the same
+day. Crawlers still see every regional page as it is, and URLs, titles, canonicals and hreflang are unchanged, so
+indexing is untouched. A pick always beats the time zone. `tests/region-boot.test.ts` pins it.
+
+## 2026-11-06 — eBay and Amazon rows are full price rows, on top, outlined
+
+**Decision (owner: "eBay prices and Amazon prices should function exactly like a normal store price row. So you can also
+add to cart … if it's in stock … it just sits on the very top. And it has a different colored outline"):** the eBay row
+is always the first row, with a green outline, and Amazon the second, with an amber one. Both carry everything a store
+row has: the stock line, the store thumbs (one tally per eBay / Amazon domain, `ebay.com.au`, `amazon.com`…) and the
+cart button. They are "manual" cart lines on their own tagged links (`src/lib/cart-list.ts`), never a Shopify checkout;
+an Amazon line's price is dropped from the visitor's list after 24 hours (Amazon's licence), and the cart then says to
+see today's price on Amazon. With no Amazon price the row reads "Also check on Amazon", a tagged link. Unchanged: neither
+is counted as a store, "Best price", a deal, an alert price or the reference price; TCGplayer and Cardmarket stay
+references (no thumbs, no cart line); no Amazon link in a pop-up.
+MTG Compare (and DexCompare, the same tables): the slots are now eBay, Amazon, TCGplayer, then the stores (TCGplayer was
+second). The eBay listing row (`EbayOfferRow`) shows the store row's "In stock" pill, with its shipping moved under the price.
+
+## 2026-11-06: The quick view carries the tagged Amazon link (owner)
+
+Since 2026-11-02 the quick view showed no Amazon link (or, on KaeYoung and ScentCompare, an "Amazon" row that opened our
+own product page), read as Amazon's ban on links in pop-ups. The owner noticed the quick view sends nobody to Amazon and
+chose (2026-11-06) to put the product page's own tagged Amazon link there. Amazon's Participation Requirements, item
+(o): "You will not post or serve any Special Links … within any pop-up or pop-under windows, transitional page ads, or
+layer ads, except for pop-up windows in conjunction with your Site promoting Products closely associated with the
+materials on your Site." A quick view the visitor opens for one product, showing that same product, fits the exception;
+the owner accepted the remaining risk. The quick view shows the link only (the item's own page where the ASIN is known,
+else the tagged search), never Amazon's price: that stays on the product page under the 24-hour licence. Uninvited
+overlays (a phone ad dock, a corner card, an exit pop-up) still never carry Amazon, and an Amazon page is never framed
+(item (n)).
+
+## 2026-11-07 — WaxCompare: sealed sports cards on the MTG Compare engine
+
+**Owner (2026-11-06):** approved sealed sports cards as the next niche ("I'm down for waxcompare.app … build it out … make sure
+you address all considerations"), with a listing plan (every sealed product type; no breaks, repacks or mystery boxes; a match
+needs year, maker, line, sport and type), its own eBay keyset at 2,500 calls a day, a chase list of about 300 singles at US$100+
+"I'll let you pick" in weeks 2–3, and the Topps affiliate coded in ("make a low effort for me … hard code it").
+
+**Decision:** a copy of MTG Compare's sealed engine in `Specifxx/waxcompare`, changed where sports cards differ:
+
+- **Identity.** `identify()` (`src/lib/sealed-title.ts`) reads year or season, maker and line (`src/lib/lines.ts`), sport (and for
+  soccer the competition), product type and a market edition (Asia, International). The group key is
+  `2025|chrome|baseball|hobby-box`, with no set tokens, so the eBay sweep matches by exact key or not at all. Lines that share a
+  word stay apart (Chrome, Chrome Update, Chrome Sapphire; Bowman, Bowman Chrome, Bowman Draft). A season is never a calendar
+  year, WNBA is never NBA, and a Topps "football" title with a season and no competition is refused (UK shops call soccer
+  football). A case's own box count ("Hobby Case 12 Boxes") is the case, not a lot of 12.
+- **Releases find themselves.** No hand-kept set list: `scripts/discover-sets.ts` adds every release 2+ stores sell to
+  `data/sets/releases.json` in the import's commit. A release is dated only from a sourced date (`dateKnown`); undated, it is never
+  "out", "pre-order" or "next", and the coming-soon block skips it.
+- **No MSRP and no pack counts.** The makers publish no list price for hobby product and stores set their own, so `rrp.ts` returns
+  null everywhere and no page says "at MSRP". Pack and card counts vary by year and are not something we can source for every
+  release, so `PACK_TYPES` is empty and no per-pack figure is printed. Never invent either.
+- **No TCGplayer row.** TCGplayer is not where sports sealed is bought; the pinned rows are eBay and Amazon. TCGplayer is not in
+  `src/data/stores.json`, so the import never reads it and no TCGplayer row or link appears; its code stays, dormant.
+- **Topps.** The US shop is a store row like any other, sorted by price. Its Impact programme (applied from the RiftCompare Impact
+  account, in review) turns on with one deep link in `TOPPS_IMPACT_LINK`; until then the links are plain.
+- **No hosted database.** MTG Compare's Neon schema was the importers' working store only. Here each data job starts a Postgres
+  inside the GitHub runner, seeds it from the committed `data/public/` and exports it back, so the site costs no database and no
+  transfer allowance. Both jobs share the concurrency group `waxcompare-data`.
+- **eBay.** Its own keyset (owner: a new site never shares a sister's keys), 2,500 a day, custom id `wax-<market>-<feed>` on the
+  shared EPN campaign. `HOT_SETS` starts empty: a hot set is picked from what the site sees selling, not guessed, and with none the
+  sweep and per-product searches follow value alone (the log says "no hot sets yet"). The sweep and check queries name sports
+  products ("baseball hobby box sealed"), and the Amazon ASIN search no longer carries the engine's "MTG" prefix.
+- **Brand.** No maker, league or team names or logos in the brand, logo or share images; `TRADEMARK_DISCLAIMER` in the footer,
+  `/about` and `/terms`. No pre-order hubs (`/preorders`): a release's pre-orders are on its release page.
+- **Stores and regions (the 2026-11-07 probe).** 1,462 candidate shops were read by GitHub Actions (`Specifxx/mtgcompare`, branch
+  `claude/project-thread-vfleqd`, `wax-probe/`): 1,291 run Shopify, 450 list sealed sports, 116 list 50 or more, in 7 currencies,
+  with 5,107 boxes sold by two or more shops of one currency. The gate (60 shops, 3 regions, 300 shared boxes) passed. Run through
+  `identify()`, the shops with 10 or more products it accepts are the launch list: 176 shops (US 64, CA 53, AU 29, EU 19, UK 11),
+  read through their sports collections (mystery, break, singles and graded collections left out), or the whole catalogue, read
+  strictly, where a shop has none. **New Zealand and Singapore are not served** (`LIVE_REGIONS`, `src/lib/regions.ts`): 9 and 4 shops,
+  18 and 13 shared boxes, so their pages would be thin; their visitors land on Australia's and the US pages. Add a region back once
+  its shops are in the list.
+- **Lines from the probe.** About 9,000 of the probe's titles named a line the first list lacked or worded it differently. Added: Upper
+  Deck's lines with the sport or a dash between maker and line ("Upper Deck Hockey Series 1", "Upper Deck - 2025-26 - Hockey - MVP"),
+  SP, Metal Universe, Team Canada, CHL, AHL, PWHL, Clear Cut, Stature; Topps Hoops (Topps' since 2025-26, kept apart from Panini's),
+  Signature Class, Holiday, Resurgence, Pro Debut; Panini Rookies & Stars, Black, Flux, Prospect Edition, Boys of Summer, Silhouette,
+  Photogenic, Turn Four, Track Kings, Pitch Kings; Leaf Metal, Metal Draft, Trinity, Vivid, Optichrome; and sports lines are now sold in
+  (Heritage Football, Stadium Club UFC, Chrome Update Basketball, Select WNBA…). Each has a probe title in `tests/sealed-title.test.ts`.
+
+**Later (weeks 2–3, in the plan):** the chase list and player pages, a Topps Now drops page, a weekly blog and sourced release dates.
+

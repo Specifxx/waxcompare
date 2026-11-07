@@ -1,0 +1,1021 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { AFFILIATE_NOTE_SHORT, ebayLabel, ebayRetailer, ebayRetailerForHref, ebaySearchUrl, REL_SPONSORED, type Placement } from "@/lib/affiliate";
+import {
+  acceptResponse,
+  conditionLabel,
+  DEFAULT_MAX_AGE_HOURS,
+  formatAge,
+  formatPrice,
+  hoursToMs,
+  importCadence,
+  isContextString,
+  isFresh,
+  listingsUrl,
+  shipLabel,
+  type Accepted,
+  type AcceptedItem,
+  type FeedKind,
+} from "@/lib/ebay-context";
+import { FEED_FIRST_INDEX, preFooterPlan } from "@/lib/ebay-ads";
+import { listingCents, pickListing, type PriceFloor } from "@/lib/ebay-offer-row";
+import { money } from "@/lib/format";
+import { isRegion, REGIONS, type Region } from "@/lib/regions";
+import type { EbayHighlight } from "./Ebay";
+import { EbayMark } from "./EbayMark";
+import { Icon } from "./Icon";
+import { OutboundLink } from "./OutboundLink";
+
+// The eBay listing strips: real listings from eBay's Browse API as image banners (the look of Rift Compare's
+// "High-end sealed on eBay" strip), read from OUR database: a daily GitHub Actions import stores them, the route
+// /api/ebay/<region> reads them. This component never talks to eBay.
+//
+//   • A page NEVER fetches while it renders (pages stay ISR). The server HTML holds the compact CTA (EbayCta:
+//     the wordmark, "Ad" and one search button: what a crawler or a visitor without script sees) on top of an
+//     invisible, strip-sized box that reserves the unit's height. Only when the unit scrolls within ~300 px of the
+//     viewport does it fetch /api/ebay/<region>?c=<context>; the strip then replaces the box at the SAME height
+//     (fixed tile heights: CLS 0). Off-screen units fetch nothing.
+//   • When no feed of the cascade has rows (before the first import, a kill switch, too-old rows) the unit is just
+//     the compact CTA: it collapses to it once it is entirely out of the viewport (below it, or above where scroll
+//     anchoring keeps the page still); in view it keeps its reserved height so nothing moves.
+//   • The response is re-validated here (ebay-context.ts acceptResponse): https, eBay image host, an eBay item URL with a campaign
+//     id (any: the importer enforced the owner's), whitelisted fields, and the AGE BOUND the route reported (EBAY_LISTING_MAX_AGE_HOURS, default 26 h): rows older
+//     than it are never shown, and a tab left open drops them when they cross it (checked on a timer and when the
+//     tab returns). Every strip shows how old its data is.
+//   • Every tile is one plain <a> through OutboundLink: rel="sponsored nofollow noopener noreferrer", one
+//     buy_click { retailer, placement } per click. The href is eBay's affiliate URL EXACTLY as stored (its customid is the per-feed
+//     reference the importer asked eBay for, mtg-<market>-<feed kind>: nothing here edits it). Thumbnails are plain lazy
+//     <img> (no-referrer); one that fails to load hides its tile.
+//   • Labelled "Ad", with the affiliate disclosure and "imported from eBay <cadence> (updated <age>)" (the cadence is read from the
+//     age bound the route reports: about once a day by default, several times a day in the compliant mode).
+//   • A POPULAR product or set (lib/popular.ts, components/Ebay.tsx hotSetHighlight) passes `highlight`: one eBay-blue search
+//     button, at least 44 px tall, inside the strip's own top line (no extra unit), under its surface's own placement (hot-home, hot-set, hot-product). It is in
+//     every state: in the strip, in the invisible reserved box (so the strip replaces the box at the same height), and as the
+//     compact CTA's one button.
+
+// ─── Fetching: one request per region+context, shared by every unit that wants it ──────
+
+const CLIENT_TTL_MS = 5 * 60_000;
+const FETCH_TIMEOUT_MS = 8000;
+const CHECK_MS = 60_000;
+const REFETCH_MIN_MS = 10 * 60_000;
+
+interface Pending {
+  promise: Promise<unknown>;
+  at: number;
+  users: number;
+  ac: AbortController;
+  done: boolean;
+}
+const requests = new Map<string, Pending>();
+
+function acquire(region: Region, context: string, force = false): Pending {
+  const key = `${region}|${context}`;
+  const hit = requests.get(key);
+  if (hit && !force && Date.now() - hit.at < CLIENT_TTL_MS) {
+    hit.users++;
+    return hit;
+  }
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
+  const entry: Pending = { promise: Promise.resolve(null), at: Date.now(), users: 1, ac, done: false };
+  entry.promise = fetch(listingsUrl(region, context), { signal: ac.signal, headers: { Accept: "application/json" } })
+    .then((r) => (r.ok ? r.json() : null))
+    .catch(() => null)
+    .then((body) => {
+      entry.done = true;
+      if (!body && requests.get(key) === entry) requests.delete(key); // a failure is not remembered
+      return body;
+    })
+    .finally(() => clearTimeout(timer));
+  requests.set(key, entry);
+  return entry;
+}
+
+/** A unit stops waiting: with nobody left, an unfinished request is aborted. (By entry, not key: a newer request under the same key is not touched.) */
+function release(entry: Pending) {
+  entry.users = Math.max(0, entry.users - 1);
+  if (entry.users === 0 && !entry.done) {
+    entry.ac.abort();
+    for (const [k, v] of requests) if (v === entry) requests.delete(k);
+  }
+}
+
+type State = { status: "idle" } | { status: "ready"; a: Accepted } | { status: "none" };
+
+/**
+ * Observe `ref`; the first time it comes within 300 px of the viewport (or at once where IntersectionObserver is
+ * missing, or when `eager`: a row of the price table, which must be in place before the visitor reaches it), load the context.
+ * Returns the unit's state. While data is shown it is re-checked against its age bound.
+ */
+export function useListings(opts: { region: Region; context: string; placement: Placement; min: number; eager?: boolean }): { ref: React.RefObject<HTMLDivElement>; state: State; now: number } {
+  const { region, context, placement, min, eager = false } = opts;
+  const ref = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<State>({ status: "idle" });
+  const [round, setRound] = useState(0); // bumped to re-fetch once the shown rows have aged out
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!isRegion(region) || !isContextString(context)) {
+      setState({ status: "none" });
+      return;
+    }
+    const node = ref.current;
+    let held: Pending | null = null;
+    let cancelled = false;
+    const load = (force: boolean) => {
+      held = acquire(region, context, force);
+      held.promise.then((body) => {
+        if (cancelled) return;
+        const a = acceptResponse(body, Date.now(), min);
+        setNow(Date.now());
+        setState(a ? { status: "ready", a } : { status: "none" });
+      });
+    };
+    let io: IntersectionObserver | null = null;
+    if (eager || typeof IntersectionObserver === "undefined" || !node) {
+      load(round > 0);
+    } else {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io?.disconnect();
+            load(round > 0);
+          }
+        },
+        { rootMargin: "300px 0px" },
+      );
+      io.observe(node);
+    }
+    return () => {
+      cancelled = true;
+      io?.disconnect();
+      if (held) release(held);
+    };
+  }, [region, context, placement, min, eager, round]);
+
+  // The age bound, enforced here too. The route says how old a row may be (and never returns older); a tab left open
+  // for hours must not keep showing rows that have since crossed it: check on a timer and when the tab comes back,
+  // drop them for the CTA, and look again (at most every 10 minutes: the daily import may have replaced them).
+  const a = state.status === "ready" ? state.a : null;
+  useEffect(() => {
+    if (!a) return;
+    let lastTry = 0;
+    const check = () => {
+      if (document.visibilityState !== "visible") return;
+      setNow(Date.now());
+      if (!isFresh(a)) {
+        setState({ status: "none" });
+        if (Date.now() - lastTry > REFETCH_MIN_MS) {
+          lastTry = Date.now();
+          setRound((n) => n + 1);
+        }
+      }
+    };
+    const id = setInterval(check, CHECK_MS);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [a]);
+
+  return { ref, state, now };
+}
+
+/** Does the browser keep the page still by itself when content above the viewport changes height (CSS scroll anchoring: Chrome, Edge, Firefox; not Safari)? */
+const nativeScrollAnchoring = () => typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("overflow-anchor", "auto");
+
+/**
+ * `none` (there are no listings to show): true once the unit is entirely outside the viewport, which is when it is safe
+ * to drop its reserved height. Without IntersectionObserver, at once.
+ *
+ * Nothing visible may move (CLS 0). Below the viewport the drop moves nothing that is on screen. Above it, the content under the
+ * unit is what the visitor is reading and must stay where it is:
+ *   • a browser with scroll anchoring (Chrome, Edge, Firefox) does that by itself, and a script that also moves the scroll position
+ *     fights it, so there the unit is simply dropped;
+ *   • Safari has no scroll anchoring: there the drop waits until the visitor has stopped scrolling for a moment (so the scroll position
+ *     read now is still the one in force when the page changes) and the scroll position is then moved by exactly the height the unit
+ *     lost, in the same frame (a layout effect);
+ *   • either way, a unit is NOT dropped while the visitor is at the foot of the page: the page would become shorter than their scroll
+ *     position, the browser would clamp it and the whole footer would jump (a measured layout shift of 0.4, from the strip above the
+ *     footer). It is dropped once they scroll up.
+ * `belowOnly` (a grid cell, whose removal reflows the cards after it by whole rows) never drops a unit that is above or in the viewport.
+ */
+function useCollapsed(ref: React.RefObject<HTMLDivElement>, none: boolean, belowOnly = false): boolean {
+  const [collapsed, setCollapsed] = useState(false);
+  const was = useRef<{ height: number; scroll: number } | null>(null);
+  useEffect(() => {
+    if (!none || collapsed) return;
+    const node = ref.current;
+    if (!node || typeof IntersectionObserver === "undefined") {
+      setCollapsed(true);
+      return;
+    }
+    const anchored = nativeScrollAnchoring();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let armed = false; // the unit is out of the viewport and waiting for the right moment to drop
+    const drop = () => {
+      timer = undefined;
+      armed = false;
+      // Judge by where the unit is NOW (the observer's entries may be a frame old, and the visitor may have scrolled back).
+      const r = node.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < window.innerHeight) return;
+      const above = r.bottom <= 0;
+      if (above && belowOnly) return;
+      if (above) {
+        const cta = node.querySelector<HTMLElement>('[data-state="cta"]');
+        const shrink = r.height - (cta ? cta.offsetHeight : 0);
+        if (window.scrollY + window.innerHeight > document.documentElement.scrollHeight - shrink) {
+          armed = true; // at the foot of the page: not now
+          return;
+        }
+      }
+      was.current = above && !anchored ? { height: r.height, scroll: window.scrollY } : null;
+      setCollapsed(true);
+    };
+    const settle = () => {
+      if (timer) clearTimeout(timer);
+      armed = true;
+      timer = setTimeout(drop, 250);
+    };
+    const onScroll = () => {
+      if (armed) settle(); // still scrolling: look again at the next pause
+    };
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.every((e) => !e.isIntersecting)) return;
+      const r = node.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < window.innerHeight) return;
+      if (r.bottom <= 0 && !anchored) settle(); // above, without scroll anchoring: after the scrolling stops
+      else drop();
+    });
+    io.observe(node);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      io.disconnect();
+      if (timer) clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [ref, none, collapsed, belowOnly]);
+  useLayoutEffect(() => {
+    if (!collapsed || !was.current) return;
+    const node = ref.current;
+    const { height, scroll } = was.current;
+    was.current = null;
+    // An ABSOLUTE target (not a relative nudge): the scroll position was read at the pause and has not moved since.
+    if (node) window.scrollTo(window.scrollX, Math.max(0, scroll + (node.getBoundingClientRect().height - height)));
+  }, [collapsed, ref]);
+  return collapsed;
+}
+
+// ─── Pieces ────────────────────────────────────────────────────────────────────
+
+const Arrow = () => <span aria-hidden="true">↗</span>;
+
+/** The placement of a highlighted button (affiliate.ts PLACEMENTS), by the strip it sits in: one per surface, so each highlight's clicks can be told apart. */
+export function hotPlacement(strip: Placement): Placement {
+  if (strip === "listings-home-sealed" || strip === "listings-home" || strip === "listings-landing") return "hot-home";
+  if (strip === "listings-set") return "hot-set";
+  return "hot-product";
+}
+
+/**
+ * The highlighted eBay search of a popular product or set: eBay's own button blue (#3665f3, white text 4.9:1), a full-width row
+ * on a phone, at least 44 px tall. A sponsored search link like the CTA's: rel sponsored, one buy_click under its surface's hot placement, and
+ * always inside a unit labelled "Ad".
+ */
+function HotLink({ region, highlight, placement, className = "" }: { region: Region; highlight: EbayHighlight; placement: Placement; className?: string }) {
+  const hot = highlight.placement ?? hotPlacement(placement);
+  // The label wraps rather than truncates: at 320 px a cut label would lose "eBay". It is the same element in the reserved box and
+  // in the strip, so a two-line label is the same height in both (no shift).
+  return (
+    <OutboundLink
+      href={ebaySearchUrl(highlight.query, region, hot)}
+      rel={REL_SPONSORED}
+      retailer={ebayRetailer(region)}
+      placement={hot}
+      className={`inline-flex min-h-11 min-w-0 max-w-full items-center justify-center gap-2 rounded-full bg-[#3665f3] px-5 py-2 text-center text-sm font-bold leading-5 text-white shadow-card transition-colors hover:bg-[#2a50c8] ${className}`}
+    >
+      <span>{highlight.label}</span> <Arrow />
+    </OutboundLink>
+  );
+}
+
+export type StripVariant = "full" | "slim";
+
+/** What the compact CTA searches eBay for. */
+export interface StripSearch {
+  kind?: "sealed" | "card";
+  /** A product, set or type name; "" = Magic sealed in general. */
+  query?: string;
+  /** The CTA's words, when "Search <query> on eBay" is not the right sentence. */
+  label?: string;
+}
+
+const DEFAULT_HEADINGS: Record<FeedKind, string> = {
+  chase: "High-end sealed on eBay",
+  sealed: "Sealed sports cards on eBay",
+  set: "Sealed sports cards on eBay",
+  type: "Sealed sports cards on eBay",
+  item: "Sealed sports cards on eBay",
+};
+
+const SITE_SUFFIX: Partial<Record<Region, string>> = { nz: " Australia", sg: " US" };
+
+function searchHref(region: Region, placement: Placement, s: StripSearch): string {
+  // "card" is the old card kind, kept so an old call site compiles: the site lists no cards, so it searches high-end sealed.
+  return s.kind === "card" ? ebaySearchUrl(s.query || "hobby box", region, placement) : ebaySearchUrl(s.query ?? "", region, placement);
+}
+
+function ctaLabel(s: StripSearch): string {
+  if (s.label) return s.label;
+  const q = (s.query ?? "").trim();
+  if (s.kind === "card") return q ? `Search ${q.slice(0, 36)} on eBay` : "Search collector boxes on eBay";
+  return q ? `Search ${q.length > 38 ? `${q.slice(0, 37)}…` : q} on eBay` : "Search sealed sports cards on eBay";
+}
+
+/**
+ * The compact single-row unit: wordmark, "Ad", one search button, the short affiliate note. What a strip is when there is nothing to list.
+ * With a `highlight` that button IS the highlight (its words, its search, eBay's blue, its surface's hot placement), on a row of its own on a phone.
+ */
+export function EbayCta({ region, placement, search, highlight, site, reserveNote = false, className = "" }: { region: Region; placement: Placement; search: StripSearch; highlight?: EbayHighlight; site?: string; reserveNote?: boolean; className?: string }) {
+  return (
+    <div data-ad={placement} data-state="cta" role="group" aria-label="Sponsored: eBay search" className={`ad-box px-3 py-2.5 sm:px-4 ${className}`}>
+      <div className={`flex items-center gap-x-3 ${highlight ? "flex-wrap gap-y-2" : ""}`}>
+        <span className="flex shrink-0 items-center gap-2">
+          <EbayMark className="text-lg" />
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Ad{site ? ` · ${site}` : ""}</span>
+        </span>
+        {highlight ? (
+          <HotLink region={region} highlight={highlight} placement={placement} className="w-full sm:ml-auto sm:w-auto" />
+        ) : (
+          <OutboundLink href={searchHref(region, placement, search)} rel={REL_SPONSORED} retailer={ebayRetailer(region)} placement={placement} className="btn-ad ml-auto min-w-0 max-w-full px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm">
+            <span className="truncate">{ctaLabel(search)}</span> <Arrow />
+          </OutboundLink>
+        )}
+      </div>
+      <p className={`mt-1.5 text-[11px] leading-4 text-muted ${reserveNote ? "min-h-8 sm:min-h-4" : ""}`}>{AFFILIATE_NOTE_SHORT} Goes to {ebayLabel(region)}.</p>
+    </div>
+  );
+}
+
+/**
+ * NZ and SG visitors are served the AU / US feeds, whose shipping was priced to Australia and the US (and which may not ship to NZ or
+ * SG at all): their tiles make no shipping claim ("Shipping on eBay", never "Free shipping" or a cost), and the disclosure says whose
+ * listings these are.
+ */
+const SHARED_FEED_NOTE: Partial<Record<Region, string>> = {
+  nz: "These are eBay Australia listings (the eBay New Zealand buyers use); delivery to New Zealand is not shown here, so check it on eBay.",
+  sg: "These are eBay US listings (the eBay Singapore buyers use); delivery to Singapore is not shown here, so check it on eBay.",
+};
+const SHARED_FEED_SHORT: Partial<Record<Region, string>> = { nz: "From eBay Australia; delivery to New Zealand is not shown.", sg: "From eBay US; delivery to Singapore is not shown." };
+function shipFor(region: Region, ship: AcceptedItem["ship"]): { text: string; free: boolean } {
+  return SHARED_FEED_NOTE[region] ? { text: "Shipping on eBay", free: false } : shipLabel(ship);
+}
+
+const DISCLOSURE = "Affiliate link: as an eBay Partner Network affiliate, WaxCompare earns from qualifying purchases — at no extra cost to you.";
+
+/** The disclosure under every strip: the affiliate note, and how old the data is (eBay's API licence asks for exactly that). */
+function Disclosure({ age, maxAgeMs, region, regionNote }: { age: string; maxAgeMs: number; region: Region; regionNote: boolean }) {
+  return (
+    <p className="mt-3 text-[11px] leading-4 text-muted sm:text-xs sm:leading-5">
+      {DISCLOSURE} Listings are imported from eBay {importCadence(maxAgeMs)} (updated {age}), so price and availability may have changed; check eBay.
+      {regionNote && SHARED_FEED_NOTE[region] ? ` ${SHARED_FEED_NOTE[region]}` : ""}
+    </p>
+  );
+}
+
+// ─── Tiles ─────────────────────────────────────────────────────────────────────
+// Every height in a tile is fixed (title: two lines of 18px, price, shipping and condition lines of fixed
+// height, a 3:4 thumbnail box), so the skeleton and the listings are the same size and nothing moves.
+
+const TILE_W: Record<StripVariant, string> = { full: "w-[148px] sm:w-[164px]", slim: "w-[148px] sm:w-[164px]" };
+// A card is portrait (3:4); a sealed product's photo is a box, near square. The shape follows the CONTEXT (not the feed that answers: a
+// chase or set context only ever cascades to chase cards, a sealed / type / item context only to sealed product), so the skeleton and
+// the listings are the same size.
+const THUMB: Record<StripVariant, { portrait: string; square: string }> = {
+  full: { portrait: "aspect-[3/4] w-full", square: "aspect-square w-full" },
+  slim: { portrait: "h-36 w-full", square: "h-36 w-full" },
+};
+// Every feed is sealed product since the Magic port (the "chase" feed is high-end sealed): no context is a card.
+const isCardContext = (_context: string) => false;
+const TILE_BOX = "group flex h-full flex-col rounded-lg border border-line bg-surface p-2 transition-colors hover:border-ink/40";
+
+function Tile({ item, region, placement, variant, portrait, onBroken }: { item: AcceptedItem; region: Region; placement: Placement; variant: StripVariant; portrait: boolean; onBroken: (id: string) => void }) {
+  const ship = shipFor(region, item.ship);
+  const cond = conditionLabel(item.condition);
+  return (
+    <OutboundLink
+      href={item.href}
+      rel={REL_SPONSORED}
+      retailer={ebayRetailerForHref(item.href, region)}
+      placement={placement}
+      className={TILE_BOX}
+      // A tile that is only partly inside the phone row is brought fully into view when it takes keyboard focus.
+      onFocus={(e) => e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" })}
+    >
+      <span className={`relative block shrink-0 overflow-hidden rounded-md bg-raised ${THUMB[variant][portrait ? "portrait" : "square"]}`}>
+        {/* eBay's own picture, as eBay serves it: a plain <img> (never proxied or resized by us). A failed one hides its tile.
+            Its alt is the listing title (SEO audit, 2026-11-03: image search reads alt, not the neighbouring text). */}
+        <img
+          src={item.imageUrl}
+          alt={item.title}
+          width={500}
+          height={500}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => onBroken(item.id)}
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+        {/* Graded / Ungraded is the fact a card's price turns on, and the shipping line is too narrow on a phone to carry it. */}
+        {cond && <span className="absolute bottom-1 left-1 max-w-[calc(100%-0.5rem)] truncate rounded bg-surface/90 px-1.5 py-0.5 text-[10px] font-semibold leading-3 text-ink shadow-card">{cond}</span>}
+      </span>
+      <span className="mt-2 line-clamp-2 h-9 text-xs font-semibold leading-[18px] group-hover:text-brand">{item.title}</span>
+      <span className="mt-1 flex h-5 items-baseline gap-1 leading-5">
+        <span className="tabular min-w-0 truncate text-[15px] font-bold">{formatPrice(item.price)}</span>
+        <span className="ml-auto shrink-0 text-xs font-semibold text-brand" aria-hidden="true">
+          <Arrow />
+        </span>
+      </span>
+      <span className={`block h-4 truncate text-[11px] leading-4 ${ship.free ? "font-medium text-open" : "text-muted"}`}>
+        {ship.text}
+      </span>
+      <span className="sr-only">{cond ? ` ${cond}.` : ""} View on eBay (opens in a new tab)</span>
+    </OutboundLink>
+  );
+}
+
+function SkeletonTile({ variant, portrait }: { variant: StripVariant; portrait: boolean }) {
+  return (
+    <div aria-hidden="true" className={TILE_BOX}>
+      <span className={`block shrink-0 rounded-md bg-raised ${THUMB[variant][portrait ? "portrait" : "square"]}`} />
+      <span className="mt-2 block h-9" />
+      <span className="mt-1 block h-5" />
+      <span className="block h-4" />
+    </div>
+  );
+}
+
+/** The row: a scroll-snap strip on phones (the unit scrolls, never the page) and a fixed grid from lg. `narrow`: always the scroll row (a column that cannot fit six). */
+function TileRow({ variant, label, narrow, fit, children }: { variant: StripVariant; label: string; narrow: boolean; fit: boolean; children: ReactNode }) {
+  const cols = fit ? "lg:grid-cols-[repeat(var(--n),minmax(0,176px))]" : variant === "slim" ? "lg:grid-cols-4" : "lg:grid-cols-6";
+  const grid = narrow ? "" : `lg:grid lg:overflow-visible lg:pb-1 ${cols}`;
+  // px-1/pt-1 (and the negative margins that cancel them) give the focus ring room inside the scrolling row, which would clip it.
+  return (
+    <ul role="list" aria-label={label} className={`relative -mx-1 mt-2 flex snap-x snap-mandatory scroll-px-1 gap-3 overflow-x-auto overscroll-x-contain px-1 pb-2 pt-1 [scrollbar-width:thin] ${grid}`}>
+      {children}
+    </ul>
+  );
+}
+
+function TileItem({ variant, narrow, children }: { variant: StripVariant; narrow: boolean; children: ReactNode }) {
+  return <li className={`shrink-0 snap-start ${TILE_W[variant]} ${narrow ? "" : "lg:w-auto"}`}>{children}</li>;
+}
+
+/**
+ * The top line, as in Rift Compare's strip: wordmark, "AD · LIVE LISTINGS ON EBAY", the headline, and how old the data is.
+ * One row from sm up (the headline beside the label); on a phone, and always in a `narrow` column (the product page's right column,
+ * where the headline would be cut to "Sun & Moon Booster Box on e..."), the headline is a row of its own. Fixed row heights, so the skeleton matches.
+ * A `hot` button (a popular product or set) ends the row from lg up; below lg (and always in a `narrow` column) it is a row of its own under
+ * the headline: full width on a phone, its own width from sm. Its row is there in the skeleton too.
+ */
+function TopLine({ site, heading, age, twoLine, narrow, hot }: { site: string; heading: string; age: string; twoLine: boolean; narrow: boolean; hot?: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="order-1 flex min-w-0 items-center gap-2">
+        <EbayMark className="text-lg" />
+        <span className="truncate text-[11px] font-semibold uppercase tracking-wide text-muted">Ad · Live listings on eBay{site}</span>
+      </div>
+      {/* A long product name wraps to two lines (the whole name, not "Ascended Heroes - Focused Fighters Premi…"); the height is reserved either way. */}
+      <p title={heading} className={`order-3 w-full min-w-0 font-display text-base font-bold leading-6 tracking-tight ${narrow ? "" : "sm:order-2 sm:w-auto sm:flex-1 sm:text-lg"} ${twoLine ? "line-clamp-2 h-12" : "h-6 truncate"}`}>
+        {heading}
+      </p>
+      <span className={`order-2 ml-auto shrink-0 text-[11px] text-muted ${narrow ? "" : "sm:order-3 sm:text-xs"}`}>Updated {age}</span>
+      {hot && <div className={`order-4 flex w-full pt-1 ${narrow ? "" : "lg:w-auto lg:pt-0"}`}>{hot}</div>}
+    </div>
+  );
+}
+
+// ─── The strip ─────────────────────────────────────────────────────────────────
+
+const SHOWN: Record<StripVariant, number> = { full: 6, slim: 4 };
+
+export interface EbayStripProps {
+  region: Region;
+  /** "chase" | "sealed" | "set:<slug>" | "type:<slug>" | "item:<slug>" (ebay-context.ts isContextString). */
+  context: string;
+  placement: Placement;
+  variant?: StripVariant;
+  /** The headline per feed kind: the cascade decides which feed answers, so the page supplies the words for each it might. */
+  headings?: Partial<Record<FeedKind, string>>;
+  /** What the compact CTA (shown when there is nothing to list) searches eBay for. */
+  search?: StripSearch;
+  /**
+   * A popular product or set (components/Ebay.tsx hotSetHighlight / hotProductHighlight): an eBay-blue search button in the strip's
+   * top line, in every state, and the compact CTA's button (in place of `search`). Placement: the highlight's own (set-sealed), else hot-home / hot-set / hot-product.
+   */
+  highlight?: EbayHighlight;
+  /** "US" on the landing page (no region of its own): the strip says which eBay. */
+  site?: string;
+  /** Inside a column too narrow for six tiles (the product page's right column): always the scroll row. */
+  narrow?: boolean;
+  /**
+   * False only on the 404 page, whose region is read after mount (it renders for the US and switches): anything that would change the
+   * unit's HEIGHT with the region is then left out or reserved, so nothing moves after the first paint. The NZ / SG sentence of the
+   * disclosure is left out (the top line, "Live listings on eBay Australia", and the "Shipping on eBay" lines carry it) and the compact
+   * CTA's note keeps two lines on a phone ("Goes to ebay.com.au" wraps where "Goes to ebay.com" does not).
+   */
+  regionKnown?: boolean;
+  className?: string;
+}
+
+export function EbayStrip({ region, context, placement, variant = "full", headings, search = {}, highlight, site, narrow = false, regionKnown = true, className = "" }: EbayStripProps) {
+  const count = SHOWN[variant];
+  const portrait = isCardContext(context);
+  const min = context.startsWith("item:") ? 1 : Math.min(2, count);
+  const { ref, state, now } = useListings({ region, context, placement, min: Math.max(1, min) });
+  const [broken, setBroken] = useState<ReadonlySet<string>>(new Set());
+  const items = state.status === "ready" ? state.a.items.slice(0, count).filter((i) => !broken.has(i.id)) : null;
+  const none = state.status === "none" || (!!items && items.length < Math.max(1, min));
+  const collapsed = useCollapsed(ref, none);
+  const siteName = site ? ` ${site}` : SITE_SUFFIX[region] ?? "";
+  // A product's name can be long: any heading over 34 characters (the phone row holds about that many) gets two lines, reserved from the start.
+  const twoLine = Object.values(headings ?? {}).some((h) => h.length > 34);
+  // A product page's strip carries the order note when its own listings answer (item feeds are stored lowest price first): the line is reserved either way.
+  const orderNote = context.startsWith("item:");
+
+  const cta = <EbayCta region={region} placement={placement} search={search} highlight={highlight} site={siteName.trim() || undefined} reserveNote={!regionKnown} />;
+  const hot = highlight ? <HotLink region={region} highlight={highlight} placement={placement} className="w-full sm:w-auto" /> : undefined;
+  // The strip's markup, with real tiles or with skeletons: ONE function, so the reserved box and the strip are the same height.
+  const body = (shown: AcceptedItem[] | null, heading: string, age: string, feed: FeedKind | null, maxAgeMs: number, fitN: number | null = null) => (
+    <>
+      <TopLine site={siteName} heading={heading} age={age} twoLine={twoLine} narrow={narrow} hot={hot} />
+      {orderNote && (
+        <p className="mt-1 h-4 text-[11px] leading-4 text-muted">{feed === "item" ? "Lowest price first, before shipping" : "\u00a0"}</p>
+      )}
+      <TileRow variant={variant} narrow={narrow} fit={fitN != null} label={`${heading} (ads)`}>
+        {shown
+          ? shown.map((it) => (
+              <TileItem key={it.id} variant={variant} narrow={narrow}>
+                <Tile item={it} region={region} placement={placement} variant={variant} portrait={portrait} onBroken={(id) => setBroken((s) => new Set(s).add(id))} />
+              </TileItem>
+            ))
+          : Array.from({ length: count }, (_, i) => (
+              <TileItem key={i} variant={variant} narrow={narrow}>
+                <SkeletonTile variant={variant} portrait={portrait} />
+              </TileItem>
+            ))}
+      </TileRow>
+      <Disclosure age={age} maxAgeMs={maxAgeMs} region={region} regionNote={regionKnown} />
+    </>
+  );
+
+  // ONE wrapper element in every state (the ref, and the scroll compensation of useCollapsed, need it to persist).
+  if (none && collapsed) return <div ref={ref} className={className}>{cta}</div>;
+  // Not known yet (before the fetch, while it runs, and in the server-rendered page), or none and still in view: the CTA on top
+  // of an invisible, strip-sized box. The CTA is what a crawler or a visitor without script sees; the box keeps the unit's height,
+  // so the strip replaces it without moving the page. (Stacked in one grid cell: the taller of the two sets the height; the column
+  // is minmax(0,1fr) so the scrolling tile row cannot widen it.)
+  if (!items || none) {
+    return (
+      <div ref={ref} className={`grid grid-cols-[minmax(0,1fr)] ${className}`}>
+        <div aria-hidden="true" className="ad-box invisible col-start-1 row-start-1 p-3 sm:p-4">
+          {body(null, headings?.chase ?? DEFAULT_HEADINGS.chase, "26 h ago", null, hoursToMs(DEFAULT_MAX_AGE_HOURS))}
+        </div>
+        <div className="col-start-1 row-start-1 self-start">{cta}</div>
+      </div>
+    );
+  }
+  const a = state.status === "ready" ? state.a : null!;
+  const heading = headings?.[a.feed] ?? DEFAULT_HEADINGS[a.feed];
+  const label = `${heading} (ads)`;
+  // Fewer tiles than the row holds (a feed with 2-5 listings): on a wide screen the frame is only as wide as its tiles (but never narrower than its top line).
+  // Not with a highlight: its button ends the top line from lg up, and a narrowed frame would push it to a row of its own (a taller strip than the skeleton).
+  const cols = variant === "slim" ? 4 : 6;
+  const fitN = !narrow && !highlight && items.length < cols ? items.length : null;
+  const partial = fitN != null ? ({ "--n": fitN } as React.CSSProperties) : undefined;
+  return (
+    <div
+      ref={ref}
+      data-ad={placement}
+      data-feed={a.feed}
+      data-state="ready"
+      role="group"
+      aria-label={`Sponsored: ${label}`}
+      style={partial}
+      className={`ad-box p-3 sm:p-4 ${partial ? "lg:max-w-[max(34rem,calc(var(--n)*176px+34px))]" : ""} ${className}`}
+    >
+      {body(items, heading, formatAge(now - a.fetchedAtMs), a.feed, a.maxAgeMs, fitN)}
+    </div>
+  );
+}
+
+// ─── Above the footer ──────────────────────────────────────────────────────────
+
+/**
+ * The slim strip above every content page's footer (4 tiles). Which feed depends on the page (lib/ebay-ads.ts preFooterPlan):
+ * the one the page's own strip is not. A region's home page has none.
+ */
+export function PreFooterStrip({ region }: { region: Region }) {
+  const path = usePathname() || "";
+  const plan = preFooterPlan(path, region);
+  if (!plan) return null; // a region's home page: it has two strips of its own and renders <NoPreFooter/>
+  // Keyed by page: a soft navigation starts a fresh unit instead of showing the previous page's tiles until the new fetch answers.
+  return <EbayStrip key={`${region}|${path}|${plan.context}`} region={region} context={plan.context} placement="listings-footer" variant="slim" search={{ kind: "sealed", query: "" }} />;
+}
+
+// ─── The in-feed tiles (product grids) ─────────────────────────────────────────
+
+/**
+ * A real eBay listing among a long product grid's products (ProductGrid `tiles`, placed by lib/ebay-ads.ts feedSlots): a labelled
+ * sponsored tile the size of a product card. The `nth` tile of a grid (0, then 1) shows the sealed feed's 7th, then 8th listing
+ * (lib/ebay-ads.ts tileSource), which no strip on the page shows; one request serves every tile and strip of the same feed.
+ *
+ * Nothing moves (CLS 0): the cell is a grid item whose content is positioned inside it, so it always takes the height of its row (the
+ * product cards beside it set it) and never makes a row taller; until the listing is known it is the same cell, invisible. With no
+ * listing for it (a feed with fewer rows, the kill switch, rows past the age bound, a photo that fails) it is removed, but only once it
+ * is entirely below the viewport, where the cards it moves up are out of sight (useCollapsed `belowOnly`). `className` "md:hidden" (a
+ * short grid, ProductGrid) hides it from md up in every state; hidden, it never comes near the viewport, so it fetches nothing.
+ *
+ * The whole tile is one sponsored link (a stretched link: its accessible name is the title, price and shipping), labelled "Ad" with the
+ * eBay wordmark and the listing's age at the top, eBay's own photo on a plate, the eBay-blue "View on eBay" button and the affiliate note.
+ */
+export function EbayFeedTile({ region, nth, placement, className = "" }: { region: Region; nth: number; placement: Placement; className?: string }) {
+  const index = FEED_FIRST_INDEX + nth; // tileSource(surface, nth).index: the same listing on every surface
+  const { ref, state, now } = useListings({ region, context: "sealed", placement, min: index + 1 });
+  const [broken, setBroken] = useState(false);
+  const a = state.status === "ready" ? state.a : null;
+  const item = a && !broken ? a.items[index] ?? null : null;
+  const none = state.status === "none" || (state.status === "ready" && !item);
+  const collapsed = useCollapsed(ref, none, true);
+  if (none && collapsed) return null;
+  if (!a || !item) return <div ref={ref} aria-hidden="true" className={`invisible ${className}`.trim()} />;
+  const ship = shipFor(region, item.ship);
+  const cond = conditionLabel(item.condition);
+  const age = formatAge(now - a.fetchedAtMs);
+  return (
+    <div ref={ref} data-ad={placement} data-feed={a.feed} data-state="ready" role="group" aria-label="Sponsored: eBay listing (ad)" className={`relative ${className}`.trim()}>
+      <div className="ad-box group absolute inset-0 flex flex-col p-2.5 transition-shadow hover:shadow-lift sm:p-3">
+        <div className="flex h-5 shrink-0 items-center gap-1.5">
+          <EbayMark className="text-[15px]" />
+          <span className="ad-pill">Ad</span>
+          <span className="ml-auto flex min-w-0 items-center gap-1 text-[11px] leading-4 text-muted">
+            <Icon name="clock" size={12} className="shrink-0" />
+            <span className="truncate">
+              <span className="sr-only sm:not-sr-only">Updated </span>
+              {age}
+            </span>
+          </span>
+        </div>
+        <span className="plate relative mt-2 block min-h-0 flex-1">
+          {/* eBay's own picture, as eBay serves it (never proxied or resized by us); a failed one removes the tile. its alt is
+              the listing title (SEO audit, 2026-11-03). */}
+          <img src={item.imageUrl} alt={item.title} width={500} height={500} loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="absolute inset-0 h-full w-full object-contain p-2" />
+          {cond && <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-0.75rem)] truncate rounded bg-surface/90 px-1.5 py-0.5 text-[10px] font-semibold leading-3 text-ink shadow-card">{cond}</span>}
+        </span>
+        <OutboundLink
+          href={item.href}
+          rel={REL_SPONSORED}
+          retailer={ebayRetailerForHref(item.href, region)}
+          placement={placement}
+          className="mt-2 block shrink-0 after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-brand"
+        >
+          <span className="line-clamp-2 h-9 text-[13px] font-semibold leading-[18px] group-hover:text-brand sm:text-sm sm:leading-[18px]">{item.title}</span>
+          <span className="tabular mt-1 block truncate font-display text-lg font-bold leading-6">{formatPrice(item.price)}</span>
+          <span className={`block h-4 truncate text-[11px] leading-4 ${ship.free ? "font-medium text-open" : "text-muted"}`}>{ship.text}</span>
+          <span className="sr-only"> View on eBay (opens in a new tab)</span>
+        </OutboundLink>
+        <span aria-hidden="true" className="btn-ad mt-2 h-8 w-full shrink-0 whitespace-nowrap px-2 py-0 text-xs group-hover:bg-[#2a50c8]">
+          View on eBay <Arrow />
+        </span>
+        <p className="mt-1.5 shrink-0 text-[10.5px] leading-[14px] text-muted">
+          {AFFILIATE_NOTE_SHORT}
+          <span className="hidden sm:inline"> Imported from eBay {importCadence(a.maxAgeMs)}: the price may have changed, so check eBay.</span>
+          {SHARED_FEED_SHORT[region] ? ` ${SHARED_FEED_SHORT[region]}` : ""}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── The eBay row of a product's price table ───────────────────────────────────
+
+/**
+ * The product's eBay listing that the price table shows, and that COUNTS AS THE CHEAPEST PRICE when it beats every store you can buy
+ * from (the owner's call, 2026-10-11): the lowest-priced plausible listing of its OWN feed (lib/ebay-offer-row.ts pickListing: never its
+ * type's or generic listings, never one under the store-price floor or stating another pack count), its price in cents when it is in the
+ * stores' currency (else null: never compared), and how old it is. Fetched as soon as the page runs; one request however many callers
+ * (the table row and the best-price card share it through `acquire`).
+ */
+export function useEbayPick({ region, slug, floor, packs, placement }: { region: Region; slug: string; floor: PriceFloor | null; packs: number | null; placement: Placement }) {
+  const { ref, state, now } = useListings({ region, context: `item:${slug}`, placement, min: 1, eager: true });
+  const a = state.status === "ready" && state.a.feed === "item" ? state.a : null;
+  const item = a ? pickListing(a.items, floor, packs) : null;
+  const cents = item && item.price.currency === REGIONS[region]?.currency ? listingCents(item.price.value) : null;
+  // Only a NEW listing, priced in the stores' currency, can be the best price (a used or graded box is not the product the stores sell).
+  const bestable = item != null && cents != null && !conditionLabel(item.condition);
+  return { ref, item, cents, bestable, age: a ? formatAge(now - a.fetchedAtMs) : "" };
+}
+
+// The price table's split into visible rows and collapsed groups, and its store rows (imported here, beside the two functions that use
+// them; OfferTable.tsx imports this module too, which is fine: neither uses the other while the modules load).
+import { EBAY_ROW_KEY, moreClosedLabel, moreOpenLabel, splitRows } from "@/lib/ebay-offer-row";
+import { PIN_OUTLINE, ROW_ACTIONS, ROW_BUTTON_LINK, ROW_GRID, StoreRow, useRankedRows, type StoreRowData } from "./OfferRows";
+import { StockPill } from "./StockPill";
+import { StoreVote } from "./StoreVote";
+import { CartAddButton } from "./cart/CartAddButton";
+
+/**
+ * A product's price table with eBay and TCGplayer PINNED at the top (the owner, 2026-10-26: "put eBay at the very top … then TCGplayer
+ * second to eBay, and then all the price rows start being cheapest"): the eBay row first, the TCGplayer row (`tcg`) second, then the
+ * store rows, ranked. Every row has the store rows' layout; only the button tells them apart: eBay blue, TCGplayer ink, the cheapest
+ * store red, the others soft.
+ *
+ * The cheapest row of the whole table carries the tint and "Best price", whichever it is: the eBay listing when it is a new listing in
+ * the stores' currency cheaper than every store you can buy from (never on a pre-order product, `allowBest`), TCGplayer when its offer
+ * is in the region's currency (the US) and cheaper, else the cheapest store. The cheapest store keeps its red button either way and
+ * reads "Best store price" when eBay or TCGplayer is cheaper. Neither eBay nor TCGplayer is counted as a store ("Prices at N stores",
+ * the median). Under "Price + shipping" only the stores re-rank, and only a store can be the best price (eBay's and TCGplayer's
+ * shipping are not measured).
+ *
+ * The server HTML (and a visitor without script) has the eBay row as an eBay SEARCH for the product; the listing is fetched as soon as
+ * the page runs (useEbayPick, shared with the best-price card) and replaces it in place: the row never moves.
+ */
+export function OfferRowsWithEbay({
+  rows: given,
+  tcg = null,
+  amazon = null,
+  region,
+  slug,
+  query,
+  floor,
+  packs = null,
+  allowBest: allowGiven = true,
+  preorder = false,
+}: {
+  rows: StoreRowData[];
+  /** The TCGplayer row, pinned third, under eBay and Amazon (owner, 2026-11-06; OfferTable builds it); null = none. */
+  tcg?: StoreRowData | null;
+  /** The Amazon row, pinned second, right under eBay (owner, 2026-11-06; OfferTable builds it where the region has an Amazon tag); null = none. Never the best price. */
+  amazon?: StoreRowData | null;
+  region: Region;
+  slug: string;
+  query: string;
+  floor: PriceFloor | null;
+  packs?: number | null;
+  allowBest?: boolean;
+  preorder?: boolean;
+}) {
+  const placement: Placement = "listings-offer-row";
+  const { ref, item, cents, bestable, age } = useEbayPick({ region, slug, floor, packs, placement });
+  const { mode, rows } = useRankedRows(given);
+  const byPrice = mode === "price";
+  // The best price of the whole table: the cheapest store you can buy from, unless TCGplayer (comparable, open) or then the eBay listing
+  // is strictly cheaper (a tie stays with the store).
+  const store = rows.find((r) => r.open) ?? null;
+  let top: "store" | "tcg" | "ebay" | null = store ? "store" : null;
+  let low = store?.cents ?? Infinity;
+  if (byPrice && tcg && tcg.open && !tcg.search && tcg.comparable !== false && tcg.cents < low) {
+    top = "tcg";
+    low = tcg.cents;
+  }
+  if (byPrice && allowGiven && bestable && cents != null && cents < low) top = "ebay";
+  const ebayRow = <EbayOfferRow key={EBAY_ROW_KEY} region={region} placement={placement} query={query} item={item} cents={cents} age={age} best={top === "ebay"} />;
+  type Slot = { key: string; open: boolean; node: ReactNode };
+  const slots: Slot[] = [
+    { key: EBAY_ROW_KEY, open: true, node: ebayRow },
+    ...(amazon ? [{ key: amazon.key, open: true, node: <StoreRow key={amazon.key} d={amazon} preorder={preorder} top={false} /> }] : []),
+    ...(tcg ? [{ key: tcg.key, open: tcg.open, node: <StoreRow key={tcg.key} d={tcg} preorder={preorder} top={top === "tcg"} /> }] : []),
+    ...rows.map((d) => ({ key: d.key, open: d.open, node: <StoreRow key={d.key} d={d} preorder={preorder} top={top === "store" && d === store} /> })),
+  ];
+  const { shown, moreOpen, moreClosed } = splitRows(slots);
+  const list = (part: Slot[]) => part.map((r) => r.node);
+  const more = (label: string, part: Slot[]) => (
+    <details className="group/more px-4 py-1 sm:px-5">
+      <summary className="btn-ghost min-h-11 w-full cursor-pointer list-none justify-center [&::-webkit-details-marker]:hidden">
+        <span className="group-open/more:hidden">{label}</span>
+        <span className="hidden group-open/more:inline">Show fewer</span>
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform group-open/more:rotate-180 motion-reduce:transition-none">
+          <path d="m5 7.5 5 5 5-5" />
+        </svg>
+      </summary>
+      <ul className="-mx-4 -mb-1 mt-1 divide-y divide-line border-t border-line sm:-mx-5">{list(part)}</ul>
+    </details>
+  );
+  return (
+    <div ref={ref}>
+      {/* Keyed lists: when the store rows re-rank, React moves their nodes instead of rebuilding them (focus kept) */}
+      <div className="group/offers divide-y divide-line" data-best={top ?? undefined}>
+        <ul className="divide-y divide-line">{list(shown)}</ul>
+        {moreOpen.length > 0 && more(moreOpenLabel(moreOpen, preorder), moreOpen)}
+        {moreClosed.length > 0 && more(moreClosedLabel(moreClosed.length, shown.some((r) => !r.open)), moreClosed)}
+      </div>
+    </div>
+  );
+}
+
+// The stores' own button (owner, 2026-11-01: eBay and Amazon rows "blend in and look exactly the same as the other price rows").
+const EBAY_BUTTON = "btn-soft";
+
+/**
+ * Since 2026-11-06 (owner: "eBay prices and Amazon prices should function exactly like a normal store price row. So you can also add
+ * to cart … if it's in stock … it just sits on the very top. And it has a different colored outline") a listing row has the store
+ * row's stock pill, thumbs (one tally for the eBay domain) and cart button (a manual line on its tagged link, lib/cart-list.ts), its
+ * shipping under the price, and a green outline.
+ *
+ * Shaped exactly like a store row (OfferRows.tsx StoreRow: the same grid, cells and line heights, 88 px on a phone), so it reads as one
+ * more price row; only the small "Ad" label sets it apart. The name cell says "eBay" (and the listing's condition when
+ * it is not new); the stock-pill cell, the listing's shipping (or "Marketplace" before there is a listing); the price cell, the listing's
+ * price; the host line, how old the listing is and its title.
+ */
+function EbayOfferRow({ region, placement, query, item, cents, age, best }: { region: Region; placement: Placement; query: string; item: AcceptedItem | null; cents: number | null; age: string; best: boolean }) {
+  const r = REGIONS[region];
+  const ship = item ? shipFor(region, item.ship) : null;
+  const cond = item ? conditionLabel(item.condition) : "";
+  const q = query.trim();
+  return (
+    <li data-offer-row="" data-ad={placement} data-state={item ? "listing" : "search"} className={`${ROW_GRID} ${best ? "bg-open-soft/40" : ""} ${PIN_OUTLINE.ebay}`}>
+      <div className="flex h-5 min-w-0 items-center gap-2 overflow-hidden sm:h-6">
+        <span className="truncate text-[15px] font-semibold sm:text-base">eBay</span>
+        <span className="ad-pill">Ad</span>
+        {best && <span className="shrink-0 rounded-full bg-open px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-surface">Best price</span>}
+        {cond && <span className="min-w-0 max-w-[9rem] truncate rounded-full border border-line bg-surface px-2 py-0.5 text-[10px] font-bold uppercase leading-3 tracking-wide text-muted">{cond}</span>}
+      </div>
+      <div className="truncate text-[11px] leading-4 text-faint sm:text-xs" title={item?.title}>
+        <StoreVote url={item ? item.href : ebaySearchUrl(q, region, placement)} name="eBay" className="-ml-1 mr-1 text-muted" />
+        {item ? (
+          <>
+            {ebayLabel(region)} · updated {age} · {item.title}
+          </>
+        ) : (
+          `Search ${q.length > 48 ? `${q.slice(0, 47)}…` : q || "this product"} on ${ebayLabel(region)}`
+        )}
+        <span className="text-muted"> · affiliate link</span>
+      </div>
+      {/* the stock pill, as on a store row: a Buy It Now listing is in stock; before there is one, what the row is */}
+      <div className="flex h-5 items-center justify-self-end [grid-area:1/2] sm:[grid-area:1/2/3]">
+        {item ? (
+          <StockPill state="open" preorder={false}>
+            In stock
+          </StockPill>
+        ) : (
+          <span className="block h-5 whitespace-nowrap rounded-full border border-line bg-surface px-2.5 text-xs font-semibold leading-[18px] text-muted sm:h-6 sm:leading-[22px]">Marketplace</span>
+        )}
+      </div>
+      <div className="mt-1 flex min-w-0 items-baseline gap-2 [grid-area:2/1] sm:mt-0 sm:block sm:text-right sm:[grid-area:1/3/3]">
+        {item ? (
+          <>
+            <span className="tabular font-display text-lg font-bold leading-6">{cents != null ? money(cents, r.market) : formatPrice(item.price)}</span>
+            {ship && <span className={`tabular truncate text-[11px] leading-4 sm:block sm:text-xs ${ship.free ? "font-semibold text-open" : "text-muted"}`}>{ship.text}</span>}
+          </>
+        ) : (
+          <span className="block truncate text-sm leading-6 text-muted sm:text-xs">eBay sellers&rsquo; prices</span>
+        )}
+      </div>
+      <div className={ROW_ACTIONS}>
+        {item && cents != null && (
+          <CartAddButton href={item.href} productUrl={item.href} storeName="eBay" title={item.title} priceCents={cents} currency={r.currency} image={item.imageUrl} className="text-muted" />
+        )}
+        <OutboundLink
+          href={item ? item.href : ebaySearchUrl(q, region, placement)}
+          rel={REL_SPONSORED}
+          retailer={item ? ebayRetailerForHref(item.href, region) : ebayRetailer(region)}
+          placement={placement}
+          className={`${EBAY_BUTTON} ${ROW_BUTTON_LINK}`}
+        >
+          {item ? "View on eBay" : "Search eBay"} <Arrow />
+          <span className="sr-only">{item ? ` (ad): ${item.title}, opens eBay` : " (ad), opens eBay"}</span>
+        </OutboundLink>
+      </div>
+    </li>
+  );
+}
+
+// ─── The small pair near the top of a product page ────────────────────────────
+
+/** A TCGplayer tile for MiniSealedAds: the same rows as TcgplayerStrip (lib/data.ts tcgplayerTiles). */
+export interface MiniTcgTile {
+  slug: string;
+  name: string;
+  imageUrl: string;
+  priceCents: number;
+  /** Already affiliate-tagged (tcgplayerAffiliateUrl), on the server. */
+  href: string;
+}
+
+const MINI_TILE = "flex w-[56px] shrink-0 snap-start flex-col overflow-hidden rounded-md border border-line bg-surface transition-colors hover:border-ink/40";
+
+function MiniRow({ brand, all, children }: { brand: ReactNode; all: ReactNode; children: ReactNode }) {
+  return (
+    // min-w-0: the row is a grid item, whose min-width is auto, so without it the row grew to the rail's content width (688px on
+    // a 390px phone), the rail never scrolled and the whole product page laid out 713px wide: tiny text, sideways scroll and half
+    // the paid tiles unreachable (2026-11-03 phone audit).
+    <div className="flex h-[78px] min-w-0 items-stretch gap-2">
+      <div className="flex w-12 shrink-0 flex-col items-center justify-center gap-1 text-center">
+        {brand}
+        {all}
+      </div>
+      <ul role="list" className="flex min-w-0 flex-1 snap-x gap-2 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:thin]">
+        {children}
+      </ul>
+    </div>
+  );
+}
+
+/**
+ * The small eBay + TCGplayer pair (owner, 2026-10-29: "much smaller … near the top … not intrusive"): one slim box under a product
+ * page's best price, an eBay row (the product's own listings, cascading like its strip: the same request, so no extra fetch) and a
+ * TCGplayer row (the set's products, the tiles TcgplayerStrip shows further down), 56px tiles with the price under each. Every height
+ * is fixed (CLS 0): an eBay row with nothing to list keeps its height as a search link. Labelled "Ad", the affiliate note inside.
+ */
+export function MiniSealedAds({
+  region,
+  context,
+  tcg,
+  ebayPlacement,
+  tcgPlacement,
+  ebayQuery,
+  tcgSearchHref,
+  className = "",
+}: {
+  region: Region;
+  context: string;
+  tcg: MiniTcgTile[];
+  ebayPlacement: Placement;
+  tcgPlacement: Placement;
+  ebayQuery: string;
+  tcgSearchHref: string;
+  className?: string;
+}) {
+  const { ref, state } = useListings({ region, context, placement: ebayPlacement, min: 1 });
+  const items = state.status === "ready" ? state.a.items.slice(0, 10) : null;
+  const usd = (cents: number) => (region === "us" ? money(cents, "US") : `US${money(cents, "US")}`);
+  const searchAll = ebaySearchUrl(ebayQuery, region, ebayPlacement);
+  return (
+    <div ref={ref} data-ad={ebayPlacement} role="group" aria-label="Sponsored: eBay and TCGplayer" className={`ad-box grid gap-2 p-2 lg:grid-cols-2 ${className}`}>
+      <MiniRow
+        brand={<EbayMark className="text-base" />}
+        all={
+          <OutboundLink href={searchAll} rel={REL_SPONSORED} retailer={ebayRetailer(region)} placement={ebayPlacement} className="text-[10px] font-bold text-brand">
+            All →
+          </OutboundLink>
+        }
+      >
+        {items && items.length
+          ? items.map((i) => (
+              <li key={i.id}>
+                <OutboundLink href={i.href} rel={REL_SPONSORED} retailer={ebayRetailerForHref(i.href, region)} placement={ebayPlacement} className={MINI_TILE} title={`${i.title} · ${formatPrice(i.price)}`}>
+                  <span className="relative block h-[56px] w-full overflow-hidden bg-raised">
+                    <img src={i.imageUrl} alt={i.title} width={56} height={56} loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-contain" />
+                  </span>
+                  <span className="tabular block truncate bg-[#0064d2] px-0.5 text-center text-[10px] font-black leading-4 text-white">{formatPrice(i.price)}</span>
+                  <span className="sr-only">{i.title}, on eBay</span>
+                </OutboundLink>
+              </li>
+            ))
+          : state.status === "idle"
+            ? Array.from({ length: 6 }, (_, n) => <li key={n} aria-hidden="true" className="h-[74px] w-[56px] shrink-0 rounded-md bg-raised" />)
+            : (
+                <li className="flex items-center">
+                  <OutboundLink href={searchAll} rel={REL_SPONSORED} retailer={ebayRetailer(region)} placement={ebayPlacement} className="btn-ad px-3 py-1.5 text-xs">
+                    Search this on {ebayLabel(region)} <Arrow />
+                  </OutboundLink>
+                </li>
+              )}
+      </MiniRow>
+      {tcg.length >= 3 && (
+        <MiniRow
+          brand={
+            <span className="text-[11px] font-black tracking-tight" aria-label="TCGplayer">
+              TCG<span className="text-[#1f6fe5]">player</span>
+            </span>
+          }
+          all={
+            <OutboundLink href={tcgSearchHref} rel={REL_SPONSORED} retailer="TCGplayer" placement={tcgPlacement} className="text-[10px] font-bold text-[#1f6fe5]">
+              All →
+            </OutboundLink>
+          }
+        >
+          {tcg.slice(0, 10).map((t) => (
+            <li key={t.slug}>
+              <OutboundLink href={t.href} rel={REL_SPONSORED} retailer="TCGplayer" placement={tcgPlacement} className={MINI_TILE} title={`${t.name} · ${usd(t.priceCents)}`}>
+                <span className="plate relative block h-[56px] w-full overflow-hidden">
+                  <img src={t.imageUrl} alt={t.name} width={56} height={56} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-contain p-0.5 mix-blend-multiply" />
+                </span>
+                <span className="tabular block truncate bg-[#1f6fe5] px-0.5 text-center text-[10px] font-black leading-4 text-white">{usd(t.priceCents)}</span>
+                <span className="sr-only">{t.name}, on TCGplayer</span>
+              </OutboundLink>
+            </li>
+          ))}
+        </MiniRow>
+      )}
+      <p className="flex items-center gap-2 text-[10px] leading-tight text-muted lg:col-span-2">
+        <span className="rounded bg-raised px-1.5 py-0.5 font-semibold uppercase tracking-wide">Ad</span>
+        <span>{AFFILIATE_NOTE_SHORT}{region !== "us" && tcg.length >= 3 ? " TCGplayer prices are in US$." : ""}</span>
+      </p>
+    </div>
+  );
+}

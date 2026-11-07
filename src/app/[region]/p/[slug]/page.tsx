@@ -1,0 +1,756 @@
+import { Flag } from "@/components/Flag";
+import Link from "@/components/Link";
+import { PriceHistoryChart } from "@/components/PriceHistoryChart";
+import { PreorderBanner } from "@/components/PreorderBanner";
+import { dailySeries, daysOfHistory, MIN_DAYS, readPriceHistory } from "@/lib/price-history";
+import { preorderPath } from "@/lib/preorder-guides";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import type { Metadata } from "next";
+import { Ago } from "@/components/Ago";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Icon } from "@/components/Icon";
+import { hotProductHighlight, isHotReleased, NoPreFooter } from "@/components/Ebay";
+import { EbayStrip, MiniSealedAds } from "@/components/EbayStrip";
+import { marketplaceOf } from "@/lib/ebay-context";
+import { ebayQuery, SoldOutCallout } from "@/components/Marketplaces";
+import { AmazonProductRow } from "@/components/Amazon";
+import { OfferTable } from "@/components/OfferTable";
+import { amazonLiveFor } from "@/lib/amazon-live";
+import { ReportPrice } from "@/components/ReportForms";
+import { PriceAlertForm } from "@/components/PriceAlertForm";
+import { ALERT_SITE_KEY } from "@/lib/alert-feed";
+import { ProductGrid } from "@/components/ProductGrid";
+import { ProductRail } from "@/components/ProductRail";
+import { Section } from "@/components/Section";
+import { BestPriceCard } from "@/components/BestPriceCard";
+import { StockPill } from "@/components/StockPill";
+import { stockHeadline } from "@/lib/stock";
+import { priceGap, shareText } from "@/lib/share-link";
+import { ShareButton } from "@/components/ShareButton";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { RecentTracker } from "@/components/Recent";
+import { ebaySearchUrl, offerLink, offerRetailer, tcgplayerAffiliateUrl, tcgplayerSearchUrl } from "@/lib/affiliate";
+import { productAdPlan, soldOutAdPlan } from "@/lib/ebay-ads";
+import { rowPacks, tableShape } from "@/lib/ebay-offer-row";
+import { productPage, setTcgplayerTiles, type ProductCardData } from "@/lib/data";
+import { TcgplayerStrip } from "@/components/TcgplayerStrip";
+import { money, plural, timeAgo } from "@/lib/format";
+import { thumb } from "@/lib/images";
+import { packsFor } from "@/lib/packs";
+import { cheapestPerPackByType } from "@/lib/per-pack";
+import { openWhere, productDescription, productIntro, quickFacts, releaseChip, valueCheck } from "@/lib/product-copy";
+import { guidesFor } from "@/content/guides";
+import { toolHref } from "@/content/tools";
+import { prevNextSet } from "@/lib/hub-copy";
+import { setCountsGrouped } from "@/lib/hub-data";
+import { TYPE_ABOUT } from "@/lib/type-about";
+import { inStockAlternatives, relatedWithFormats } from "@/lib/product-data";
+import { productNoindex } from "@/lib/index-tiers";
+import { productFaq } from "@/lib/product-faq";
+import { isPreorderSet } from "@/lib/release";
+import { regionOrNotFound, REGION_LIST, type Market, type RegionInfo } from "@/lib/regions";
+import { RRP_NOTE, usMsrpCents } from "@/lib/rrp";
+import { RIFT_REL, riftHistoryHref } from "@/lib/riftcompare";
+import { offerStock } from "@/lib/sealed-offers";
+import { TYPE_BY_LABEL } from "@/lib/sealed-title";
+import { jsonLd, pageMeta, productJsonLd, regionAlternates, withMtg } from "@/lib/seo";
+import { fitDescription, seoCopy, shortName } from "@/lib/seo-titles";
+import { SET_BY_CODE } from "@/lib/sets";
+import { shippingCell } from "@/lib/shipping";
+import { rankRows } from "@/lib/shipping-rank";
+
+// Rendered per request and kept by Vercel's CDN for a day (next.config.js, CDN_PAGES), never ISR: an ISR write
+// costs about twenty renders, and the data only changes with a release, which empties the CDN anyway.
+export const dynamic = "force-dynamic";
+
+const getPage = cache((slug: string, market: Market) => productPage(slug, market));
+// The same-set read (take 40), shared by the title's value check and the page: one query per render.
+const getRelated = cache((market: Market, setCode: string, slug: string) => relatedWithFormats(market, setCode, slug));
+
+/**
+ * The product in this region, or a 404: unknown slug, or a product nothing in
+ * this region lists (no ProductStat row and no offers). The old thin "Not
+ * listed here yet" page is gone; the region chips on a real page still lead
+ * to wherever it is listed. The stats are already fetched, so this costs nothing.
+ */
+async function load(slug: string, r: RegionInfo) {
+  const p = await getPage(slug, r.market);
+  if (!p) notFound();
+  const here = p.stats.find((s) => s.market === r.market) ?? null;
+  if (!here && !p.offers.length) notFound();
+  return { p, here };
+}
+
+type Loaded = Awaited<ReturnType<typeof load>>;
+
+/**
+ * The value check (lib/product-copy.ts): this product's price per pack against the set's other formats today, from the same-set rows
+ * (and this product, as its card would read). Null without a set, a fixed pack count, or an open price.
+ */
+function valueOf({ p, here }: Loaded, r: RegionInfo, related: ProductCardData[], bestCents: number | null) {
+  const type = TYPE_BY_LABEL.get(p.productType);
+  const set = p.setCode ? SET_BY_CODE.get(p.setCode) : null;
+  const packs = type ? packsFor(type.key, p.setCode, p.name) : null;
+  if (!set || !packs || bestCents == null) return null;
+  const self: ProductCardData = {
+    slug: p.slug,
+    name: p.name,
+    productType: p.productType,
+    setCode: p.setCode,
+    imageUrl: p.imageUrl,
+    lowestPriceCents: bestCents,
+    inStockStores: Math.max(1, here?.inStockStores ?? 0),
+    listedStores: here?.listedStores ?? 0,
+    marketplaceOpen: here?.marketplaceOpen ?? false,
+    medianOpenCents: here?.medianOpenCents ?? null,
+    releaseDate: set.releaseDate,
+  };
+  return valueCheck({
+    slug: p.slug,
+    productType: p.productType,
+    perPack: Math.round(bestCents / packs),
+    setName: set.name,
+    market: r.market,
+    inName: r.inName,
+    region: r.region,
+    picks: cheapestPerPackByType([self, ...related]),
+  });
+}
+
+export async function generateMetadata({ params }: { params: { region: string; slug: string } }): Promise<Metadata> {
+  const r = regionOrNotFound(params.region);
+  const loaded = await load(params.slug, r);
+  const { p } = loaded;
+  const open = p.offers.filter((o) => offerStock(o) === "open");
+  const cheapest = open[0];
+  const where = cheapest ? openWhere(open, `${r.adjective} store`) : null;
+  const related = p.setCode ? await getRelated(r.market, p.setCode, p.slug) : [];
+  const value = valueOf(loaded, r, related, cheapest?.priceCents ?? null);
+  const desc = productDescription({
+    name: p.name,
+    market: r.market,
+    adjective: r.adjective,
+    cheapestCents: cheapest?.priceCents ?? null,
+    where,
+    preorder: isPreorderSet(p.setCode),
+    value,
+  });
+  // Thin pages stay reachable but out of the index: fewer than two listings to compare (lib/index-tiers.ts, the rule the sitemap
+  // follows too, so the two agree). A noindex page carries no hreflang set either, and the set only names the regional copies that
+  // are themselves indexable.
+  const noindex = productNoindex(loaded.here, p.productType);
+  const path = `/${r.region}/p/${p.slug}`;
+  const indexable = REGION_LIST.filter((x) => {
+    if (x.region === r.region) return !noindex;
+    return !productNoindex(p.stats.find((st) => st.market === x.market), p.productType);
+  });
+  const image = thumb(p.imageUrl, 1200);
+  const title = seoCopy.productTitle({ name: p.name, market: r.market, inName: r.inName, cheapestCents: cheapest?.priceCents ?? null, productType: p.productType, setCode: p.setCode });
+  const plainTitle = typeof title === "string" ? title : title.absolute;
+  const meta = pageMeta({
+    title: plainTitle,
+    description: fitDescription(desc, desc.replace(p.name, shortName(p.name, 60))),
+    path,
+    alternates: noindex ? undefined : regionAlternates(r.region, `/p/${p.slug}`, indexable),
+    image,
+    noindex,
+  });
+  // The product's own tags through `other` (Next's openGraph union has no
+  // product type): og:type and the price a crawler can quote. Next 14 writes
+  // `other` as <meta name=…>, not property=, so the standard og:type=website
+  // stays as well. Shopify's CDN scales to the width asked for and keeps the
+  // aspect ratio, so only the width is known; TCGplayer's renditions are square.
+  const square = image?.includes("tcgplayer-cdn.tcgplayer.com");
+  const gap = priceGap(open.filter((o) => !o.marketplace).map((o) => ({ priceCents: o.priceCents, storeName: o.storeName })));
+  return {
+    ...meta,
+    // " | WaxCompare" only where the whole title still fits in 65 characters (title.absolute otherwise)
+    title,
+    // With a real price gap here, the share card draws it (app/og/p/[region]/[slug], lib/share-link.ts); else the photo.
+    openGraph: {
+      ...meta.openGraph,
+      ...(gap
+        ? { images: [{ url: `/og/p/${r.region}/${p.slug}`, width: 1200, height: 630, alt: `${p.name}: ${shareText(p.name, gap, (c) => money(c, r.market))}` }] }
+        : image
+          ? { images: [{ url: image, width: 1200, ...(square ? { height: 1200 } : {}), alt: p.name }] }
+          : {}),
+    },
+    ...(gap ? { twitter: { card: "summary_large_image", images: [`/og/p/${r.region}/${p.slug}`] } } : {}),
+    other: {
+      "og:type": "product",
+      ...(cheapest ? { "product:price:amount": (cheapest.priceCents / 100).toFixed(2), "product:price:currency": r.currency } : {}),
+    },
+  };
+}
+
+// A 1×1 transparent GIF: the <source> a <picture> uses where its image is not shown (the big photo on a phone, the thumbnail on a
+// desktop), so each screen downloads only the photo it shows.
+const NOTHING = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+export default async function ProductPage({ params }: { params: { region: string; slug: string } }) {
+  const r = regionOrNotFound(params.region);
+  const loaded = await load(params.slug, r);
+  const { p, here } = loaded;
+
+  const set = p.setCode ? SET_BY_CODE.get(p.setCode) : null;
+  const type = TYPE_BY_LABEL.get(p.productType);
+  const pre = isPreorderSet(p.setCode);
+  const now = Date.now();
+  const open = p.offers.filter((o) => offerStock(o, now) === "open");
+  const best = open[0] ?? null;
+  const bestLink = best ? offerLink(best.store, best.url, r.region, "product-best") : null;
+  // "Price + shipping" (the table's switch): the in-stock offer cheapest with its cheapest measured shipping, for the best-price card.
+  // Null when no in-stock store has a measurement (the card then stays the price card in either ranking).
+  const byTotal = rankRows(
+    open.map((o) => ({ o, open: true, cents: o.priceCents, ship: o.marketplace ? null : shippingCell(o.store, r.market, o.priceCents, (c) => money(c, r.market)) })),
+    "total",
+  )[0];
+  const totalBest = byTotal?.ship ? byTotal : null;
+  const totalLink = totalBest ? offerLink(totalBest.o.store, totalBest.o.url, r.region, "product-best") : null;
+  const stores = p.offers.filter((o) => !o.marketplace);
+  const openStores = open.filter((o) => !o.marketplace).length;
+  const tcgOpen = open.some((o) => o.marketplace);
+  const tableTitle = !p.offers.length
+    ? `Not listed in ${r.name} yet`
+    : stores.length
+      ? `Prices at ${plural(stores.length, "store")} in ${r.name}`
+      : `Not listed in ${r.name} yet`;
+  // TCGplayer: in the US one of the offers; elsewhere the separate US$ offer.
+  const tcgplayer = p.offers.find((o) => o.marketplace) ?? p.usMarketplace;
+  // The same-set read, all of it (take 40): the value check reads every format, the grid shows eight.
+  const related = p.setCode ? await getRelated(r.market, p.setCode, p.slug) : [];
+  const grid = set ? related.slice(0, 8) : [];
+  // The TCGplayer strip's tiles (2026-10-28): this set's products on TCGplayer, topped up with the newest sets', never this product.
+  const tcgTiles = await setTcgplayerTiles(p.setCode, p.slug).catch(() => []);
+  // In-stock products of the type: "In stock instead" on a sold-out page, "More <type> in <region>" on an in-stock one with no set.
+  // The page's one new read (LIMIT 4; the headline types' cheapest when the type has none open).
+  const alternatives = !best || !p.setCode ? await inStockAlternatives(r.market, p.productType, p.setCode, p.slug) : [];
+  const elsewhere = REGION_LIST.filter((x) => x.region !== r.region)
+    .map((x) => ({ x, s: p.stats.find((s) => s.market === x.market) }))
+    .filter((e) => !!e.s); // a stat row exists only where a store or TCGplayer lists it
+
+  // eBay units on this page (components/Ebay.tsx, Marketplaces.tsx, EbayStrip.tsx), one per phone screen at most:
+  //   • IN STOCK: the marketplace panel under the best-price card (the first-screen unit; its eBay row shows the product's own new
+  //     listing when the card does not), then the product's own listings as an image strip after the price table and the facts, where
+  //     that is a screen below the panel, else at the bottom of the page in place of the pre-footer strip (productAdPlan).
+  //   • SOLD OUT: the callout's eBay box (the first-screen unit: the search, or the product's own new listing with its price), then the
+  //     strip after the table and the in-stock alternatives, or at the bottom, at least GAP below the box (soldOutAdPlan).
+  //   Both plans also keep the units under a quarter of the page (the collapsed table makes pages shorter): often that means no
+  //   pre-footer strip on a product page now.
+  //   • The phone buy bar (StickyBuyBar) repeats the top of the page and hides whenever any of these is in view.
+  // EVERY product asks for its own listings: the daily catalogue sweep (lib/ebay-sweep.ts) gives an item feed to every product it finds on
+  // eBay; where it found fewer than two, the route answers with the type's listings, then (for box-class types only) generic sealed.
+  // The table's pinned TCGplayer row is one of the offers in the US; elsewhere (its US$ offer, or a search) one row more.
+  const tcgExtra = p.offers.length > 0 && !p.offers.some((o) => o.marketplace) ? 1 : 0;
+  const shape = tableShape(p.offers.length + tcgExtra, open.length + tcgExtra, p.offers.length > 0);
+  const stripContext = `item:${p.slug}`;
+  // The eBay row of the price table skips a listing under 40% of the cheapest store price, when the store prices are in the eBay site's
+  // currency (not NZ or SG, served the AU and US sites): such a listing is a part of the product or a single card, not the product. The
+  // price is the cheapest IN-STOCK store's, the rows the listing is ranked among (a sold-out or stale price can be far below what the
+  // product sells for now); any store's when none is in stock.
+  const cheapestCents = best?.priceCents ?? p.offers.reduce<number | null>((m, o) => (m == null || o.priceCents < m ? o.priceCents : m), null);
+  // NZ and SG are served the AU and US sites, in A$ and US$: their eBay listings are never compared with the stores' prices.
+  const ebayComparable = marketplaceOf(r.region).currency === r.currency;
+  // The eBay listing may be the best price (BestPriceCard, the table's badge) where it is comparable and the product is not a pre-order:
+  // an eBay listing of an unreleased product is a seller's pre-sale. The same rule decides where an eBay PRICE may show at all (the
+  // panel's row, the sold-out box, the buy bar): elsewhere they stay eBay searches.
+  const ebayBest = ebayComparable && !pre;
+  const ebayFloor = cheapestCents != null && ebayComparable ? { value: (cheapestCents * 0.4) / 100, currency: r.currency } : null;
+  // Price signals beside the best price, each a fact about the current listings: per pack (when the product line fixes a pack count),
+  // the median of the in-stock stores (from ProductStat, null under two stores), and in the US TPCi's published MSRP. Nothing is history.
+  const packs = type ? packsFor(type.key, p.setCode, p.name) : null;
+  const median = here?.medianOpenCents ?? null;
+  const medianStores = here?.inStockStores ?? 0;
+  const msrp = r.market === "US" && type ? usMsrpCents(type.key, p.setCode) : null;
+  // The table's eBay pick, for every other place that may show the same listing (the panel, the sold-out box, the buy bar): the same
+  // arguments, so the same single request.
+  const ebayPick = ebayBest ? { slug: p.slug, floor: ebayFloor, packs: rowPacks(type?.key, packs) } : null;
+  // A product of one of the owner's hot sets (lib/popular.ts: 30th Celebration first), once the set is out: the strip carries the
+  // highlighted "Shop <product> on eBay" button. Where the strip goes is the plan's call as for any product.
+  const hot = isHotReleased(p.setCode);
+  const ebayQ = ebayQuery(p.name, tcgplayer);
+
+  const plan = best
+    ? productAdPlan({ offerRows: p.offers.length, summaries: shape.summaries, elsewhere: elsewhere.length, related: grid.length, rail: p.setCode ? 0 : alternatives.length })
+    : null;
+  const soldPlan = best ? null : soldOutAdPlan({ visibleRows: shape.visible, summaries: shape.summaries, alternatives: alternatives.length, elsewhere: elsewhere.length, related: grid.length });
+  const stripAt: "table" | "bottom" | null = plan ? (plan.tableGroup ? "table" : plan.preFooter ? "bottom" : null) : soldPlan!.strip;
+  const preFooter = plan ? plan.preFooter : soldPlan!.preFooter;
+  const strip = stripAt && (
+    <EbayStrip
+      region={r.region}
+      context={stripContext}
+      placement={best ? "listings-product" : "listings-product-soldout"}
+      className="mt-14"
+      headings={{ item: `${p.name} on eBay`, type: type ? `${type.plural} on eBay` : undefined, sealed: "Sealed sports cards on eBay" }}
+      search={{ kind: "sealed", query: ebayQ, label: "Search this product on eBay" }}
+      highlight={hot ? hotProductHighlight(p.name, ebayQ) : undefined}
+    />
+  );
+
+  const value = valueOf(loaded, r, related, best?.priceCents ?? null);
+  const facts = quickFacts({
+    market: r.market,
+    inName: r.inName,
+    adjective: r.adjective,
+    packs: packs,
+    release: set?.dateKnown ? { date: set.releaseDate, preorder: pre } : null,
+    cheapest: best ? { cents: best.priceCents, storeName: best.storeName, marketplace: best.marketplace, lastSeen: best.lastSeen } : null,
+    openStores,
+    storeCount: stores.length,
+    tcgOpen,
+    msrp,
+    elsewhere: elsewhere.map(({ x, s }) => ({ region: x.region, name: x.inName.replace(/^the /, ""), flag: x.flag, inName: x.inName, market: x.market, lowestPriceCents: s!.lowestPriceCents, open: s!.inStockStores > 0 || s!.marketplaceOpen })),
+  });
+  // The explanations that used to sit under the card, now first in the table's "How these prices work".
+  const notes = [
+    p.offers.some((o) => o.marketplace)
+      ? "Prices exclude shipping (each row shows the store’s measured shipping where we have it). Check the store’s own page before you buy."
+      : "Store prices exclude shipping (each row shows the store’s measured shipping where we have it); check the store before you buy.",
+    ...(ebayBest && best ? ["An eBay listing shown as the best price is one seller’s, imported from eBay on a schedule; its shipping is beside its price, and eBay’s page is final."] : []),
+    ...(packs != null ? ["Per-pack prices are the listed price divided by the packs the product holds."] : []),
+    ...(msrp != null ? [RRP_NOTE] : []),
+  ];
+
+  const ld = open.length
+    ? productJsonLd({
+        name: p.name,
+        path: `/${r.region}/p/${p.slug}`,
+        image: p.imageUrl,
+        productType: p.productType,
+        setName: set?.name,
+        brand: set?.maker ?? null,
+        currency: r.currency,
+        lowCents: open[0].priceCents,
+        highCents: open[open.length - 1].priceCents,
+        offerCount: open.length,
+        preorder: pre,
+        // the value check's own sentence when it is about this product; else the page's description (facts only, never eBay's)
+        description:
+          value && !value.href
+            ? `${value.text}.`
+            : productDescription({ name: p.name, market: r.market, adjective: r.adjective, cheapestCents: open[0].priceCents, where: openWhere(open, `${r.adjective} store`), preorder: pre, value: null }),
+      })
+    : null;
+
+  const heading = withMtg(p.name);
+  // The daily price history (lib/price-history.ts): a chart once the product has MIN_DAYS of snapshots here, nothing before.
+  const history = readPriceHistory();
+  const historyDays = history && daysOfHistory(history, r.market, p.slug) >= MIN_DAYS ? dailySeries(history, r.market, p.slug, 90) : [];
+  // Questions answered from the page's own data (lib/product-faq.ts): stock here, per pack, the last 30 days of snapshots, the other regions.
+  const faq = productFaq({
+    heading,
+    market: r.market,
+    inName: r.inName,
+    adjective: r.adjective,
+    preorder: pre,
+    here: loaded.here,
+    cheapest: best ? { cents: best.priceCents, storeName: best.storeName, marketplace: best.marketplace } : null,
+    packs,
+    history: historyDays,
+    elsewhere: elsewhere.map(({ x, s }) => ({ name: x.name, market: x.market, inStockStores: s!.inStockStores, marketplaceOpen: s!.marketplaceOpen, lowestPriceCents: s!.lowestPriceCents })),
+  });
+  // RiftCompare keeps TCGplayer's market price over time for card games; sports sealed has none there.
+  const riftHref: string | null = null;
+  const typeLink = type ? { href: `/${r.region}/type/${type.slug}`, label: `See ${type.plural} in stock in ${r.inName}` } : { href: `/${r.region}/sealed`, label: `See sealed products in stock in ${r.inName}` };
+  const chip = "rounded-full bg-raised px-2.5 py-1 text-xs font-semibold leading-4 text-muted";
+  const img = p.imageUrl ? { big: thumb(p.imageUrl, 900)!, small: thumb(p.imageUrl, 240)! } : null;
+  // "About" (SEO release, 2026-10-21): the page's own words under the facts, and where to go next: the set, its neighbours, the type,
+  // the guides about this type, and the tools. All internal links, all pure (no read).
+  const intro = productIntro({
+    name: p.name,
+    productType: p.productType,
+    about: type ? TYPE_ABOUT[type.slug] ?? null : null,
+    set: set ? { name: set.name, series: set.series, releaseDate: set.releaseDate, dateKnown: set.dateKnown, maker: set.maker } : null,
+    preorder: pre,
+    packs,
+    market: r.market,
+    inName: r.inName,
+    adjective: r.adjective,
+    cheapest: best ? { cents: best.priceCents, storeName: best.storeName, marketplace: best.marketplace } : null,
+    medianCents: median,
+    openStores,
+    storeCount: stores.length,
+    elsewhere: elsewhere.length,
+  });
+  const listedSets = set ? await setCountsGrouped(r.market) : null;
+  const { prev: prevSet, next: nextSet } = set ? prevNextSet(set.code, (c) => (listedSets?.get(c)?.products ?? 0) > 0) : { prev: null, next: null };
+  const aboutGuides = guidesFor(r.region)
+    .filter((g) => type && g.topic.types?.includes(type.key))
+    .slice(0, 3);
+  const hub = pre && set ? preorderPath(r.region, set.code) : null;
+  const explore = [
+    ...(hub && set ? [{ href: hub, label: `${set.name} pre-orders, store by store` }] : []),
+    ...(set ? [{ href: `/${r.region}/sets/${set.slug}`, label: `All ${set.name} sealed` }] : []),
+    ...(prevSet ? [{ href: `/${r.region}/sets/${prevSet.slug}`, label: prevSet.name }] : []),
+    ...(nextSet ? [{ href: `/${r.region}/sets/${nextSet.slug}`, label: nextSet.name }] : []),
+    { href: typeLink.href, label: type ? `${type.plural} in ${r.inName}` : `Sealed in ${r.inName}` },
+    { href: `/${r.region}/deals`, label: `Deals in ${r.inName}` },
+    ...aboutGuides.map((g) => ({ href: `/${r.region}/guides/${g.slug}`, label: g.title })),
+    { href: toolHref(r.region, "value-checker"), label: "Value checker" },
+    { href: toolHref(r.region, "selling-fee-calculator"), label: "Selling-fee calculator" },
+  ];
+
+  // "Quick facts": the value check, then short facts side by side, then the cheapest offer, the stock, and the other regions as links.
+  // In stock it comes before the strip (between the panel and it); sold out, after it (the order the brief sets: strip, other regions).
+  const factsCard = (
+    <section id="facts" aria-labelledby="facts-h" className="mt-14">
+      <div className="card overflow-hidden">
+        <h2 id="facts-h" className="eyebrow border-b border-line bg-raised px-5 py-2.5 sm:px-6">
+          Quick facts
+        </h2>
+        {value && (
+          <p className="flex gap-2.5 border-b border-line bg-open-soft/50 px-5 py-3.5 text-sm leading-6 sm:px-6">
+            <Icon name="tag" size={16} className="mt-1 shrink-0 text-open" />
+            <span>
+              <b className="font-semibold text-open">Value check: </b>
+              {value.href ? (
+                <Link href={value.href} prefetch={false} className="font-semibold underline decoration-open/50 underline-offset-2 hover:decoration-open">
+                  {value.text} →
+                </Link>
+              ) : (
+                <>{value.text}.</>
+              )}
+            </span>
+          </p>
+        )}
+        <dl className="grid grid-cols-3 gap-x-4 gap-y-3.5 p-5 sm:gap-x-6 sm:p-6">
+          {facts.map((f) => (
+            <div key={f.term} className={f.short ? "min-w-0" : "col-span-full min-w-0"}>
+              <dt className="text-xs text-muted">{f.term}</dt>
+              <dd className="mt-0.5 text-sm font-medium leading-5">
+                {f.regions ? (
+                  // one set of classes on the list for its six tiles (a tile: the flag, the region, its from-price)
+                  <ul className="mt-1.5 grid grid-cols-2 gap-2 font-normal sm:grid-cols-3 lg:grid-cols-6 [&_a:hover]:border-ink/30 [&_a]:flex [&_a]:min-h-11 [&_a]:items-center [&_a]:gap-2 [&_a]:rounded-lg [&_a]:border [&_a]:border-line [&_a]:px-3 [&_a]:py-1.5 [&_b]:block [&_b]:truncate [&_b]:font-medium [&_small]:block [&_small]:truncate [&_small]:text-xs [&_small]:text-muted">
+                    {f.regions.map((g) => (
+                      <li key={g.region} className="min-w-0">
+                        <Link href={`/${g.region}/p/${p.slug}`} prefetch={false}>
+                          <Flag code={g.region} />
+                          <span className="min-w-0">
+                            <b>{g.name}</b>
+                            <small className="tabular">{g.text}</small>
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <>
+                    {f.text}
+                    {f.checked && (
+                      <>
+                        {" "}
+                        <Ago iso={f.checked} initial={timeAgo(f.checked, now)} />
+                      </>
+                    )}
+                  </>
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+
+  return (
+    <div className="page pb-8 pt-4 sm:pt-8">
+      {!preFooter && <NoPreFooter />}
+      <Breadcrumbs
+        items={[
+          { href: `/${r.region}`, label: r.name },
+          ...(type ? [{ href: `/${r.region}/type/${type.slug}`, label: type.plural }] : []),
+          ...(set ? [{ href: `/${r.region}/sets/${set.slug}`, label: set.name }] : []),
+          { label: p.name },
+        ]}
+      />
+
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-8">
+        {/* The big photo: desktops only (a phone gets the thumbnail beside the name, so the price is in the first screen). */}
+        <div className="card relative hidden aspect-square items-center justify-center overflow-hidden bg-raised lg:sticky lg:top-[calc(var(--hdr)+1.5rem)] lg:flex">
+          {img ? (
+            <picture>
+              <source media="(max-width: 1023.98px)" srcSet={NOTHING} />
+              <img src={img.big} alt={p.name} width={900} height={900} fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-contain p-8" />
+            </picture>
+          ) : (
+            <span className="font-display text-2xl font-bold text-faint">{p.productType}</span>
+          )}
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex items-start gap-4">
+            {img && (
+              <div className="plate flex h-24 w-24 shrink-0 items-center justify-center p-1.5 lg:hidden">
+                <picture>
+                  <source media="(min-width: 1024px)" srcSet={NOTHING} />
+                  <img src={img.small} alt={p.name} width={96} height={96} fetchPriority="high" decoding="async" className="h-[84px] w-[84px] object-contain" />
+                </picture>
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className={chip}>{p.productType}</span>
+                {set && (
+                  <Link
+                    href={`/${r.region}/sets/${set.slug}`}
+                    prefetch={false}
+                    className={`${chip} relative hover:text-ink after:absolute after:-inset-x-0.5 after:-inset-y-2 after:content-['']`}
+                  >
+                    <span className="hidden sm:inline">{set.series} · </span>
+                    {set.name}
+                  </Link>
+                )}
+                {set && (set.dateKnown || pre) && <span className={pre ? "rounded-full bg-pre-soft px-2.5 py-1 text-xs font-semibold leading-4 text-pre" : chip}>{releaseChip(set.releaseDate, pre)}</span>}
+                {packs != null && <span className={`${chip} hidden sm:inline`}>{plural(packs, "pack")}</span>}
+              </div>
+              <div className="mt-2">
+                <ShareButton title={heading} path={`/${r.region}/p/${p.slug}`} kind="product" text={shareText(heading, priceGap(open.filter((o) => !o.marketplace).map((o) => ({ priceCents: o.priceCents, storeName: o.storeName }))), (c) => money(c, r.market))} className="float-right -mt-1 ml-2" />
+                <h1 className="font-display text-2xl font-bold leading-tight sm:text-3xl">{heading}</h1>
+              </div>
+            </div>
+          </div>
+
+          {best && bestLink ? (
+            <>
+              {/* The best price: the cheapest store's, or the product's eBay listing when that is cheaper (BestPriceCard, in the browser). */}
+              <div id="best" className="mt-4">
+                <BestPriceCard
+                  region={r.region}
+                  market={r.market}
+                  adjective={r.adjective}
+                  preorder={pre}
+                  store={{
+                    cents: best.priceCents,
+                    where: `${best.marketplace ? "on" : "at"} ${best.storeName}`,
+                    marketplace: best.marketplace,
+                    href: bestLink.href,
+                    rel: bestLink.rel,
+                    sponsored: bestLink.sponsored,
+                    retailer: offerRetailer(best.store, best.storeName, r.market),
+                    button: best.marketplace ? `Buy on ${best.storeName}` : `Buy at ${best.storeName}`,
+                    checked: best.lastSeen,
+                  }}
+                  packs={packs}
+                  median={median}
+                  medianStores={medianStores}
+                  msrp={msrp}
+                  openStores={openStores}
+                  storeCount={stores.length}
+                  tcgOpen={tcgOpen}
+                  openCount={open.length}
+                  highestOpenCents={open[open.length - 1].priceCents}
+                  ebay={ebayBest ? { slug: p.slug, floor: ebayFloor, packs: rowPacks(type?.key, packs), query: ebayQ } : null}
+                  total={
+                    totalBest && totalLink
+                      ? {
+                          store: {
+                            cents: totalBest.o.priceCents,
+                            where: `at ${totalBest.o.storeName}`,
+                            marketplace: false,
+                            href: totalLink.href,
+                            rel: totalLink.rel,
+                            sponsored: totalLink.sponsored,
+                            retailer: offerRetailer(totalBest.o.store, totalBest.o.storeName, r.market),
+                            button: `Buy at ${totalBest.o.storeName}`,
+                          },
+                          shipCents: totalBest.ship!.min,
+                          shipText: totalBest.ship!.text,
+                          shipTitle: totalBest.ship!.title,
+                        }
+                      : null
+                  }
+                />
+              </div>
+            </>
+          ) : (
+            // Sold out everywhere: said plainly where the price would be (stock first), the stores that list it counted.
+            <div id="best" className="card mt-4 p-5" data-stock-first="">
+              <StockPill state="soldout">{stockHeadline({ inStockStores: 0, listedStores: stores.length, marketplaceOpen: false }, pre).text}</StockPill>
+              <p className="mt-3 text-sm text-muted">
+                {stores.length
+                  ? `No ${r.adjective} card shop we track has it ${pre ? "open for pre-order" : "in stock"} right now. The stores that list it are below.`
+                  : `None of the ${r.adjective} stores we track list it right now.`}
+              </p>
+            </div>
+          )}
+          {/* The small eBay + TCGplayer pair under the best price (owner, 2026-10-29: "much smaller … near the top … not
+              intrusive"): the product's own eBay listings (the strip's request) and the set's TCGplayer products. */}
+          <MiniSealedAds
+            region={r.region}
+            context={stripContext}
+            tcg={tcgTiles.map((t) => ({ slug: t.slug, name: t.name, imageUrl: thumb(t.imageUrl, 120) ?? t.imageUrl, priceCents: t.priceCents, href: tcgplayerAffiliateUrl(t.url, r.region, "tcgplayer-strip-mini") }))}
+            ebayPlacement="listings-product-mini"
+            tcgPlacement="tcgplayer-strip-mini"
+            ebayQuery={ebayQ}
+            tcgSearchHref={tcgplayerSearchUrl(set?.name ?? "", r.region, "tcgplayer-strip-mini")}
+            className="mt-4"
+          />
+        </div>
+      </div>
+
+      <Section id="prices" title={tableTitle}>
+        {p.offers.length ? (
+          // eBay and TCGplayer are pinned at the top of the table, eBay first, TCGplayer second, then the stores cheapest first; each is an
+          // ordinary row with its own button colour, and the cheapest row of the whole table is highlighted (owner, 2026-10-26).
+          <OfferTable
+            offers={p.offers}
+            region={r.region}
+            preorder={pre}
+            packs={packs}
+            ebay={{ slug: p.slug, query: ebayQ, floor: ebayFloor, packs: rowPacks(type?.key, packs) }}
+            pinned={{ productName: p.name, tcgplayer, amazon: amazonLiveFor(p.slug, r.region) }}
+            notes={notes}
+          />
+        ) : (
+          <div className="card px-6 py-8 text-muted">
+            None of the {r.adjective} stores we track list {p.name} right now.
+          </div>
+        )}
+        <ReportPrice
+          product={p.name}
+          region={r.short}
+          buttonClassName="btn-ghost"
+          stores={p.offers.filter((o) => !o.marketplace).map((o) => ({ name: o.storeName, price: money(o.priceCents, r.market) }))}
+        />
+        {/* RiftCompare's shared alert service emails when it drops (lib/alert-feed.ts, DECISIONS.md 2026-11-02). */}
+        <PriceAlertForm site={ALERT_SITE_KEY} productId={p.id} region={r.market} priceCents={here?.lowestPriceCents ?? null} className="mt-3" buttonClassName="btn-ghost" />
+        {riftHref && (
+          // The owner's other Pokémon site keeps what this one does not: TCGplayer's market price over time (lib/riftcompare.ts).
+          <p className="mt-4 text-sm text-muted">
+            <Icon name="clock" size={14} className="mr-1.5 inline align-[-2px]" />
+            Price history: TCGplayer&rsquo;s market price for this product over time, with its TCGplayer and eBay prices, is on{" "}
+            <a href={riftHref} rel={RIFT_REL} target="_blank" className="font-semibold text-ink underline decoration-line underline-offset-2 hover:decoration-ink">
+              RiftCompare ↗
+            </a>
+          </p>
+        )}
+      </Section>
+
+      {/* eBay and TCGplayer are rows of the table now (pinned at its top), so an in-stock page has no separate marketplaces panel. Sold out
+          everywhere, the callout still says so plainly and leads to the marketplaces and to what is in stock instead. */}
+      {!best && (
+        <div id="soldout" className="mt-10">
+          <SoldOutCallout
+            region={r.region}
+            productName={p.name}
+            storesListing={stores.length}
+            notChecked={stores.filter((o) => offerStock(o, now) === "unknown").length}
+            tcgplayer={tcgplayer}
+            ebayQuery={ebayQ}
+            pick={ebayPick}
+            instead={typeLink}
+          />
+        </div>
+      )}
+      {/* Sold out: the Amazon row (lib/amazon.ts), a marketplace link with no price. In stock it is a search row pinned in the table. */}
+      {!best && <AmazonProductRow region={r.region} name={p.name} slug={p.slug} />}
+
+      {!best && alternatives.length > 0 && (
+        <Section id="instead" title="In stock instead" href={typeLink.href} linkLabel="See all">
+          <ProductRail products={alternatives} region={r.region} label="In stock instead" />
+        </Section>
+      )}
+
+      {best ? (
+        <>
+          {factsCard}
+          {stripAt === "table" && strip}
+        </>
+      ) : (
+        <>
+          {stripAt === "table" && strip}
+          {factsCard}
+        </>
+      )}
+
+      {historyDays.length >= MIN_DAYS && (
+        <Section id="history" title="Price history" kicker={`Cheapest in-stock price in ${r.inName}`}>
+          <PriceHistoryChart values={historyDays} market={r.market} />
+        </Section>
+      )}
+
+      {/* The next set on pre-order, when there is one (components/PreorderBanner: gone on its release day). */}
+      <div className="mt-12">
+        <PreorderBanner region={r.region} />
+      </div>
+
+      <section aria-labelledby="about-h" className="mt-14 max-w-3xl">
+        <h2 id="about-h" className="font-display text-2xl font-bold tracking-tight">
+          About {heading}
+        </h2>
+        <div className="mt-4 space-y-3 leading-7 text-muted">
+          {intro.map((t) => (
+            <p key={t}>{t}</p>
+          ))}
+        </div>
+        <nav aria-label="Keep exploring" className="mt-6">
+          <h3 className="eyebrow">Keep exploring</h3>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {explore.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} prefetch={false} className="chip min-h-10">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </section>
+
+      {faq.length > 0 && (
+        <section aria-labelledby="faq-h" className="mt-14 max-w-3xl">
+          <h2 id="faq-h" className="font-display text-2xl font-bold tracking-tight">
+            Questions about {heading}
+          </h2>
+          <dl className="mt-4 space-y-5">
+            {faq.map((f) => (
+              <div key={f.q}>
+                <dt className="font-semibold">{f.q}</dt>
+                <dd className="mt-1 leading-7 text-muted">{f.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      {grid.length > 0 && set && (
+        <Section title={`More from ${set.name}`} href={`/${r.region}/sets/${set.slug}`} linkLabel="Whole set">
+          <ProductGrid products={grid} region={r.region} />
+        </Section>
+      )}
+
+
+      {best && !p.setCode && alternatives.length > 0 && (
+        <Section title={`More ${type ? type.plural : "sealed products"} in ${r.inName}`} href={typeLink.href} linkLabel="See all">
+          <ProductRail products={alternatives} region={r.region} label={`More ${type ? type.plural : "sealed products"}`} />
+        </Section>
+      )}
+
+      {stripAt === "bottom" && (
+        <>
+          <NoPreFooter />
+          {strip}
+        </>
+      )}
+
+      {best && bestLink ? (
+        <StickyBuyBar
+          region={r.region}
+          anchor="best"
+          preorder={pre}
+          store={{ cents: best.priceCents, storeName: best.storeName, href: bestLink.href, rel: bestLink.rel, retailer: offerRetailer(best.store, best.storeName, r.market), marketplace: best.marketplace }}
+          pick={ebayPick}
+        />
+      ) : (
+        <StickyBuyBar region={r.region} anchor="soldout" pick={ebayPick} search={{ href: ebaySearchUrl(ebayQ, r.region, "product-sticky"), line: `Sold out at ${r.adjective} stores` }} />
+      )}
+
+      {/* Remembered in this browser only, for the region home's "Recently viewed" (components/Recent.tsx). */}
+      <RecentTracker region={r.region} slug={p.slug} />
+      {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ld) }} />}
+    </div>
+  );
+}
+

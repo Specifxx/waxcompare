@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="0.5" cy="0.3" r="0.85"><stop offset="0" stop-color="#1b2f63"/><stop offset="1" stop-color="#070d20"/></radialGradient>
+    <radialGradient id="seal" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#ff5a68"/><stop offset="0.55" stop-color="#d8233a"/><stop offset="1" stop-color="#8e0c1f"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <g transform="rotate(-12 26 32)"><rect x="12" y="13" width="24" height="34" rx="3" fill="#3d5fb3" stroke="#070d20" stroke-width="1.2"/><rect x="15" y="16" width="18" height="21" rx="1.5" fill="#5a7ccc"/></g>
+  <g transform="rotate(8 34 30)"><rect x="21" y="10" width="25" height="35" rx="3" fill="#f6f7fb" stroke="#070d20" stroke-width="1.2"/><rect x="24" y="13" width="19" height="22" rx="1.5" fill="#c3d0ee"/><rect x="24" y="37.5" width="12" height="3" rx="1.5" fill="#9cadd6"/></g>
+  <circle cx="43" cy="45" r="11" fill="url(#seal)" stroke="#070d20" stroke-width="1.2"/>
+  <circle cx="43" cy="45" r="7.6" fill="none" stroke="#ffc2c8" stroke-opacity="0.6" stroke-width="1"/>
+  <path d="M43.00 40.00 L44.23 43.30 L47.76 43.45 L45.00 45.65 L45.94 49.05 L43.00 47.10 L40.06 49.05 L41.00 45.65 L38.24 43.45 L41.77 43.30 Z" fill="#fff3f4"/>
+</svg>

@@ -1,0 +1,49 @@
+import { PreFooterStrip } from "@/components/EbayStrip";
+import { PreFooterTcgplayer } from "@/components/PreFooterTcgplayer";
+import { listedSetCodes, tcgplayerTiles, type TcgplayerTile } from "@/lib/data";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { SideAds } from "@/components/SideAds";
+import { SideNav } from "@/components/SideNav";
+import { navGroups } from "@/lib/nav";
+import { regionOrNotFound } from "@/lib/regions";
+
+// Nothing here is prerendered at build: every region page is force-dynamic and kept by Vercel's CDN
+// (next.config.js, CDN_PAGES; ISR until 2026-10-17). A build must not depend on the database being
+// reachable — when Rift Compare's database ran out of transfer, every deploy failed until it was replaced.
+
+// The 404 here is not enough on its own: a page's generateMetadata and body run
+// alongside the layout, so every page under [region] resolves its region the
+// same way before touching anything else (/terms, /foo and /AU used to 500).
+export default async function RegionLayout({ children, params }: { children: React.ReactNode; params: { region: string } }) {
+  const r = regionOrNotFound(params.region);
+  // The pre-footer TCGplayer strip's products: read at request time (pages are force-dynamic), never at build; a failure shows none.
+  // The sets with a product here, so the menus and footer never link a set page that would 404 (lib/release.ts menuSets); a
+  // failed read links every set, as before.
+  const [tcg, listed] = await Promise.all([tcgplayerTiles().catch((): TcgplayerTile[] => []), listedSetCodes(r.market).catch(() => null)]);
+  return (
+    <>
+      <Header region={r.region} listed={listed} />
+      {/* From xl, the sidebar (components/SideNav.tsx) fills the wide screen's left side; the page keeps its own width beside it. */}
+      <div className="mx-auto flex w-full max-w-shell flex-1">
+        <SideNav region={r.region} groups={navGroups(r.region, undefined, listed)} />
+        <main id="main" className="min-w-0 flex-1">
+        {children}
+        {/* Every region page ends with a slim eBay listing strip (four tiles), directly above the site
+            footer (inside <main>: it is page content, not a landmark of its own). With nothing to list it
+            is the compact CTA row. A page too short to fit it beside its own units renders <NoPreFooter/>,
+            and globals.css hides this wrapper. The legal pages are not under [region], so they never get one. */}
+        <div className="page mt-16" data-ebay-prefooter>
+          <PreFooterStrip region={r.region} />
+          <PreFooterTcgplayer region={r.region} tiles={tcg} />
+        </div>
+        </main>
+      </div>
+      <Footer region={r.region} listed={listed} />
+      {/* From 1280px (every regular 16:9 and 16:10 screen; owner, 2026-11-06), drawn in the browser: an eBay rail down the far left and
+          a TCGplayer rail down the far right, fixed beside the shell, ten tiles that scroll (components/SideAds.tsx). Nothing in the
+          server HTML, nothing on smaller screens. */}
+      <SideAds region={r.region} tiles={tcg} />
+    </>
+  );
+}

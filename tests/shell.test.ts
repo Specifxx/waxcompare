@@ -1,0 +1,392 @@
+// The site's shell: the header (one 60px row, search at every width), the phone menu, the region footer, the root layout's
+// fonts, the landing page's metadata, breadcrumbs, the product card and the empty state. Rendered on the server as a crawler sees them.
+import { test } from "node:test";
+import { NETWORK_PAGE, footerSisters } from "../src/lib/family-network";
+import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import * as React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import type { ProductCardData } from "../src/lib/data";
+import { IMPACT_SITE_VERIFICATIONS } from "../src/lib/affiliate";
+import { REGION_LIST } from "../src/lib/regions";
+import { SETS } from "../src/lib/sets";
+import { OPERATOR, SITE_NAME, SITE_URL } from "../src/lib/site";
+import { DEFAULT_OG_IMAGE } from "../src/lib/seo";
+import { findBannedCopy } from "../src/lib/copy-rules";
+import { Breadcrumbs, parentCrumb } from "../src/components/Breadcrumbs";
+import { Footer, footerColumns } from "../src/components/Footer";
+import { Header, HEADER_NAV } from "../src/components/Header";
+import { openPreorderGuides } from "../src/lib/preorder-guides";
+import { MENU_ROWS, MenuSheet } from "../src/components/MobileMenu";
+import { SideNav } from "../src/components/SideNav";
+import { navGroups, retargetGroups, retargetHref } from "../src/lib/nav";
+import { isActivePath } from "../src/components/NavLink";
+import { cardCompareLabel, cardStockLabel, ProductCard, shortTypeLabel } from "../src/components/ProductCard";
+import { pathAfterRegion, regionSwitchHref } from "../src/components/RegionSwitcher";
+import { Empty, emptyActionIcon } from "../src/components/Section";
+import { metadata as landingMetadata } from "../src/app/(site)/page";
+
+// The components are compiled with the classic JSX runtime here (tsconfig "jsx": "preserve"; Next uses its own).
+(globalThis as unknown as { React: typeof React }).React = React;
+
+const src = (p: string) => readFileSync(new URL(`../src/${p}`, import.meta.url), "utf8");
+
+/** Server markup inside a stub app router (SearchBox calls useRouter), without React's server-only warnings. */
+function render(el: React.ReactElement): string {
+  const router = { push() {}, replace() {}, refresh() {}, prefetch() {}, back() {}, forward() {} };
+  const err = console.error;
+  console.error = () => {};
+  try {
+    return renderToStaticMarkup(React.createElement(AppRouterContext.Provider, { value: router as never }, el));
+  } finally {
+    console.error = err;
+  }
+}
+
+const hrefs = (html: string) => [...html.matchAll(/href="([^"]*)"/g)].map((m) => m[1].replace(/&amp;/g, "&"));
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+
+test("Footer on a region page: Shop, Latest releases, Explore and WaxCompare, then the regions; every link internal", () => {
+  const html = render(React.createElement(Footer, { region: "au" }));
+  for (const t of ["Shop", "Latest releases", "Explore", "WaxCompare"]) assert.match(html, new RegExp(`<h2 class="eyebrow mb-2">${t}</h2>`), t);
+  const links = hrefs(html);
+  for (const h of [
+    "/au/type/hobby-boxes",
+    "/au/type/jumbo-boxes",
+    "/au/type/mega-boxes",
+    "/au/type/blaster-boxes",
+    "/au/type/hobby-cases",
+    "/au/deals",
+    "/au/this-week",
+    "/au/releases",
+    "/au/guides",
+    "/au/stores",
+    "/au/sealed",
+    "/about",
+    "/about#stores",
+    "/contact",
+    "/terms",
+    "/privacy",
+    "/about#money",
+  ])
+    assert.ok(links.includes(h), `links to ${h}`);
+  // Latest releases: at most six, each to its release page in this region (none until the first import finds some).
+  assert.ok(links.filter((h) => h.startsWith("/au/sets/")).length <= 6);
+  // The flag row: every region's home, this one marked.
+  for (const r of REGION_LIST) assert.ok(links.includes(`/${r.region}`), r.region);
+  assert.match(html, /aria-current="true" class="chip min-h-10 chip-on" href="\/au">/);
+  // every link is internal but the owner's sister sites ("Also from us", tests/footer.test.ts)
+  const sisters = new Set<string>([...footerSisters("wax").map((s) => s.url), NETWORK_PAGE]);
+  for (const h of links) if (!sisters.has(h) && h !== "mailto:compareempire@gmail.com") assert.match(h, /^\//, `${h} is internal`);
+  assert.equal(footerColumns("au").length, 5); // Shop, Latest releases, Explore, Guides (every guide: no orphans), WaxCompare
+});
+
+test("Footer: the family inbox beside /contact (owner, 2026-11-01), the two-line disclosure, and no 'operated by WaxCompare'", () => {
+  for (const region of ["us", null] as const) {
+    const html = render(React.createElement(Footer, { region }));
+    assert.match(html, /href="mailto:compareempire@gmail\.com"/);
+    assert.match(html, /href="\/contact"/);
+    assert.doesNotMatch(html, /@[a-z0-9.-]*riftcompare|riftcompare[a-z0-9.-]*@/i, "another brand's email address never shows in the chrome (the RiftCompare sister-site link may)");
+    assert.match(html, /eBay, Amazon and Topps links are affiliate links and are marked where they appear\.<br\/>No store pays to be listed or to rank\./);
+    assert.match(html, /How we make money/);
+    assert.match(html, /Prices and stock are read from each store about twice a day; the store’s own page is final\./);
+    // the footer links the history-backed /back-in-stock page by its name; nothing else history-backed is allowed
+    assert.equal(findBannedCopy(html.replace(/<[^>]+>/g, " "), { history: true }), null);
+    assert.equal(findBannedCopy(html.replace(/<a [^>]*href="\/[a-z]{2}\/back-in-stock"[^>]*>Back in stock<\/a>/g, " ").replace(/<[^>]+>/g, " ")), null);
+    if (OPERATOR === SITE_NAME) assert.doesNotMatch(html, /operated by/i, "never the circular 'WaxCompare is operated by WaxCompare'");
+  }
+  assert.match(src("components/Footer.tsx"), /OPERATOR !== SITE_NAME && ` Operated by \$\{OPERATOR\}\.`/);
+});
+
+test("Footer with no region: Regions and WaxCompare columns only, and no region-scoped link", () => {
+  const html = render(React.createElement(Footer, { region: null }));
+  assert.deepEqual(
+    footerColumns(null).map((c) => c.title),
+    ["Regions", "WaxCompare"],
+  );
+  assert.doesNotMatch(html, /Latest releases|>Shop<|>Explore</);
+  const links = hrefs(html);
+  for (const r of REGION_LIST) assert.ok(links.includes(`/${r.region}`), r.region);
+  assert.ok(!links.some((h) => /^\/[a-z]{2}\//.test(h)), "nothing under a region");
+});
+
+test("the footer is drawn by each layout after its <main> (and by the 404 and error pages), not by the root layout", () => {
+  assert.match(src("app/[region]/layout.tsx"), /<\/main>\s*<\/div>\s*<Footer region=\{r\.region\}( listed=\{listed\})? \/>/);
+  assert.match(src("app/(site)/layout.tsx"), /<\/main>\s*<\/div>\s*<Footer region=\{null\} \/>/);
+  assert.match(src("app/not-found.tsx"), /<\/main>\s*<Footer region=\{null\} \/>/);
+  assert.match(src("app/error.tsx"), /<\/main>\s*<Footer region=\{region\?\.region \?\? null\} \/>/);
+  assert.doesNotMatch(src("app/layout.tsx"), /<Footer|components\/Footer/);
+  // Static: the footer reads no database.
+  assert.doesNotMatch(src("components/Footer.tsx"), /prisma|@\/lib\/db|data"/);
+});
+
+// ─── Header and menu ─────────────────────────────────────────────────────────
+
+test("Header on a region page: search at every width (never in a hidden wrapper), the menu button, a compact region button", () => {
+  const html = render(React.createElement(Header, { region: "us" }));
+  assert.match(html, /^<header class="sticky top-0 z-40 h-\[var\(--hdr\)\] border-b border-line bg-surface\/90 backdrop-blur-md">/);
+  const form = html.indexOf('role="search"');
+  assert.ok(form > 0, "the search form is in the header");
+  const wrapper = html.lastIndexOf("<div", form);
+  const cls = /class="([^"]*)"/.exec(html.slice(wrapper, form))?.[1] ?? "";
+  assert.match(cls, /\bhdr-search min-w-0 flex-1\b/);
+  assert.doesNotMatch(cls, /(^|\s)hidden(\s|$)/, "visible below md");
+  assert.doesNotMatch(html, /hidden[^"]*md:block[^>]*>\s*<form[^>]*role="search"/);
+  assert.match(html, /aria-label="Menu" aria-haspopup="dialog" aria-expanded="false" aria-controls="site-menu"/);
+  assert.match(html, /<dialog id="site-menu"/);
+  assert.match(html, /aria-label="Region: United States\. Change region"[^>]*class="chip [^"]*h-11 w-11/);
+  assert.doesNotMatch(html, /aria-label="Sections"[^>]*class="page flex gap-1 overflow-x-auto/, "the second chip row is gone");
+});
+
+test("Header nav (lg and up): Deals · All sealed · Sets · Releases · Guides · Stores, each to its region path", () => {
+  assert.deepEqual(
+    HEADER_NAV.map((n) => n.label),
+    ["Deals", "All sealed", "Sets", "Releases", "Guides", "Stores"],
+  );
+  const html = render(React.createElement(Header, { region: "uk" }));
+  const nav = /<nav class="hidden items-center gap-0\.5 lg:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
+  // While a set is on pre-order, "Releases" is its pre-order hub.
+  const pre = openPreorderGuides()[0];
+  for (const [href, label] of [
+    ["/uk/deals", "Deals"],
+    ["/uk/sealed", "All sealed"],
+    ["/uk/sets", "Sets"],
+    pre ? [`/uk/preorders/${pre.set.slug}`, `${pre.set.name} pre-orders`] : ["/uk/releases", "Releases"],
+    ["/uk/guides", "Guides"],
+    ["/uk/stores", "Stores"],
+  ])
+    assert.match(nav, new RegExp(`href="${href}"[^>]*>${label}</a>`), label);
+  assert.match(nav, /data-ad="header"/, "eBay's labelled link stays (xl)");
+});
+
+test("Header with no region: the whole header, built for the default region (the browser moves it to the visitor's)", () => {
+  const html = render(React.createElement(Header, { region: null }));
+  assert.match(html, /role="search"/, "search from the first page");
+  const nav = /<nav class="hidden items-center gap-0\.5 lg:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
+  const pre = openPreorderGuides()[0];
+  for (const h of ["/us/deals", "/us/sealed", "/us/sets", pre ? `/us/preorders/${pre.set.slug}` : "/us/releases", "/us/guides", "/us/stores", "/blog"]) assert.match(nav, new RegExp(`href="${h}"`), h);
+  assert.doesNotMatch(nav, /data-ad="header"/, "eBay's link is a region page's only");
+  assert.match(html, /aria-label="Menu"/);
+  assert.match(html, /aria-label="Region: United States\. Change region"/);
+  assert.doesNotMatch(html, /Continue to|Choose your region/);
+});
+
+test("the sidebar (xl): product types, sets, deals and the rest, under each layout, every link a real region path", () => {
+  const groups = navGroups("au", "2026-10-28");
+  assert.deepEqual(groups.map((g) => g.title), ["Shop by product", "Releases", "Deals & stock", "More"]);
+  for (const l of groups.flatMap((g) => g.links)) assert.match(l.href, /^\/au\/|^\/blog$|^\/creators$|^\/forum$/, l.href);
+  assert.ok(!groups.flatMap((g) => g.links).some((l) => l.href.includes("/preorders/")), "no pre-order hubs on WaxCompare");
+  assert.deepEqual(groups[0].links.slice(0, 4).map((l) => l.href), ["/au/type/hobby-boxes", "/au/type/jumbo-boxes", "/au/type/mega-boxes", "/au/type/blaster-boxes"]);
+  assert.equal(groups[1].links.at(-1)!.href, "/au/sets");
+  assert.ok(navGroups("us", "2026-11-25")[2].links.some((l) => l.label === "Black Friday"), "Black Friday in season");
+  assert.ok(!groups[2].links.some((l) => l.label === "Black Friday"));
+  const html = render(React.createElement(SideNav, { region: "au", groups }));
+  assert.match(html, /^<aside class="hidden w-60 shrink-0 xl:block" data-sidenav="">/);
+  assert.match(html, /href="\/au\/type\/hobby-boxes"/);
+  assert.match(src("app/[region]/layout.tsx"), /<SideNav region=\{r\.region\} groups=\{navGroups\(r\.region(, undefined, listed)?\)\} \/>/);
+  assert.match(src("app/(site)/layout.tsx"), /<SoftSideNav built=\{X_DEFAULT_REGION\} groups=\{navGroups\(X_DEFAULT_REGION\)\} \/>/);
+  // the same links in another region; a link outside a region stays put
+  assert.equal(retargetHref("/us/type/blaster-boxes", "ca"), "/ca/type/blaster-boxes");
+  assert.equal(retargetHref("/us", "ca"), "/ca");
+  assert.equal(retargetHref("/blog", "ca"), "/blog");
+  assert.equal(retargetHref("/usx/a", "ca"), "/usx/a");
+  assert.deepEqual(retargetGroups(navGroups("us", "2026-10-28"), "au"), groups);
+});
+
+test("NavLink's current-section logic (aria-current='page'): whole segments, and the paths a section also covers", () => {
+  assert.equal(isActivePath("/us/sets", "/us/sets"), true);
+  assert.equal(isActivePath("/us/sets/bloomburrow", "/us/sets"), true);
+  assert.equal(isActivePath("/us/sets/", "/us/sets"), true);
+  assert.equal(isActivePath("/us/setsx", "/us/sets"), false);
+  assert.equal(isActivePath("/us", "/us/sets"), false);
+  assert.equal(isActivePath("/us/sealed/page/2", "/us/sealed"), true);
+  assert.equal(isActivePath("/us/type/secret-lair", "/us/sealed", ["/us/type"]), true);
+  assert.equal(isActivePath("/us/sealed?q=cbb", "/us/sealed"), true);
+  assert.equal(isActivePath(null, "/us/sealed"), false);
+  assert.equal(isActivePath("/au/sets", "/us/sets"), false);
+});
+
+test("the phone menu: every group of the sidebar under the region, then the regions, which switch to the same page", () => {
+  assert.ok(MENU_ROWS.length >= 10, "the 404's tiles");
+  // The sheet's contents render on the first open: the header's server HTML has the empty <dialog> only.
+  assert.match(render(React.createElement(Header, { region: "ca" })), /<dialog id="site-menu" data-menu="" aria-label="Menu" class="menu-sheet [^"]*"><\/dialog>/);
+  const groups = navGroups("ca", "2026-10-28");
+  const sheet = render(React.createElement(MenuSheet, { region: "ca", groups, pathname: "/ca/stores", onClose() {} }));
+  assert.match(sheet, /aria-current="page"[^>]*href="\/ca\/stores"|href="\/ca\/stores"[^>]*aria-current="page"/, "the current section is marked");
+  for (const t of ["Shop by product", "Releases", "Deals &amp; stock", "More"]) assert.match(sheet, new RegExp(`>${t}</h2>`), t);
+  for (const l of groups.flatMap((g) => g.links)) assert.ok(hrefs(sheet).includes(l.href), l.href);
+  for (const p of ["/deals", "/this-week", "/back-in-stock", "/price-moves", "/out-of-print", "/sealed", "/type/hobby-boxes", "/type/jumbo-boxes", "/type/mega-boxes", "/type/blaster-boxes", "/type/hobby-cases", "/sets", "/releases", "/guides", "/tools", "/stores"])
+    assert.ok(hrefs(sheet).includes(`/ca${p}`), p);
+  assert.equal(sheet.match(/aria-hidden="true" focusable="false" class="text-2xl"/g)?.length, REGION_LIST.length, "a flag tile per region");
+  assert.ok(hrefs(sheet).includes("/uk/stores"), "a region tile goes to the same page there");
+  // a soft sheet (a page with no region): every tile to the region's home
+  const soft = render(React.createElement(MenuSheet, { region: "au", groups: navGroups("au", "2026-10-28"), pathname: "/about", onClose() {}, soft: true }));
+  for (const r of REGION_LIST) assert.ok(hrefs(soft).includes(`/${r.region}`), r.region);
+  assert.equal(pathAfterRegion("/au/sets/bloomburrow"), "/sets/bloomburrow");
+  assert.equal(regionSwitchHref("/au/sets/bloomburrow", "uk", "au"), "/uk/sets/bloomburrow");
+  assert.equal(regionSwitchHref("/about", "uk", null), "/uk", "a page with no region goes to the region's home, not /uk/about");
+  assert.equal(regionSwitchHref("/au/p/nope", "uk", null), "/uk", "a 404 under a region: the home, not another 404");
+});
+
+// ─── Root layout ─────────────────────────────────────────────────────────────
+
+test("root layout: both faces use display 'optional' (no font-swap layout shift), and the Impact meta block is unchanged", () => {
+  const layout = src("app/layout.tsx");
+  assert.equal(layout.match(/display: "optional"/g)?.length, 2);
+  assert.match(layout, /Inter\(\{[^}]*display: "optional"/);
+  assert.match(layout, /Bricolage_Grotesque\(\{[^}]*display: "optional"/);
+  assert.doesNotMatch(layout, /display: "swap"/);
+  // The same pins as tests/affiliate.test.ts.
+  assert.match(layout, /IMPACT_SITE_VERIFICATIONS\.map\(\(value\) =>[\s\S]*name: "impact-site-verification", value/);
+  assert.ok(layout.indexOf("impact-site-verification") > layout.indexOf("<head>") && layout.indexOf("impact-site-verification") < layout.indexOf("</head>"));
+  assert.ok(IMPACT_SITE_VERIFICATIONS.length >= 2);
+});
+
+// ─── Landing page ────────────────────────────────────────────────────────────
+
+test("landing metadata: hreflang for every region home plus x-default '/', a short description, the site's share card", () => {
+  const langs = landingMetadata.alternates?.languages as Record<string, string>;
+  assert.equal(Object.keys(langs).length, REGION_LIST.length + 1);
+  for (const r of REGION_LIST) assert.equal(langs[r.hreflang], `${SITE_URL}/${r.region}`);
+  assert.equal(langs["x-default"], `${SITE_URL}/`);
+  const d = String(landingMetadata.description);
+  assert.ok(d.length <= 155, `${d.length} characters`);
+  assert.equal(findBannedCopy(d), null);
+  assert.deepEqual((landingMetadata.openGraph as { images: unknown[] }).images, [DEFAULT_OG_IMAGE]);
+  assert.equal((landingMetadata.twitter as { card: string }).card, "summary_large_image");
+  const title = (landingMetadata.title as { absolute: string }).absolute;
+  assert.ok(title.length <= 65, title);
+});
+
+test("landing page: static and short: hero, one fair paragraph, the region's five, the hot buttons, and nothing else", () => {
+  const page = src("app/(site)/page.tsx");
+  assert.doesNotMatch(page, /prisma|@\/lib\/db|@\/lib\/data"/, "no database");
+  assert.match(page, /text-4xl[^"]*sm:text-6xl/);
+  assert.match(page, /Sealed sports card prices, <span className="text-brand">cheapest first\.<\/span>/);
+  // No "Continue to <region>" step (owner, 2026-10-28): the search, then the shortcuts in the visitor's region.
+  assert.match(page, /<form\s+id="landing-search"\s+action=\{`\/\$\{X_DEFAULT_REGION\}\/sealed`\}\s+method="get"/);
+  assert.match(page, /<\/form>[\s\S]*<RegionSuggest formId="landing-search" links=\{HERO_LINKS\} \/>/);
+  assert.match(page, /ranked by price and stock only[\s\S]*No store pays to be listed or to rank, and every affiliate link is marked\.[\s\S]*href="\/about"[\s\S]*How it works/);
+  // The next set's "Coming soon" block between the hero and the region's five (2026-10-26); it carries the pre-order hub link, so the
+  // hot buttons keep their Commander decks button.
+  assert.match(page, /<ComingSoonSwitch byRegion=\{featured\} today=\{today\} \/>[\s\S]*<HomeRegionGrid initial=\{initialPicks\} \/>/);
+  // What moved to /about, the guides index and the region homes stays off the landing page.
+  assert.doesNotMatch(page, /FAQPage|faqJsonLd|GuideCard|MarketReport|SuggestedTypeLinks|EbayStrip|AdSlot/);
+  assert.equal((page.match(/<section/g) ?? []).length, 2, "the hero and the fair paragraph; the grid is its own section");
+  const suggest = src("components/RegionSuggest.tsx");
+  assert.doesNotMatch(suggest, /> Continue to \{|Choose your region <span/);
+  assert.match(suggest, /setAttribute\("action", `\/\$\{region\}\/sealed`\)/);
+  assert.match(suggest, /retargetHref\(l\.href, region\)/);
+  assert.match(suggest, /href=\{`\/\$\{to\}\/type\/\$\{t\.slug\}`\}/);
+});
+
+test("/about carries what the landing page used to: the FAQ with its FAQPage JSON-LD, what we compare, the regions", () => {
+  const about = src("app/(site)/about/page.tsx");
+  assert.match(about, /<h3 className="font-semibold">\{f\.q\}<\/h3>/, "FAQ questions are real h3s");
+  assert.match(about, /jsonLd\(faqJsonLd\(FAQ\)\)/, "the FAQPage markup only where the answers are shown");
+  assert.match(about, /<SuggestedTypeLinks types=\{PRODUCT_TYPES/);
+  assert.match(about, /COUNTRY_GUIDE\.path/);
+  assert.match(about, /href=\{`\/\$\{r\.region\}\/stores`\}/);
+  assert.doesNotMatch(about, /one on the landing page/, "the landing page carries no eBay strip now");
+});
+
+test("the share card exists as a route, with its bundled OFL face, and says the registry's numbers", () => {
+  const og = src("app/opengraph-image.tsx");
+  for (const f of ["BricolageGrotesque-ExtraBold.ttf", "BricolageGrotesque-SemiBold.ttf", "OFL.txt"]) assert.ok(existsSync(new URL(`../src/app/fonts/${f}`, import.meta.url)), f);
+  const card = src("lib/og-card.tsx");
+  assert.match(og, /ogCard\(/, "drawn by lib/og-card.tsx");
+  assert.match(card, /fonts: \[/);
+  assert.match(card, /weight: 800/);
+  assert.doesNotMatch(card, /fetch\(|prisma|@\/lib\/db/, "no remote fetch, no database");
+  assert.match(og, /Sports card boxes,[\s\S]*compared across[\s\S]*\$\{STORES\.length\} stores[\s\S]*in \$\{REGION_LIST\.length\} regions/);
+  assert.doesNotMatch(og, /fetch\(|prisma|@\/lib\/db/, "no remote fetch, no database");
+  assert.equal(DEFAULT_OG_IMAGE.url, `${SITE_URL}/opengraph-image`);
+});
+
+// ─── Breadcrumbs ─────────────────────────────────────────────────────────────
+
+test("Breadcrumbs: one '← parent' link below sm, the trail from sm, and the BreadcrumbList JSON-LD once", () => {
+  const items = [{ href: "/us", label: "United States" }, { href: "/us/sets", label: "Sets" }, { label: "Bloomburrow" }];
+  assert.deepEqual(parentCrumb(items), { href: "/us/sets", label: "Sets" });
+  assert.equal(parentCrumb([{ label: "Only" }]), null);
+  const html = render(React.createElement(Breadcrumbs, { items }));
+  assert.match(html, /<a class="-ml-1 inline-flex min-h-10 [^"]*sm:hidden" href="\/us\/sets"><span aria-hidden="true">←<\/span><span class="truncate">Sets<\/span><\/a>/);
+  assert.match(html, /<ol class="hidden sm:flex /);
+  assert.equal(html.match(/application\/ld\+json/g)?.length, 1);
+  const ld = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(html)![1]);
+  assert.equal(ld["@type"], "BreadcrumbList");
+  assert.equal(ld.itemListElement.length, 3);
+  assert.equal(ld.itemListElement[1].item, `${SITE_URL}/us/sets`);
+  assert.match(src("components/Breadcrumbs.tsx"), /breadcrumbJsonLd\(items\)/, "seo.ts's builder, not a copy");
+});
+
+// ─── Product card ────────────────────────────────────────────────────────────
+
+const card = (o: Partial<ProductCardData> = {}): ProductCardData => ({
+  slug: "2025-topps-chrome-baseball-fotl-hobby-box",
+  name: "2025 Topps Chrome Baseball FOTL Hobby Box",
+  productType: "FOTL Hobby Box",
+  setCode: "2025|chrome|baseball",
+  imageUrl: "https://cdn.shopify.com/s/files/1/0001/products/chrome.jpg",
+  lowestPriceCents: 5750,
+  inStockStores: 12,
+  listedStores: 19,
+  marketplaceOpen: false,
+  medianOpenCents: null,
+  releaseDate: "2026-07-17",
+  ...o,
+});
+
+test("ProductCard: photo on a plate, short type pill, sentence-case 'From' before the price, stock with its unit, the compare line", () => {
+  const html = render(React.createElement(ProductCard, { p: card(), region: "us" }));
+  assert.match(html, /class="plate relative m-2 aspect-square lg:mb-0 lg:aspect-\[8\/7\]"/);
+  assert.match(html, /mix-blend-multiply/);
+  assert.match(html, /max-w-\[calc\(100%-1\.5rem\)\] truncate[^"]*">FOTL box<\/span>/);
+  assert.match(html, /<span class="text-xs font-medium text-muted">From<\/span><span class="tabular [^"]*">\$57\.50<\/span>/);
+  // stock first: the pill comes before the price in the markup
+  assert.ok(html.indexOf("In stock at 12 of 19") < html.indexOf("$57.50"), "stock before price");
+  assert.doesNotMatch(html, /uppercase tracking-wide text-faint">From|Last listed/);
+  assert.match(html, />In stock at 12 of 19<span class="stock-unit"> stores<\/span><\/span>/);
+  assert.doesNotMatch(html, /TCGplayer/);
+  assert.match(html, /Compare 19 prices&nbsp;→|Compare 19 prices →/);
+  assert.match(html, /lg:opacity-0[^"]*lg:group-hover:opacity-100[^"]*lg:group-focus-visible:opacity-100/);
+  assert.doesNotMatch(html, /ebay|tcgplayer\.com|data-ad/i, "no paid link inside a card");
+  assert.equal(findBannedCopy(html.replace(/<[^>]+>/g, " ")), null);
+});
+
+test("ProductCard labels: short types, stock in words, and what the click opens", () => {
+  assert.equal(shortTypeLabel("FOTL Hobby Box"), "FOTL box");
+  assert.equal(shortTypeLabel("Breaker's Delight Box"), "Breaker's Delight");
+  assert.equal(shortTypeLabel("Hobby Box"), "Hobby Box");
+  assert.equal(shortTypeLabel("Blaster Box"), "Blaster Box");
+  assert.deepEqual(cardStockLabel(card({ inStockStores: 1 }), false), ["In stock at 1 of 19", " stores"]);
+  assert.deepEqual(cardStockLabel(card(), true), ["Pre-order at 12 of 19", " stores"]);
+  assert.deepEqual(cardStockLabel(card({ inStockStores: 0, marketplaceOpen: false, listedStores: 3 }), false), ["Sold out at all 3", " stores"]);
+  assert.deepEqual(cardStockLabel(card({ inStockStores: 0, marketplaceOpen: false, listedStores: 0 }), false), ["Not in stock", ""]);
+  assert.equal(cardCompareLabel(card({ marketplaceOpen: false })), "Compare 19 prices");
+  assert.equal(cardCompareLabel(card({ inStockStores: 1, listedStores: 1, marketplaceOpen: false })), "See the offer");
+  assert.equal(cardCompareLabel(card({ inStockStores: 0, marketplaceOpen: false })), "See alternatives");
+  const sold = render(React.createElement(ProductCard, { p: card({ inStockStores: 0, marketplaceOpen: false, listedStores: 3 }), region: "au" }));
+  assert.match(sold, />Sold out at all 3<span class="stock-unit"> stores/);
+  assert.match(sold, /No price while sold out/);
+  assert.deepEqual(cardStockLabel(card({ inStockStores: 0, marketplaceOpen: false, listedStores: 1 }), false), ["Sold out at 1", " store"]);
+  assert.doesNotMatch(sold, />From</);
+});
+
+// ─── Empty states ────────────────────────────────────────────────────────────
+
+test("Empty with actions: a designed state, each action a chip with an icon beside its link; without actions, unchanged", () => {
+  const html = render(
+    React.createElement(Empty, { actions: [{ href: "/au/type/play-booster-boxes", label: "All booster boxes" }, { href: "/au/releases", label: "Pre-orders" }], children: "Nothing in stock right now." }),
+  );
+  assert.match(html, /<li class="empty-action"><svg [^>]*>[\s\S]*?<\/svg><a class="chip min-h-10" href="\/au\/type\/play-booster-boxes">All booster boxes<\/a><\/li>/);
+  assert.equal(html.match(/<svg /g)?.length, 3, "the state's icon and one per chip");
+  assert.equal(emptyActionIcon("/au/releases"), "calendar");
+  assert.equal(emptyActionIcon("/au/deals"), "tag");
+  assert.equal(emptyActionIcon("/au/stores"), "store");
+  assert.equal(emptyActionIcon("/au/sealed?q=cbb"), "search");
+  assert.equal(emptyActionIcon("/ca"), "arrow-right");
+  assert.equal(render(React.createElement(Empty, { children: "Nothing." })), '<div class="card px-6 py-10 text-center text-muted">Nothing.</div>');
+});

@@ -1,0 +1,131 @@
+name: WaxCompare sealed import
+
+# Reads every store in src/data/stores.json into the job's own throwaway Postgres (seeded from the committed data, so it starts
+# from yesterday's rows), adds every release 2+ stores now sell to data/sets/releases.json, exports the whole database to
+# data/public/ and commits it to main. Twice a day. No eBay API calls: no eBay credentials are passed to this job at all.
+#
+# No database secret: WaxCompare has no hosted database (DECISIONS.md 2026-11-07).
+# Secrets (Settings → Secrets and variables → Actions), optional:
+#   REVALIDATE_SECRET     same value as REVALIDATE_SECRET in Vercel; without it pages refresh within 24h.
+#   AMAZON_CREATORS_AU_*  the Creators API credential the ASIN step uses (a no-op without it).
+# Variable (same page, "Variables" tab):
+#   SITE_URL              e.g. https://waxcompare.app
+#
+
+on:
+  schedule:
+    # 20:47 UTC ≈ early morning in Australia/NZ; 08:47 UTC ≈ Europe's morning.
+    - cron: "47 20 * * *"
+    - cron: "47 8 * * *"
+  workflow_dispatch:
+    inputs:
+      # Store keys and markets; "tcgplayer" (or "US") includes TCGplayer.
+      only:
+        description: "Only these stores or markets, comma-separated (e.g. AU or a store key). Blank = all."
+        required: false
+        default: ""
+
+concurrency:
+  # ONE group for both data jobs: each seeds from main and exports the whole database back, so two at once would overwrite each
+  # other's rows. They queue instead.
+  group: waxcompare-data
+  cancel-in-progress: false
+
+# Writes the public data snapshot to main after the import (scripts/publish-public-data.sh).
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    # WaxCompare has no hosted database (DECISIONS.md 2026-11-07): each run gets an empty Postgres that dies with the runner,
+    # seeded from the committed data (scripts/seed-from-public.ts), and the result is exported back to main.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wax
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/wax
+      DB_SOURCE_NAME: actions-postgres
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # A queued run may have been triggered on an older commit: start from main as it is NOW, so the seed is the newest snapshot.
+      - name: Start from the newest main
+        run: git fetch -q origin main && git reset -q --hard origin/main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Sync the schema
+        # No --accept-data-loss: a schema change that would drop data fails
+        # here, loudly, instead of quietly deleting it.
+        run: npx prisma db push --skip-generate && npx prisma generate
+
+      - name: Seed the database from the committed data
+        run: npx tsx scripts/seed-from-public.ts
+
+      - name: Import
+        env:
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL || 'https://waxcompare.app' }}
+          ONLY: ${{ inputs.only }}
+          # The expired-eBay-listing purge at the end of the import uses the same age bound as the eBay import
+          # (a repository variable; blank = 26 hours).
+          EBAY_LISTING_MAX_AGE_HOURS: ${{ vars.EBAY_LISTING_MAX_AGE_HOURS }}
+        # Three stores at a time: Shopify throttles by IP across all of its
+        # storefronts, and a runner reading ten at once gets 429s from stores
+        # it has barely touched.
+        run: |
+          if [ -n "$ONLY" ]; then
+            npx tsx scripts/import.ts --concurrency 3 --only "$ONLY"
+          else
+            npx tsx scripts/import.ts --concurrency 3
+          fi
+
+      # Releases find themselves (lib/set-discovery.ts): every release 2+ stores now sell gets its page in this same data commit.
+      - name: Discover new releases
+        run: npx tsx scripts/discover-sets.ts
+
+      # The site reads these files, not the database (src/lib/public-data/): export every public table and
+      # commit it to main, which is the release that puts this import's prices live.
+      - name: Export the public data
+        run: npx tsx scripts/export-public-data.ts
+
+      # Amazon ASINs (Creators API searchItems, AMAZON_SEARCH_BUDGET a region a day) for the product pages' Amazon row,
+      # matched by the sealed classifier. ASINs only: Amazon prices are fetched by each Vercel build and never committed
+      # (DECISIONS.md 2026-11-05). A no-op until the secrets exist; never fails the run.
+      - name: Amazon ASINs (Creators API)
+        continue-on-error: true
+        env:
+          AMAZON_CREATORS_AU_CLIENT_ID: ${{ secrets.AMAZON_CREATORS_AU_CLIENT_ID }}
+          AMAZON_CREATORS_AU_CLIENT_SECRET: ${{ secrets.AMAZON_CREATORS_AU_CLIENT_SECRET }}
+          AMAZON_CREATORS_AU_VERSION: ${{ secrets.AMAZON_CREATORS_AU_VERSION }}
+        run: npx tsx scripts/amazon-asins.ts
+
+      # The Compare Empire network (DECISIONS.md "Sites that grow each other"): this site's best deals for the sister
+      # sites, and their feeds for the "Other card games on sale" block. Read from the files just exported; never fails the run.
+      - name: Family feed
+        run: PUBLIC_DATA_MODE=files npx tsx scripts/family-sync.ts
+
+      - name: Publish it to main
+        # ONE RELEASE A DAY (owner, 2026-10-17: "reduce the cost"). The 20:47 UTC run (early morning in Australia,
+        # afternoon in the Americas) and a manual run release ("release": the commit subject carries
+        # [deploy]; the build gate still holds it to one build per 12 hours); the 08:47 run commits its snapshot without the marker and it rides the next release, which carries a
+        # newer whole-database snapshot anyway. Every release empties Vercel's CDN; the 08:47 read still feeds the alerts.
+        env:
+          RELEASE: ${{ (github.event_name != 'schedule' || github.event.schedule == '47 20 * * *') && 'release' || '' }}
+        run: bash scripts/publish-public-data.sh "sealed-import.yml run ${{ github.run_id }}" $RELEASE

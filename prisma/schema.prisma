@@ -1,0 +1,143 @@
+// DexCompare (sealed) — Pokémon TCG sealed products compared across stores.
+//
+// DELIBERATELY NO HISTORY. Every table holds the CURRENT state only: the latest
+// read of each store's listings and the per-market summary derived from them.
+// There is no price history, no stock history and no first-seen table, and no
+// user data at all (no accounts, no emails). That keeps the database small and
+// flat (a few thousand rows, not millions), which is what keeps it inside
+// Neon's free tier. See README.md, "What this site does not store".
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// One sealed product, e.g. "Surging Sparks Elite Trainer Box". Market-agnostic:
+// the same product exists in every region, and each region's offers hang off it.
+// Rows are kept while any store still lists the product (in stock or sold out),
+// so its URL keeps working between restocks.
+model Product {
+  id          String   @id @default(cuid())
+  // Identity from the title classifier (src/lib/sealed-title.ts): "<set>|<type>"
+  // for set products, "<type>|<set or ->|<signature>" for collections, tins, etc.
+  groupKey    String   @unique
+  slug        String   @unique
+  name        String
+  productType String
+  setCode     String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+
+  offers Offer[]
+  stats  ProductStat[]
+
+  @@index([setCode])
+  @@index([productType])
+}
+
+// A store's current listing for a product. One row per (product, store): the
+// importer keeps the best listing a store has (in stock first, then cheapest).
+// A store's rows are replaced only after a SUCCESSFUL read of that store, so a
+// failed read keeps yesterday's rows, which then age into "unknown" (see
+// src/lib/sealed-offers.ts) rather than vanishing.
+model Offer {
+  id         String   @id @default(cuid())
+  productId  String
+  store      String // store key, see src/lib/stores/
+  market     String // AU | NZ | US | UK | CA | EU | SG — also the currency
+  title      String // the store's own product title
+  url        String
+  priceCents Int
+  inStock    Boolean
+  imageUrl   String?
+  lastSeen   DateTime // the importer's last successful read of this store
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, store])
+  @@index([store])
+  @@index([market, productId])
+}
+
+// Per-market summary of a product, recomputed wholesale by every import. This
+// is what listing pages read, so a region's browse page is one indexed read
+// instead of an aggregate over every offer on every request.
+model ProductStat {
+  productId        String
+  market           String
+  lowestPriceCents Int? // cheapest OPEN offer (in stock and freshly read), a marketplace's included; null = none
+  // Independent STORES only: every "N stores" on the site reads these, and a
+  // marketplace (TCGplayer) is never a store. Its presence is marketplaceOpen.
+  inStockStores    Int
+  listedStores     Int
+  // A marketplace (TCGplayer, US only) has an OPEN offer for the product. A
+  // product is buyable when inStockStores > 0 OR this is true.
+  marketplaceOpen  Boolean @default(false)
+  // Median of the OPEN independent-store prices in this market (null under
+  // two stores): "18% below the median of 6 stores" is a cross-store fact
+  // about now, not history.
+  medianOpenCents  Int?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, market])
+  @@index([market, inStockStores])
+}
+
+// Per-store health from the latest import: how many sealed listings the store
+// had and whether the last read worked. Current state only.
+model StoreStat {
+  store      String    @id
+  market     String
+  listed     Int       @default(0)
+  inStock    Int       @default(0)
+  lastOkAt   DateTime?
+  lastError  String?
+  // Listed 20+ products and had none in stock at the last import: a store that
+  // has stopped restocking. Its sold-out rows stay (the page says so) but no
+  // longer count as "listed by N stores" (ProductStat.listedStores).
+  dormant    Boolean   @default(false)
+  updatedAt  DateTime  @updatedAt
+
+  @@index([market])
+}
+
+// ─── eBay listings (the daily import, scripts/ebay-import.ts) ───────────────────
+// The strips' data. Operational and TRANSIENT, not history: a feed's rows are REPLACED
+// in one transaction by each import run (never appended), at most 12 per feed, and every
+// row older than the display bound + 4 h is deleted (eBay API License Agreement 3.1(b):
+// delete copies no longer required). The web route only reads this table; it never calls
+// eBay and holds no eBay credentials. `src/lib/ebay-store.ts` carries the identical DDL
+// the importer self-heals with (CREATE TABLE IF NOT EXISTS) if a table is missing.
+model EbayListing {
+  // "<marketplace>|<kind>[:<arg>]": EBAY_US|chase, EBAY_AU|sealed, EBAY_GB|set:surging-sparks,
+  // EBAY_US|type:booster-boxes, EBAY_US|item:<productId>
+  feed       String
+  rank       Int // 0-based display order within the feed
+  itemId     String
+  title      String
+  imageUrl   String // https, *.ebayimg.com
+  priceValue String // exactly as eBay returned it ("717.90"); never converted
+  currency   String
+  shipValue  String? // the first shipping option's cost, when eBay gave one
+  shipFree   Boolean? // true: free shipping; null: unknown
+  condition  String?
+  url        String // the affiliate URL (itemAffiliateWebUrl, or tagged itemWebUrl)
+  fetchedAt  DateTime // when eBay answered for this feed
+
+  @@id([feed, rank])
+  @@index([fetchedAt])
+}
+
+// Browse-search calls made per day, in the time zone eBay resets its daily limit in
+// (America/Los_Angeles). Reserved with ONE atomic statement before each search, so
+// overlapping and manual runs can never exceed the cap. One small row per day.
+model EbayCallDay {
+  day       String   @id // YYYY-MM-DD, Pacific time
+  total     Int
+  updatedAt DateTime
+}

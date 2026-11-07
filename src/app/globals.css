@@ -1,0 +1,784 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 246 246 243;
+  --surface: 255 255 255;
+  --raised: 250 250 248;
+  --line: 228 227 222;
+  --ink: 21 23 28;
+  --muted: 92 96 108;
+  --faint: 100 104 115; /* 5.2:1 on --bg, 5.6:1 on --surface (WCAG AA for small text) */
+  --brand: 184 22 46; /* WaxCompare seal red; white on it is 6.6:1, and it reads at 6.3:1 on --bg */
+  --brand-ink: 255 255 255;
+  --brand-soft: 252 233 236;
+  --brand-strong: 146 14 34; /* brand as TEXT on --brand-soft and on --surface: chips and .btn-soft */
+  --spark: 212 168 72; /* brass, used sparingly: highlights only */
+  --open: 20 118 56; /* 5.0:1 on --open-soft, 5.7:1 on --surface: the 12px stock pill is AA */
+  --open-soft: 226 245 232;
+  --sold: 100 104 115; /* 4.8:1 on --sold-soft: the 12px sold-out pill is AA */
+  --sold-soft: 238 238 240;
+  --stale: 143 88 0; /* was 176 110 0: 3.7:1 on --stale-soft, under WCAG AA 4.5:1 (axe color-contrast, "Not checked recently" pill) */
+  --stale-soft: 253 243 219;
+  --pre: 88 76 214;
+  --pre-soft: 236 234 252;
+  --ad: 243 246 252; /* sponsored units: a cool tint no store row or product card uses. muted 5.8:1, brand 4.7:1 on it */
+  --ad-line: 120 128 148;
+  --shadow: 24 22 18;
+  /* The sticky header's height: sticky offsets (top-[var(--hdr)]) and anchor jumps (scroll-padding-top below) follow it. */
+  --hdr: 60px;
+  color-scheme: light;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --hdr: 64px;
+  }
+}
+
+/* Dark is the default (owner, 2026-10-24): a visitor who has not chosen light gets it, decided before first paint by
+   THEME_BOOT_SCRIPT (lib/theme.ts) from their own saved choice; no server read, so one CDN copy serves everyone. */
+:root:not([data-theme="light"]) {
+    --bg: 15 16 19;
+    --surface: 23 24 29;
+    --raised: 29 31 37;
+    --line: 45 47 55;
+    --ink: 238 238 241;
+    --muted: 166 170 181;
+    --faint: 140 144 156; /* 6.0:1 on --bg, 5.6:1 on --surface */
+    --brand: 255 122 136;
+    --brand-ink: 32 6 10;
+    --brand-soft: 66 22 30;
+    --brand-strong: 255 176 184; /* on --brand-soft and on --surface */
+    --open: 74 206 120;
+    --open-soft: 20 48 30;
+    --sold: 150 154 164;
+    --sold-soft: 38 40 46;
+    --stale: 240 180 60;
+    --stale-soft: 52 40 14;
+    --pre: 160 150 255;
+    --pre-soft: 36 32 70;
+    --ad: 26 31 45;
+    --ad-line: 120 130 156;
+    --shadow: 0 0 0;
+    color-scheme: dark;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  /* An in-page link (#prices) or a focused element lands below the sticky header, not under it. */
+  scroll-padding-top: calc(var(--hdr) + 8px);
+}
+
+body {
+  @apply bg-bg text-ink antialiased;
+  font-feature-settings: "ss01", "cv11";
+  /* A safety net for phones: an element wider than the screen (a rail whose grid item lacks min-w-0, a wide table) is clipped
+     instead of laying the whole page out wider and zoomed out, with a sideways scroll into dead space. `clip`, not `hidden`,
+     so position: sticky keeps working. */
+  overflow-x: clip;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Focus that's visible on every surface. */
+:focus-visible {
+  outline: 2px solid rgb(var(--brand));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@layer components {
+  .page {
+    @apply mx-auto w-full max-w-page px-4 sm:px-6;
+  }
+  .card {
+    @apply rounded-xl border border-line bg-surface shadow-card;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-brand-ink hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-surface text-ink hover:bg-raised;
+  }
+  /* A secondary action that is still a buy action (an in-stock store that is not the cheapest): the brand's tint, quieter than
+     .btn-primary, louder than .btn-ghost. brand-strong on brand-soft is 5.6:1 (6.9:1 dark). */
+  .btn-soft {
+    @apply btn bg-brand-soft text-brand-strong hover:bg-brand/15;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink/30;
+  }
+  .chip-on {
+    @apply border-ink bg-ink text-surface hover:border-ink;
+  }
+  /* A sponsored eBay unit: dashed, cool-tinted, always with an .ad-pill. Never a card, never a row. */
+  .ad-box {
+    @apply rounded-xl border border-dashed border-ad-line bg-ad;
+  }
+  /* An ad's own button: eBay's button blue, #3665f3 with white text (4.9:1; #2a50c8 on hover, 6.8:1), the blue of eBay's own
+     buttons, the price table's eBay row and the hot buttons. It never passes for the site's red actions (.btn-primary) and every
+     unit around one carries its "Ad" label. (Until the growth release it was a grey outline.) The transparent border keeps the
+     box the size the outline gave it. */
+  .btn-ad {
+    @apply btn border border-transparent bg-[#3665f3] text-white hover:bg-[#2a50c8];
+  }
+  /* TCGplayer's button in the price table's pinned TCGplayer row: the site's ink (near-black, white in dark mode), so the table's four
+     kinds of row read apart by their button alone: eBay blue, TCGplayer ink, the cheapest store red (.btn-primary), the others soft. */
+  .btn-tcg {
+    @apply btn border border-transparent bg-ink text-surface hover:bg-ink/85;
+  }
+  /* An ad's chips: outlined and cool-toned, so they never pass for the site's internal navigation chips (.chip). */
+  .ad-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-dashed border-ad-line bg-surface px-3 py-1 text-xs font-medium text-ink transition-colors hover:border-ink;
+  }
+  .ad-pill {
+    @apply inline-flex shrink-0 items-center rounded border border-ad-line px-1.5 text-[11px] font-bold leading-[18px] text-muted;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.12em] text-muted;
+  }
+  /* What a product photo sits on: white, rounded, a hairline ring. Store photos are shot on white, so in dark mode the plate stays
+     light (#f3f3f1) instead of putting a white rectangle on a dark card. */
+  .plate {
+    @apply isolate overflow-hidden rounded-lg bg-white ring-1 ring-line;
+  }
+  :root:not([data-theme="light"]) .plate {
+    background-color: #f3f3f1;
+  }
+  /* One row that scrolls sideways (chips, a product rail): snap to each child, no scrollbar, and a fade at the right edge that says
+     there is more. The 4px of block padding (cancelled by the margin) keeps focus rings from being clipped by the scroll box. */
+  .scroller {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-block: 4px;
+    margin-block: -4px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+  }
+  .scroller::-webkit-scrollbar {
+    display: none;
+  }
+  .scroller > * {
+    flex: none;
+    scroll-snap-align: start;
+  }
+  .prose-dex p {
+    @apply mb-4 leading-7 text-muted;
+  }
+  .prose-dex h2 {
+    @apply mb-3 mt-8 font-display text-xl font-bold text-ink;
+  }
+  .prose-dex a {
+    @apply font-medium text-brand underline underline-offset-2;
+  }
+  .prose-dex ul {
+    @apply mb-4 list-disc space-y-1 pl-5 text-muted;
+  }
+  .prose-dex ol {
+    @apply mb-4 list-decimal space-y-1 pl-5 text-muted;
+  }
+}
+
+/* ── The shell (components/Header.tsx, MobileMenu.tsx, Section.tsx) ─────────────────────────────────────────────── */
+
+/* The header's search box is components/SearchBox.tsx, unchanged; the header only fits it to its one row: a 44px target below
+   lg (40px from lg), and 16px text on a phone, where anything smaller makes iOS zoom the page on focus. */
+.hdr-search form[role="search"] {
+  min-height: 2.75rem;
+}
+@media (max-width: 639.98px) {
+  .hdr-search input {
+    font-size: 16px;
+  }
+}
+@media (min-width: 1024px) {
+  .hdr-search form[role="search"] {
+    min-height: 2.5rem;
+  }
+}
+
+/* The phone menu: a native modal <dialog> drawn as a sheet from the top. It slides in with a transform (no layout), the page behind
+   is dimmed, and it does not scroll under the sheet (the gutter stays, so nothing moves on a desktop with scrollbars). */
+.menu-sheet[open] {
+  animation: menu-sheet-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.menu-sheet::backdrop {
+  background: rgb(15 16 19 / 0.45);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+@keyframes menu-sheet-in {
+  from {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-sheet[open] {
+    animation: none;
+  }
+}
+html:has(.menu-sheet[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* An empty state's action chip leads with an icon that sits beside its link (the link is just the chip and its words). */
+.empty-action {
+  position: relative;
+  display: inline-flex;
+}
+.empty-action > svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: rgb(var(--brand-strong));
+}
+.empty-action > .chip {
+  padding-left: 2.125rem;
+}
+
+/* A product card's body is a size container: on a card too narrow for "In stock · 12 stores" (a 2-up grid on a 320px phone) the
+   pill drops the unit ("In stock · 12"); its title still says it in full. */
+.card-body {
+  container-type: inline-size;
+}
+@container (max-width: 127.98px) {
+  .stock-unit {
+    display: none;
+  }
+}
+
+/* A page whose own units leave no room for the banner above the footer asks for
+   it to be dropped with <NoPreFooter/> (components/Ebay.tsx). Pure CSS, so the
+   page stays static. Where :has() is missing the banner simply stays. */
+body:has([data-ebay-no-prefooter]) [data-ebay-prefooter] {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Halloween (data-season="halloween", lib/season.ts; 16-31 October in the visitor's own time, ported from RiftCompare).
+   The landing hero turns to a moonlit Innistrad night: a violet sky with a harvest moon, cobwebs in its top corners, bats,
+   candlelit jack-o'-lanterns in its bottom corners, and "Night falls on Innistrad" above the eyebrow. Everything keys off the
+   attribute, so on 1 November the site is exactly its usual self with no deploy. Decoration sits behind the hero content
+   (.mc-hero-content is z-index 1) and never takes pointer events. Brand, buy and stock colours are untouched.
+   --------------------------------------------------------------------------- */
+.mc-decor,
+.mc-moon {
+  display: none;
+}
+:root[data-season="halloween"] .mc-decor {
+  display: block;
+}
+:root[data-season="halloween"] .mc-moon {
+  display: inline-flex;
+}
+.mc-hero-content {
+  position: relative;
+  z-index: 1;
+}
+:root[data-season="halloween"] .mc-hero {
+  background-image:
+    radial-gradient(circle at 82% 18%, rgb(255 214 140 / 0.35) 0, rgb(255 214 140 / 0.12) 70px, transparent 160px),
+    radial-gradient(ellipse 80% 70% at 50% 0%, rgb(122 46 196 / 0.16) 0%, transparent 75%),
+    linear-gradient(180deg, rgb(122 46 196 / 0.08), transparent);
+}
+:root[data-season="halloween"]:not([data-theme="light"]) .mc-hero {
+    background-image:
+      radial-gradient(circle at 82% 18%, rgb(255 210 130 / 0.22) 0, rgb(255 190 90 / 0.08) 80px, transparent 170px),
+      radial-gradient(ellipse 80% 70% at 50% 0%, #2a1250 0%, rgb(42 18 80 / 0.4) 45%, transparent 80%);
+}
+.mc-decor {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.mc-web {
+  position: absolute;
+  top: 0;
+  width: clamp(56px, 13vw, 190px);
+  aspect-ratio: 1;
+  background-color: rgb(60 40 110 / 0.28);
+  -webkit-mask: url(/brand/cobweb.svg) 0 0 / contain no-repeat;
+  mask: url(/brand/cobweb.svg) 0 0 / contain no-repeat;
+}
+:root:not([data-theme="light"]) .mc-web { background-color: rgb(225 220 255 / 0.3); }
+.mc-web-l { left: 0; }
+.mc-web-r { right: 0; transform: scaleX(-1); }
+.mc-pumpkins {
+  position: absolute;
+  bottom: 6px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+.mc-pumpkins-l { left: 14px; }
+.mc-pumpkins-r { right: 14px; }
+.mc-pumpkin {
+  display: block;
+  width: clamp(40px, 5.2vw, 80px);
+  aspect-ratio: 100 / 92;
+  background: url(/brand/pumpkin.svg) center / contain no-repeat;
+  filter: drop-shadow(0 0 10px rgb(255 140 30 / 0.5));
+  animation: mc-candle 2.6s ease-in-out infinite;
+}
+.mc-pumpkin-sm {
+  width: clamp(28px, 3.4vw, 52px);
+  animation-delay: -1.1s;
+}
+@keyframes mc-candle {
+  0%, 100% { filter: drop-shadow(0 0 10px rgb(255 140 30 / 0.5)); }
+  30% { filter: drop-shadow(0 0 16px rgb(255 160 40 / 0.75)); }
+  34% { filter: drop-shadow(0 0 7px rgb(255 130 30 / 0.4)); }
+  62% { filter: drop-shadow(0 0 18px rgb(255 170 50 / 0.8)); }
+}
+/* Bats: a two-wing silhouette drawn with a mask, flapping as they cross the strip ABOVE the hero's content (never behind its text). */
+.mc-bat {
+  position: absolute;
+  left: -40px;
+  width: 30px;
+  aspect-ratio: 2 / 1;
+  background-color: rgb(40 20 70 / 0.7);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M20 6c1-2 2-3 2-3l1 3c4-4 9-5 17-3-4 1-6 4-6 8-2-2-5-2-7 1-1-2-3-3-5-2-2-1-4 0-5 2-2-3-5-3-7-1 0-4-2-7-6-8 8-2 13-1 17 3l1-3s1 1 2 3z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M20 6c1-2 2-3 2-3l1 3c4-4 9-5 17-3-4 1-6 4-6 8-2-2-5-2-7 1-1-2-3-3-5-2-2-1-4 0-5 2-2-3-5-3-7-1 0-4-2-7-6-8 8-2 13-1 17 3l1-3s1 1 2 3z'/%3E%3C/svg%3E") center / contain no-repeat;
+  animation: mc-fly 19s linear infinite, mc-flap 0.32s ease-in-out infinite alternate;
+}
+:root:not([data-theme="light"]) .mc-bat { background-color: rgb(200 180 240 / 0.55); }
+.mc-bat-1 { top: 8px; animation-delay: -3s, 0s; }
+.mc-bat-2 { top: 18px; width: 22px; animation-duration: 25s, 0.28s; animation-delay: -14s, -0.1s; }
+.mc-bat-3 { top: 4px; width: 18px; animation-duration: 31s, 0.25s; animation-delay: -22s, -0.2s; }
+@keyframes mc-fly {
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(28vw, 6px, 0); }
+  50% { transform: translate3d(55vw, -4px, 0); }
+  75% { transform: translate3d(82vw, 5px, 0); }
+  100% { transform: translate3d(calc(100vw + 80px), 0, 0); }
+}
+@keyframes mc-flap {
+  from { scale: 1 1; }
+  to { scale: 1 0.8; }
+}
+.mc-moon {
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid rgb(122 46 196 / 0.35);
+  background: rgb(var(--surface) / 0.85);
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgb(var(--brand-strong));
+  box-shadow: 0 0 22px rgb(122 46 196 / 0.18);
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+.mc-moon:hover,
+.mc-moon:focus-visible {
+  border-color: rgb(var(--brand));
+  box-shadow: 0 0 30px rgb(122 46 196 / 0.35);
+}
+.mc-moon b {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 800;
+  color: rgb(var(--ink));
+}
+.mc-eyes {
+  display: inline-flex;
+  gap: 4px;
+}
+.mc-eyes i {
+  display: block;
+  width: 9px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffcf6b;
+  box-shadow: 0 0 6px 1px rgb(255 150 30 / 0.9);
+  animation: mc-blink 4.6s ease-in-out infinite;
+}
+.mc-eyes i:first-child { transform: rotate(14deg); }
+.mc-eyes i:last-child { transform: rotate(-14deg); }
+@keyframes mc-blink {
+  0%, 90%, 100% { scale: 1 1; }
+  93% { scale: 1 0.1; }
+}
+@media (max-width: 639.98px) {
+  /* Tucked into the corners, below the search box: nothing over the hero's text or controls on a phone. */
+  .mc-pumpkin-sm,
+  .mc-bat-3 { display: none; }
+  .mc-pumpkin { width: 30px; }
+  .mc-pumpkins { bottom: 4px; }
+  .mc-pumpkins-l { left: 8px; }
+  .mc-pumpkins-r { right: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mc-bat { display: none; }
+  .mc-pumpkin,
+  .mc-eyes i { animation: none; }
+}
+
+/* ThemeToggle: the icon for the theme you would switch TO. */
+.theme-icon-dark { display: none; }
+:root[data-theme="light"] .theme-icon-dark { display: block; }
+:root[data-theme="light"] .theme-icon-light { display: none; }
+
+/* Quick view (src/components/QuickView.tsx): opens at once, prices shimmer in. */
+.qv-shimmer {
+  background: linear-gradient(90deg, rgb(var(--raised)) 0%, rgb(var(--line)) 50%, rgb(var(--raised)) 100%);
+  background-size: 200% 100%;
+  animation: qv-shimmer 1.1s linear infinite;
+}
+@keyframes qv-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+.qv-panel { animation: qv-in 0.18s ease-out; }
+.qv-backdrop { animation: qv-fade 0.18s ease-out; }
+@keyframes qv-in { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes qv-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .qv-shimmer, .qv-panel, .qv-backdrop { animation: none; }
+}
+
+/* xmas-common:start (the same block on every Compare site) */
+/* ---------------------------------------------------------------------------
+   Christmas (data-season="christmas", lib/season.ts; 1 November to 26 December).
+   Owner, 2026-11-01: "make all of the sites Christmas themed". Pure decoration:
+   every piece is aria-hidden, pointer-events:none, sits under the content and
+   is hidden unless <html> carries the attribute, so on 27 December the site is
+   its usual self again with no deploy. The art is small cached SVGs in
+   public/xmas/. Snow is two tiled CSS layers moved by transform only (the
+   compositor's job, no script), and stops for prefers-reduced-motion.
+   --------------------------------------------------------------------------- */
+.xmas-only {
+  display: none !important;
+}
+:root[data-season="christmas"] .xmas-only {
+  display: block !important;
+}
+.xmas-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* A strand of lights along the top edge, its bulbs twinkling in turn. */
+.xmas-lights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  pointer-events: none;
+  background: url(/xmas/lights.svg) 0 0 / 160px 36px repeat-x;
+}
+.xmas-lights::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18px 19px, rgb(255 59 78 / 0.55), transparent 11px) 0 0 / 160px 36px repeat-x,
+    radial-gradient(circle at 101px 25px, rgb(46 224 122 / 0.5), transparent 11px) 0 0 / 160px 36px repeat-x;
+  animation: xmas-twinkle 2.4s ease-in-out infinite;
+}
+.xmas-lights::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 59px 25px, rgb(255 204 51 / 0.55), transparent 11px) 0 0 / 160px 36px repeat-x,
+    radial-gradient(circle at 142px 19px, rgb(79 184 255 / 0.5), transparent 11px) 0 0 / 160px 36px repeat-x;
+  animation: xmas-twinkle 2.4s ease-in-out -1.2s infinite;
+}
+@keyframes xmas-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+/* Falling snow: two tiled layers of flakes, each one tile taller than its box
+   and slid down by exactly one tile, so the loop has no seam. */
+.xmas-snow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.xmas-snow::before,
+.xmas-snow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -380px;
+  bottom: 0;
+  --flake: rgb(255 255 255 / 0.85);
+  background-image:
+    radial-gradient(circle at 170px 82px, var(--flake) 1.5px, transparent 2.5px),
+    radial-gradient(circle at 29px 42px, var(--flake) 2.0px, transparent 3.0px),
+    radial-gradient(circle at 53px 192px, var(--flake) 1.7px, transparent 2.7px),
+    radial-gradient(circle at 264px 114px, var(--flake) 1.0px, transparent 2.0px),
+    radial-gradient(circle at 227px 219px, var(--flake) 1.0px, transparent 2.0px),
+    radial-gradient(circle at 51px 287px, var(--flake) 1.5px, transparent 2.5px),
+    radial-gradient(circle at 294px 68px, var(--flake) 2.2px, transparent 3.2px),
+    radial-gradient(circle at 327px 326px, var(--flake) 1.7px, transparent 2.7px),
+    radial-gradient(circle at 36px 300px, var(--flake) 1.7px, transparent 2.7px),
+    radial-gradient(circle at 30px 118px, var(--flake) 1.0px, transparent 2.0px),
+    radial-gradient(circle at 73px 153px, var(--flake) 1.5px, transparent 2.5px);
+  background-size: 380px 380px;
+  animation: xmas-fall 20s linear infinite;
+  will-change: transform;
+}
+.xmas-snow::after {
+  top: -290px;
+  background-image:
+    radial-gradient(circle at 281px 65px, var(--flake) 1.7px, transparent 2.7px),
+    radial-gradient(circle at 97px 57px, var(--flake) 1.7px, transparent 2.7px),
+    radial-gradient(circle at 101px 195px, var(--flake) 1.0px, transparent 2.0px),
+    radial-gradient(circle at 37px 35px, var(--flake) 1.8px, transparent 2.8px),
+    radial-gradient(circle at 259px 277px, var(--flake) 1.5px, transparent 2.5px),
+    radial-gradient(circle at 165px 243px, var(--flake) 1.7px, transparent 2.7px),
+    radial-gradient(circle at 237px 190px, var(--flake) 1.3px, transparent 2.3px),
+    radial-gradient(circle at 97px 129px, var(--flake) 1.0px, transparent 2.0px),
+    radial-gradient(circle at 158px 273px, var(--flake) 1.6px, transparent 2.6px);
+  background-size: 290px 290px;
+  opacity: 0.55;
+  animation: xmas-fall-sm 12s linear infinite;
+}
+@keyframes xmas-fall {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-38px, 380px, 0); }
+}
+@keyframes xmas-fall-sm {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(22px, 290px, 0); }
+}
+/* Light pages: flakes need an edge to show on white. */
+.xmas-snow-light::before,
+.xmas-snow-light::after {
+  --flake: rgb(148 178 210 / 0.75);
+}
+/* The art. */
+.xmas-art {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  background: center / contain no-repeat;
+}
+.xmas-tree { aspect-ratio: 100 / 130; background-image: url(/xmas/xmas-tree.svg); }
+.xmas-gift { aspect-ratio: 100 / 90; background-image: url(/xmas/gift.svg); }
+.xmas-cane { aspect-ratio: 60 / 120; background-image: url(/xmas/candy-cane.svg); }
+.xmas-stocking { aspect-ratio: 70 / 100; background-image: url(/xmas/stocking.svg); }
+.xmas-holly { aspect-ratio: 100 / 60; background-image: url(/xmas/holly.svg); }
+.xmas-hat { aspect-ratio: 100 / 80; background-image: url(/xmas/santa-hat.svg); }
+.xmas-flake {
+  aspect-ratio: 1;
+  background-color: currentColor;
+  -webkit-mask: url(/xmas/snowflake.svg) center / contain no-repeat;
+  mask: url(/xmas/snowflake.svg) center / contain no-repeat;
+}
+@media (prefers-reduced-motion: reduce) {
+  .xmas-snow::before,
+  .xmas-snow::after,
+  .xmas-lights::before,
+  .xmas-lights::after {
+    animation: none;
+  }
+}
+/* The hero set: snow, lights along the top (from where a side rail ends,
+   --xmas-left), a tree and a present in the bottom-left corner, a candy cane
+   and a small tree in the bottom-right. Under the hero's content. */
+.xmas-hero {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.xmas-hero .xmas-lights {
+  left: var(--xmas-left, 0px);
+}
+.xmas-corner {
+  position: absolute;
+  bottom: 4px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  pointer-events: none;
+}
+.xmas-corner .xmas-art {
+  position: relative;
+}
+.xmas-corner-l {
+  left: calc(var(--xmas-left, 0px) + 14px);
+}
+.xmas-corner-r {
+  right: 14px;
+}
+.xmas-corner .xmas-tree {
+  width: clamp(40px, 5vw, 84px);
+  filter: drop-shadow(0 0 12px rgb(255 214 102 / 0.3));
+}
+.xmas-corner .xmas-tree-sm {
+  width: clamp(30px, 3.8vw, 62px);
+}
+.xmas-corner .xmas-gift {
+  width: clamp(28px, 3.3vw, 52px);
+}
+.xmas-corner .xmas-cane {
+  width: clamp(15px, 1.8vw, 28px);
+  margin-right: 4px;
+}
+@media (max-width: 639.98px) {
+  /* Phones: small and tucked into the corners, clear of the hero's text. */
+  .xmas-corner .xmas-tree-sm,
+  .xmas-corner .xmas-gift { display: none; }
+  .xmas-corner .xmas-tree { width: 26px; }
+  .xmas-corner .xmas-cane { width: 11px; }
+  .xmas-corner { bottom: 2px; }
+  .xmas-corner-l { left: 4px; }
+  .xmas-corner-r { right: 4px; }
+  .xmas-lights { transform: scale(0.8); transform-origin: 0 0; right: -25%; }
+}
+/* Santa's hat on the logo mark, everywhere the logo is. The mark is a mask
+   on most sites, so the hat is a sibling in a host span, not a child. */
+.xmas-hat-host {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.xmas-logo-hat {
+  display: none;
+}
+:root[data-season="christmas"] .xmas-logo-hat {
+  display: block;
+  position: absolute;
+  top: -34%;
+  left: -16%;
+  width: 72%;
+  aspect-ratio: 100 / 80;
+  background: url(/xmas/santa-hat.svg) center / contain no-repeat;
+  transform: rotate(-20deg);
+  pointer-events: none;
+}
+/* The festive line in the hero (ChristmasGifts): a pill to the site's gift
+   shopping page, shown only in the season. */
+.xmas-pill-row {
+  display: none;
+}
+:root[data-season="christmas"] .xmas-pill-row {
+  display: flex;
+}
+.xmas-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid var(--xmas-pill-border, rgb(248 113 113 / 0.45));
+  background: var(--xmas-pill-bg, rgb(12 24 48 / 0.6));
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--xmas-pill-fg, #e0f2fe);
+  box-shadow: 0 0 22px rgb(220 38 38 / 0.18);
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+.xmas-pill:hover,
+.xmas-pill:focus-visible {
+  box-shadow: 0 0 30px rgb(220 38 38 / 0.32);
+  transform: translateY(-1px);
+}
+.xmas-pill b {
+  font-weight: 800;
+  color: var(--xmas-pill-strong, #fff);
+}
+.xmas-pill .xmas-pill-more {
+  color: var(--xmas-pill-soft, #bae6fd);
+  font-weight: 500;
+}
+.xmas-pill-icon {
+  display: block;
+  width: 18px;
+  aspect-ratio: 100 / 90;
+  background: url(/xmas/gift.svg) center / contain no-repeat;
+}
+/* xmas-common:end */
+
+/* xmas-site:start — WaxCompare's Christmas: the landing hero turns into a
+   snowy winter night (dark) or a frosted morning (light), with snow, lights,
+   trees and a candy cane (ChristmasDecor), a gifts line to the sealed list
+   (ChristmasGifts) and Santa's hat on the five-orb mark. Brand, buy and stock
+   colours are untouched; the hero content stays above it (.mc-hero-content). */
+:root[data-season="christmas"] .mc-hero {
+  background-image:
+    radial-gradient(ellipse 45% 60% at 8% 100%, rgb(22 163 74 / 0.1), transparent 70%),
+    radial-gradient(ellipse 45% 60% at 92% 100%, rgb(220 38 38 / 0.09), transparent 70%),
+    linear-gradient(180deg, rgb(207 228 247 / 0.75), rgb(236 244 251 / 0.4) 60%, transparent);
+}
+:root[data-season="christmas"]:not([data-theme="light"]) .mc-hero {
+  background-image:
+    radial-gradient(ellipse 45% 60% at 8% 100%, rgb(22 163 74 / 0.14), transparent 70%),
+    radial-gradient(ellipse 45% 60% at 92% 100%, rgb(220 38 38 / 0.14), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 0%, #16305a 0%, rgb(22 48 90 / 0.4) 45%, transparent 80%);
+}
+:root[data-season="christmas"][data-theme="light"] .xmas-snow::before,
+:root[data-season="christmas"][data-theme="light"] .xmas-snow::after {
+  --flake: rgb(120 160 205 / 0.75);
+}
+:root[data-theme="light"] .xmas-pill {
+  --xmas-pill-bg: rgb(255 255 255 / 0.92);
+  --xmas-pill-fg: #7f1d1d;
+  --xmas-pill-strong: #7f1d1d;
+  --xmas-pill-soft: #1e3a5f;
+  --xmas-pill-border: rgb(185 28 28 / 0.4);
+}
+/* xmas-site:end */
+
+/* The beta forum (src/components/forum/forum.css) in this site's colours. */
+.fm {
+  --fm-card: rgb(var(--surface));
+  --fm-sunk: rgb(var(--raised));
+  --fm-line: rgb(var(--line));
+  --fm-ink: rgb(var(--ink));
+  --fm-muted: rgb(var(--muted));
+  --fm-accent: rgb(var(--brand));
+  --fm-on-accent: rgb(var(--brand-ink));
+  --fm-accent-soft: rgb(var(--brand-soft));
+  --fm-radius: 14px;
+  --fm-head: var(--font-display), var(--font-sans), system-ui, sans-serif;
+}
+
+/* lib/region-boot.ts: while a visitor is moved to their own region's copy of the page, at most 1.5 s. */
+html[data-geo="pending"] main { visibility: hidden; }
+
+/* Rate us card and "What people say" (components/site-reviews): drawn in the site's own theme, light and dark. */
+:root {
+  --srv-bg: rgb(var(--surface));
+  --srv-fg: rgb(var(--ink));
+  --srv-muted: rgb(var(--muted));
+  --srv-line: rgb(var(--line));
+  --srv-accent: rgb(var(--brand));
+  --srv-accent-fg: rgb(var(--brand-ink));
+  --srv-field: rgb(var(--raised));
+}
+
+/* The side rails (components/SideAds.tsx; owner 2026-11-06: "it should appear on regular 16:9 screens … 16:10 even"). From 1280px
+   the shell leaves 160px (a 136px rail and two 12px gutters) free on each side for them; from 1864px it is its full 1480px again
+   and the rails sit just outside it. Pure CSS, the same on the server and in the browser: no layout shift when the rails mount. */
+@media (min-width: 1280px) {
+  /* The page's shell only: the header keeps its full width (the rails start below it), or its menu would not fit. */
+  .max-w-shell {
+    max-width: min(1480px, calc(100vw - 320px));
+  }
+}
+/* A rail's list scrolls inside it (up to ten tiles): a thin bar, and the page does not scroll on past the list's end. */
+.rail-scroll {
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
