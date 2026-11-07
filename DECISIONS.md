@@ -1299,6 +1299,9 @@ Elite on Topps Chrome Football and Basketball, an NBL (Australian league) blaste
   Chrome, Chrome Sapphire, Chrome Update, Bowman Chrome University, Stadium Club) still read, because their match is removed first.
 - `value-box` is its own type (a box of value packs, US$15 floor, an eBay "gated" type like the blaster): never the pack.
 - A store's comma is not a word ("Hobby, Pack" is a pack), a "Cello Box" is refused, and "3-Tin", "Exclusive", "SSP", "Case Hit",
-  a lettered card number ("#AK-38") and a title ending in "Auto" are refused as multiples, editions or singles.
+  a lettered card number ("#AK-38", "#CPA-AH"), a serial after a space (" /10"), "RC Auto" and a title ending in "Auto" are refused
+  as multiples, editions or singles. "Collegiate" and "Draft" join `VARIANT` (the draft lines keep reading), and a plain "Jumbo Pack"
+  is a hobby jumbo pack, refused, never the value pack ("Jumbo Value Pack" still is one). After the second import, 21 of 890 groups
+  still spread past 2x, and those read as real old-stock or store pricing, not merges.
 - On the probe's own titles this costs little: shared keys US 1,675, CA 1,473, AU 444, UK 207, EU 210 (from 1,644 / 1,498 / 452 /
   222 / 217; the US gains from value boxes splitting off). Every title is in `tests/sealed-title.test.ts`.

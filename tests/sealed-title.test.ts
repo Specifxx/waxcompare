@@ -163,6 +163,10 @@ test("a sub-brand, another league's edition or a single never lands on the base 
     "COLSON MONTGOMERY 2026 Topps Update Series Rookie All Kings Case Hit SSP #AK-38",
     "2026 Ethan Conrad Bowman Chrome Mega Box Auto",
     "2021 Panini Prizm Football Cello Box",
+    "2025 Panini Prizm Collegiate Draft Football Hobby, Box",
+    "2026 Bowman Chrome Mega Box Black Mojo #CPA-AH Andri Hidalgo RC Auto /10",
+    "2026 Topps Update Series Baseball Jumbo, Pack",
+    "2026 Topps Series 1 Baseball Hobby Jumbo Pack",
   ])
     assert.equal(typeof identify(t), "string", t);
   // The base releases and the lines that carry those words in their own names still read.
@@ -176,6 +180,8 @@ test("a sub-brand, another league's edition or a single never lands on the base 
   // A value box is a box of value packs, never the pack; a store's comma is not a word.
   assert.equal(k("2026 Topps Heritage Football Value Box"), "2026|heritage|football|value-box");
   assert.equal(k("Topps - Update Series - MLB Baseball - 2026 - Fat Pack"), "2026|update|baseball|value-pack");
+  assert.equal(k("2026 Topps Series 1 Jumbo Value Pack"), "2026|series-1|baseball|value-pack");
+  assert.equal(k("2025 Bowman Draft Baseball Hobby Box"), "2025|bowman-draft|baseball|hobby-box");
   assert.equal(k("2025 Panini Luminance Football Hobby, Pack"), "2025|luminance|football|hobby-pack");
   assert.equal(k("2025 Panini Prizm Football Fat, Pack (Green Flash)"), "2025|prizm|football|value-pack");
 });

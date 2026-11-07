@@ -152,7 +152,7 @@ const FOREIGN =
 
 // Singles, slabs, breaks and anything that isn't a factory-sealed product.
 const NOT_SEALED =
-  /\b(?:psa|cgc|bgs|beckett\s*graded|sgc|graded|slab|slabbed)\b|\bgem\s*mint\b|\bsingles?\b|\bsingle\s*cards?\b|\bbase\s*cards?\b|#\s*\d{1,4}\b|#\s*[a-z]{1,5}\s*-\s*\d{1,4}\b|\bssp\b|\bcase\s*hits?\b|\bauto\s*$|\brookie\s*card\b|\brc\s*(?:lot|card)\b|\b(?:box|case|group|team|pack|live|personal|hit)\s*breaks?\b|(?<!\bfast\s)\bbreaks?\b|\bspots?\b|\brandom\s*(?:team|division|player|serial|hit|letter|number)s?\b|\bpick\s*your\b|\b(?:pyt|pyd|pyp)\b|\bhit\s*draft\b|\brip\s*(?:&|and|n)\s*ship\b|\brepack(?:ed|s)?\b|\bmystery\b|\blucky\s*(?:dip|bag|box)\b|\bgrab\s*bag\b|\bhit\s*parade\b|\bfanatics\s*(?:mystery|fest)\b|\bresealed\b|\bopened\b|\bempty\b|\bbox\s*only\b|\bwrappers?\b|\bdamaged\b|\bdented\b|\bcrushed\b|\btorn\b|\bcustom\b|\bproxy\b|\breprints?\b|\btopps\s*now\b|\bliving\s*set\b|\bon\s*-?\s*demand\b|\bteam\s*set\b|\bsigned\b|\bautographed\s*(?:ball|jersey|photo|helmet|bat)\b|\bdigital\b|\bcode\b|\bgift\s*card\b|\bvoucher\b|\bdeposit\b/i;
+  /\b(?:psa|cgc|bgs|beckett\s*graded|sgc|graded|slab|slabbed)\b|\bgem\s*mint\b|\bsingles?\b|\bsingle\s*cards?\b|\bbase\s*cards?\b|#\s*\d{1,4}\b|#\s*[a-z]{1,5}\s*-\s*[a-z0-9]{1,5}\b|\brc\s*auto\b|\bssp\b|\bcase\s*hits?\b|\bauto\s*$|\brookie\s*card\b|\brc\s*(?:lot|card)\b|\b(?:box|case|group|team|pack|live|personal|hit)\s*breaks?\b|(?<!\bfast\s)\bbreaks?\b|\bspots?\b|\brandom\s*(?:team|division|player|serial|hit|letter|number)s?\b|\bpick\s*your\b|\b(?:pyt|pyd|pyp)\b|\bhit\s*draft\b|\brip\s*(?:&|and|n)\s*ship\b|\brepack(?:ed|s)?\b|\bmystery\b|\blucky\s*(?:dip|bag|box)\b|\bgrab\s*bag\b|\bhit\s*parade\b|\bfanatics\s*(?:mystery|fest)\b|\bresealed\b|\bopened\b|\bempty\b|\bbox\s*only\b|\bwrappers?\b|\bdamaged\b|\bdented\b|\bcrushed\b|\btorn\b|\bcustom\b|\bproxy\b|\breprints?\b|\btopps\s*now\b|\bliving\s*set\b|\bon\s*-?\s*demand\b|\bteam\s*set\b|\bsigned\b|\bautographed\s*(?:ball|jersey|photo|helmet|bat)\b|\bdigital\b|\bcode\b|\bgift\s*card\b|\bvoucher\b|\bdeposit\b/i;
 
 // Accessories and merchandise. Albums and stickers are products only in the sticker lines (Panini Stickers, Match Attax), read later.
 const ACCESSORY =
@@ -170,7 +170,7 @@ const RETAIL_EDITION = /\bwalmart\b|\btarget\b|\bcostco\b|\bsam'?s\s*club\b|\bme
 // second line (Stadium Club Chrome), a premium or "extra" version, a hobby-only "Preferred" box. Refused, never merged into the base
 // release (found by the first import, 2026-11-07: a EuroLeague box was the cheapest "Prizm Basketball" hobby box).
 const VARIANT =
-  /\bcosmic\b|\bsapphire\b|\bno\s*huddle\b|\bstars\s*(?:&|and)\s*stripes\b|\busa\s*(?:baseball|basketball|national)\b|\bteam\s*usa\b|\beuro\s*league\b|\bturkish\s*airlines\b|\bebl\b|\bnbl\b|\bovertime\s*elite\b|\bote\b|\bmonopoly\b|\bblack\s*diamond\b|\bpreferred\b|\buniversity\b|\bbowman\b|\bstadium\s*club\b|\bpulse\b|\baura\b|\bupdate\b|\bextra\b|\beco\s*pack\b|\bpremium\b|\bsuper\s*jumbo\b|\bbest\s*u\b|\bu\b/i;
+  /\bcosmic\b|\bsapphire\b|\bno\s*huddle\b|\bstars\s*(?:&|and)\s*stripes\b|\busa\s*(?:baseball|basketball|national)\b|\bteam\s*usa\b|\beuro\s*league\b|\bturkish\s*airlines\b|\bebl\b|\bnbl\b|\bovertime\s*elite\b|\bote\b|\bmonopoly\b|\bblack\s*diamond\b|\bpreferred\b|\buniversity\b|\bbowman\b|\bstadium\s*club\b|\bpulse\b|\baura\b|\bupdate\b|\bextra\b|\beco\s*pack\b|\bpremium\b|\bsuper\s*jumbo\b|\bbest\s*u\b|\bu\b|\bcollegiate\b|\bdraft\b/i;
 
 // ── release: year, line, sport, competition ──────────────────────────────────
 
@@ -321,6 +321,7 @@ export function readType(t: string, lineKey?: string): TypeKey | null {
   if (/\bh2\b|\bhybrid\b/.test(s)) return "hybrid-box";
   if (/\bvalue\s*box(?:es)?\b/.test(s)) return "value-box";
   if (/\bcello\s*box(?:es)?\b/.test(s)) return null;
+  if (/\bjumbo\s*packs?\b/.test(s) && !/\b(?:value|fat|retail)\b/.test(s)) return null; // a hobby jumbo pack, never a value pack
   if (/\bjumbo\s*(?:packs?|value|fat|retail)\b|\bvalue\s*packs?\b|\bfat\s*packs?\b|\bmulti\s*-?\s*packs?\b/.test(s)) return "value-pack";
   if (/\bhta\b|\bjumbo\b/.test(s)) return "jumbo-box";
   if (/\bhobby\s*lite\b|\blite\s*box\b/.test(s)) return "lite-box";
@@ -439,7 +440,7 @@ export function identify(title: string, opts: { strict?: boolean } = {}): Sealed
     .replace(/\b20[12]\d\s*\/\s*(?:20)?\d\d\b/g, " ")
     .replace(/[([][^)\]]*\b(?:pre[-\s]?orders?|releas\w*|ships?|shipping|eta|arriv\w*|available|out)\b[^)\]]*[)\]]/gi, " ")
     .replace(/\b(?:releas\w*|ships?|shipping|eta|arriv\w*|available|out|street)\s*(?:date|on)?\s*:?\s*\d{1,2}\s*\/\s*\d{1,2}(?:\s*\/\s*\d{2,4})?\b/gi, " ");
-  if (/\b\d{1,4}\s*\/\s*\d{2,4}\b/.test(undated)) return "not-sealed";
+  if (/\b\d{1,4}\s*\/\s*\d{2,4}\b|(?:^|\s)\/\s*\d{1,4}\b/.test(undated)) return "not-sealed";
   if (ACCESSORY.test(t)) return "accessory";
   if (MULTIPLE.test(t.replace(/\(\s*\d{1,3}\s*(?:packs?|boxes|cards)\s*(?:per\s*(?:box|case|pack))?\s*\)/gi, " ").replace(/\b\d{1,3}\s*(?:packs?|cards)\s*per\s*(?:box|pack|case)\b/gi, " ").replace(/\b\d{1,2}\s*boxes\s*per\s*case\b|\(\s*\d{1,2}\s*boxes\s*\)/gi, " ").replace(/\bcase\s*[-–:,]?\s*\d{1,2}\s*(?:hobby\s+|jumbo\s+)?boxes\b/gi, "case "))) return "multiple"; // "Hobby Case 12 Boxes": the case's own contents
   if (RETAIL_EDITION.test(t)) return "retail-edition";
