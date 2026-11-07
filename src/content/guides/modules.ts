@@ -5,9 +5,11 @@ import type { GuideModule } from "./kit";
 import * as boxTypes from "./hobby-vs-blaster-vs-mega-box";
 import * as whereToBuy from "./where-to-buy-sealed-sports-cards-online";
 import * as resealed from "./how-to-avoid-resealed-sports-card-boxes";
+import * as blackFriday from "./sports-cards-black-friday-2026";
 
 export const GUIDE_MODULES: Record<GuideSlug, GuideModule> = {
   "hobby-vs-blaster-vs-mega-box": boxTypes,
   "where-to-buy-sealed-sports-cards-online": whereToBuy,
   "how-to-avoid-resealed-sports-card-boxes": resealed,
+  "sports-cards-black-friday-2026": blackFriday,
 };

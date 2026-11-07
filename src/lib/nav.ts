@@ -40,7 +40,7 @@ export function navGroups(region: Region, today: string = new Date().toISOString
       title: "Deals & stock",
       links: [
         s("deals", "Deals"),
-        ...(inSeason(today) ? [s("blackFriday", "Black Friday")] : []),
+        ...(inSeason(today) ? [s("blackFriday", "Black Friday"), s("cyberMonday", "Cyber Monday")] : []),
         s("thisWeek", "This week"),
         s("backInStock", "Back in stock"),
         s("priceMoves", "Price moves"),

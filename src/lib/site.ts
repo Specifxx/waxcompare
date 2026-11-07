@@ -33,6 +33,7 @@ export const SOCIAL_LINKS: string[] = [];
 export const SECTION_PATHS = {
   deals: "/deals",
   blackFriday: "/black-friday",
+  cyberMonday: "/cyber-monday",
   boxingDay: "/boxing-day",
   januarySales: "/january-sales",
   lunarNewYear: "/lunar-new-year",

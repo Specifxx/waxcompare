@@ -16,7 +16,7 @@
 import type { Region } from "../../lib/regions";
 import { REGION_LIST } from "../../lib/regions";
 
-export type GuideSlug = "hobby-vs-blaster-vs-mega-box" | "where-to-buy-sealed-sports-cards-online" | "how-to-avoid-resealed-sports-card-boxes";
+export type GuideSlug = "hobby-vs-blaster-vs-mega-box" | "where-to-buy-sealed-sports-cards-online" | "how-to-avoid-resealed-sports-card-boxes" | "sports-cards-black-friday-2026";
 
 export interface Guide {
   slug: GuideSlug;
@@ -66,6 +66,17 @@ export const GUIDES: readonly Guide[] = [
     updated: D,
     regions: "all",
     topic: { types: ["hobby-box", "jumbo-box", "mega-box", "blaster-box"] },
+    ebay: { heading: "Sealed sports card boxes on eBay", query: "sports cards hobby box sealed" },
+  },
+  {
+    slug: "sports-cards-black-friday-2026",
+    title: "Sports card Black Friday 2026: the prices to beat",
+    description: "Sports card Black Friday and Cyber Monday 2026: the dates, today's cheapest sealed hobby, mega and blaster boxes, and five checks before you pay.",
+    kicker: "Black Friday",
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    regions: "all",
+    topic: { types: ["hobby-box", "mega-box", "blaster-box"] },
     ebay: { heading: "Sealed sports card boxes on eBay", query: "sports cards hobby box sealed" },
   },
   {
