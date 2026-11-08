@@ -35,7 +35,7 @@ Repo **Specifxx/waxcompare** → Settings → Secrets and variables → Actions:
 | Secret | `REVALIDATE_SECRET` | optional; the same value as `REVALIDATE_SECRET` in Vercel. |
 | Secret | `PSI_API_KEY` | optional; the weekly PageSpeed check. |
 | Variable | `SITE_URL` | optional; default `https://sportscardcompare.com`. |
-| Variable | `EBAY_DAILY_CAP`, `EBAY_RUN_CAP`, `EBAY_SWEEP_CALLS` | optional; unset they are 2,500 / 2,500 / 2,100. 2,500 is the cap the owner set for this site's keyset; never raise it without him. |
+| Variable | `EBAY_DAILY_CAP`, `EBAY_RUN_CAP`, `EBAY_SWEEP_CALLS` | optional; unset they are 1,400 / 1,400 / 950. 1,400 is this site's share of Compare Empire's keyset (owner, 2026-11-08); never raise it without him. |
 
 The workflows need **Settings → Actions → General → Workflow permissions: Read and write** (the import commits `data/public/`).
 
@@ -326,15 +326,15 @@ underperforms:
 The image strips on the site ("Chase cards on eBay", "Sealed Pokémon on eBay", "<Set> chase cards on
 eBay", "<Product> on eBay") show **real eBay listings**: photo, title, price as eBay returns it, shipping,
 and how old the data is, each tile an affiliate link. They are **imported once a day** by a GitHub Actions
-job (`.github/workflows/ebay-import.yml`, `scripts/ebay-import.ts`) with SportsCardCompare's own eBay keys
+job (`.github/workflows/ebay-import.yml`, `scripts/ebay-import.ts`) with Compare Empire's eBay keys (shared)
 and stored in two small tables; the website only **reads** them. Scraping eBay is a Terms violation and eBay
 blocks it; the Browse API is the only compliant source. **Every product page asks for its own listings**, which come
 first from the **catalogue sweep** (below): broad searches paged 200 listings a call, each listing handed to the
 product the repo's classifier says it is, so one call can feed dozens of products, cheap ones included.
 
 > **READ THIS FIRST: the 5,000 calls/day limit belongs to the eBay APPLICATION (the keyset), not to this site.**
-> SportsCardCompare runs on its OWN eBay keyset, a separate eBay application the owner created for it (owner, 2026-11-06: a new site never
-> shares an existing site's keys), capped at **2,500** calls a day (`EBAY_DAILY_CAP`, also the importer's hard maximum). The importer's
+> SportsCardCompare runs on COMPARE EMPIRE'S keyset (owner, 2026-11-08: the "compareempire" app's 5,000 a day is split Compare Empire
+> 2,900, SportsCardCompare 1,400, MotorCompare 600, 100 spare), capped at **1,400** calls a day (`EBAY_DAILY_CAP`, also the importer's hard maximum). The importer's
 > counter (`EbayCallDay`) counts only the searches THIS importer makes; it cannot see any other site's calls, and eBay's own counter
 > (which a 429 comes from) adds every user of the keyset. So if the keyset were ever shared with another site, set `EBAY_DAILY_CAP` to
 > each site's agreed share on BOTH sites, or better, give each its own separate eBay application again. The importer prints its running

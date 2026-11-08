@@ -7,7 +7,7 @@ name: SportsCardCompare eBay import
 # A run, in order (DEPLOY.md, "The catalogue sweep"): (1) the fixed feeds: chase, sealed, types, sets (265 calls);
 # (2) the CATALOGUE SWEEP (src/lib/ebay-sweep.ts): per marketplace, broad searches paged 200 listings a call, each listing
 # handed to the product the repo's classifier says it is, so one call can feed dozens of products (an item feed for every
-# product found, cheap ones included; up to EBAY_SWEEP_CALLS, default 2100); (3) one search per ELIGIBLE product the
+# product found, cheap ones included; up to EBAY_SWEEP_CALLS, default 950); (3) one search per ELIGIBLE product the
 # sweep did not cover, with what is left of the run cap. Every product page asks for its own listings. Why: one search per
 # product reached 1,735 of the 7,701 eligible keys a day and 44% of those searches came back empty. Every Browse call, sweep
 # pages included, is reserved in the database before it is made and never passes the run cap or the daily cap.
@@ -26,8 +26,9 @@ name: SportsCardCompare eBay import
 #      under the 2,500 daily cap with room for a manual run; the default 2500 would use the whole day in the first run.
 #      Each run then buys the fixed feeds (265) and 115 sweep pages.
 #
-# WAXCOMPARE HAS ITS OWN KEYSET (owner's rule: a new site never shares a sister's keys): 2,500 calls a day is this site's cap
-# (EBAY_DAILY_CAP, default 2500; tests/ebay-cap.test.ts pins the default). The day's spend is kept across runs in
+# SPORTSCARDCOMPARE SHARES COMPARE EMPIRE'S KEYSET (owner, 2026-11-08: the "compareempire" app's 5,000 a day is split Compare
+# Empire 2,900, SportsCardCompare 1,400, MotorCompare 600): 1,400 calls a day is this site's cap and ceiling
+# (EBAY_DAILY_CAP, default 1400; tests/ebay-cap.test.ts pins the default). The day's spend is kept across runs in
 # data/state/ebay-calls.json (exported after every run, seeded before the next), since the job's database dies with the runner.
 #
 # Why 08:37 UTC: it is the FIRST slot after eBay's daily call counter resets in BOTH seasons (midnight Pacific = 07:00 UTC
@@ -40,21 +41,21 @@ name: SportsCardCompare eBay import
 # run late; the 26 h bound leaves two hours for that, and a run that never comes only blanks the strips (to a search link).
 #
 # Secrets (Settings → Secrets and variables → Actions):
-#   EBAY_CLIENT_ID, EBAY_CLIENT_SECRET   the Production keyset (App ID / Cert ID) of SportsCardCompare's own eBay
+#   EBAY_CLIENT_ID, EBAY_CLIENT_SECRET   the Production keyset (App ID / Cert ID) of Compare Empire's eBay
 #                                    application. Without them the job writes a skip message and exits 0.
 # Variables (same page, "Variables" tab), all optional:
-#   EBAY_DAILY_CAP (2500, max 2500)  most Browse calls per Pacific day, across every run of the day (kept in the database); this site's SHARE of the keyset
-#   EBAY_RUN_CAP (2500)              most Browse searches in one run, retries included (a strict ceiling); set it lower than the daily cap
+#   EBAY_DAILY_CAP (1400, max 1400)  most Browse calls per Pacific day, across every run of the day (kept in the database); this site's SHARE of the keyset
+#   EBAY_RUN_CAP (1400)              most Browse searches in one run, retries included (a strict ceiling); set it lower than the daily cap
 #                                    to keep room for a manual re-run on the same Pacific day
 #   EBAY_LISTING_MAX_AGE_HOURS (26)  how old a listing may be before the site stops showing it (set the same value in Vercel; the store import reads it too)
-#   EBAY_SWEEP_CALLS (2100)          how many of a run's calls the catalogue sweep may spend (the per-product searches get the rest).
+#   EBAY_SWEEP_CALLS (950)          how many of a run's calls the catalogue sweep may spend (the per-product searches get the rest).
 #
 # Inputs (Run workflow): only (buckets: chase, sealed, types, sets, sweep, items; a list without "sweep" skips the sweep), force,
 # dry_run, and probe: scripts/ebay-sweep-probe.ts instead of the import, about 60 calls (20 pages on EBAY_US, 10 on each other
 # marketplace), each reserved against the daily cap, match counts and sample titles in the log, NO listing written. Its run of
 # 2026-10-11: products with >= 1 / >= 2 listings: US 430/208, UK 266/121, AU 303/130, CA 197/70 (65% of CA listings carried prices
 # eBay converted from USD, refused by design), EU 154/61 (half German- or Japanese-language, refused).
-# Timeout 90 minutes: a full run makes about 2,500 searches, the sweep's pages 200 listings each.
+# Timeout 90 minutes: a full run makes about 1,400 searches, the sweep's pages 200 listings each.
 
 on:
   schedule:
@@ -163,9 +164,9 @@ jobs:
           # The eBay keys exist ONLY in this step's environment.
           EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
           EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
-          EBAY_DAILY_CAP: ${{ vars.EBAY_DAILY_CAP || '2500' }}
-          EBAY_RUN_CAP: ${{ vars.EBAY_RUN_CAP || '2500' }}
-          EBAY_SWEEP_CALLS: ${{ vars.EBAY_SWEEP_CALLS || '2100' }}
+          EBAY_DAILY_CAP: ${{ vars.EBAY_DAILY_CAP || '1400' }}
+          EBAY_RUN_CAP: ${{ vars.EBAY_RUN_CAP || '1400' }}
+          EBAY_SWEEP_CALLS: ${{ vars.EBAY_SWEEP_CALLS || '950' }}
           EBAY_LISTING_MAX_AGE_HOURS: ${{ vars.EBAY_LISTING_MAX_AGE_HOURS }}
           ONLY: ${{ inputs.only }}
           DRY: ${{ inputs.dry_run }}

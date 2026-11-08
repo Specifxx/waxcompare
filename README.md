@@ -36,7 +36,7 @@ exports every public table back to `data/public/` and commits it to `main`. The 
 (`src/lib/public-data/`). See DEPLOY.md, "Where the data lives".
 
 - `scripts/import.ts`: every store in `src/data/stores.json` (Shopify `products.json` or WooCommerce's Store API), twice a day.
-- `scripts/ebay-import.ts`: eBay's Browse API with SportsCardCompare's own keyset, 2,500 calls a day, once a day.
+- `scripts/ebay-import.ts`: eBay's Browse API with Compare Empire's shared keyset, 1,400 calls a day, once a day.
 - `scripts/amazon-asins.ts` / `scripts/fetch-amazon-prices.ts`: Amazon ASINs in the import, Amazon prices in each build (never
   committed; shown for 24 hours).
 - `scripts/probe-stores.ts` / `scripts/registry-from-probe.ts`: how the store list was found and is refreshed.
