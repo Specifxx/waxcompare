@@ -17,14 +17,12 @@ import { SearchBox } from "@/components/SearchBox";
 import { Flag } from "@/components/Flag";
 import { RegionChips } from "@/components/RegionChips";
 import { Empty, Section } from "@/components/Section";
-import { StockPill } from "@/components/StockPill";
 import { homeRails, regionOverview, tcgplayerTiles, type ProductCardData } from "@/lib/data";
 import { TcgplayerStrip } from "@/components/TcgplayerStrip";
 import { dealsCopy, dealsInMarket, nearestRegion, stockLabel } from "@/lib/deals";
 import { cardOpen } from "@/lib/compact";
 import { money, plural, timeAgo } from "@/lib/format";
 import { thumb } from "@/lib/images";
-import { hotPicks } from "@/lib/hot-picks";
 import { COUNTRY_GUIDE } from "@/content/guides/country-prices";
 import { openPreorderGuides } from "@/lib/preorder-guides";
 import { featureOrder, featureSort, isPreorderSet, formatRelease } from "@/lib/release";
@@ -40,6 +38,8 @@ import { StockRow } from "@/components/StockRow";
 import { storesInMarket } from "@/lib/stores";
 import { emptyHomeReport, loadHomeReport } from "@/lib/home-report";
 import { MarketReport } from "@/components/home/MarketReport";
+import { HeroCards, heroFromPicks, type HeroCard } from "@/components/home/HeroCards";
+import { regionPicks, type Pick } from "@/lib/picks";
 import { SetIndex } from "@/components/SetIndex";
 import { setCountsGrouped, typeLabelsInMarket } from "@/lib/hub-data";
 
@@ -73,7 +73,7 @@ const QUICK_TYPES = ["hobby-boxes", "jumbo-boxes", "mega-boxes", "blaster-boxes"
 
 export default async function RegionHome({ params }: { params: { region: string } }) {
   const r = regionOrNotFound(params.region);
-  const [{ boxes, etbs, preorders, latestSets: bySet }, overview, deals, report, older, featured, setCounts, listedTypes] = await Promise.all([
+  const [{ boxes, etbs, preorders, latestSets: bySet }, overview, deals, report, older, featured, setCounts, listedTypes, picks] = await Promise.all([
     homeRails(r.market),
     getOverview(r.market),
     dealsInMarket(r.market, { take: 8 }),
@@ -83,6 +83,7 @@ export default async function RegionHome({ params }: { params: { region: string 
     loadFeatured(r.region).catch(() => null),
     setCountsGrouped(r.market),
     typeLabelsInMarket(r.market),
+    regionPicks(r.region).catch((): Pick[] => []),
   ]);
   // The soonest upcoming set with a pre-order page: the rail's "see all" goes there.
   const preorderGuide = openPreorderGuides()[0] ?? null;
@@ -92,21 +93,25 @@ export default async function RegionHome({ params }: { params: { region: string 
   // The first hot set that is out, in featuring order (lib/popular.ts hotSetsByFeature: the newest release first), gets the sealed strip's highlighted
   // eBay button, "Shop 30th Celebration on eBay": inside that strip's own top line, so the page keeps its two units.
   const hotHighlight = hotSetHighlight(firstHotSet());
-  const hot = hotPicks(preorders, boxes);
+  // The hero's two trading cards: the region's most-stocked new boxes (lib/picks.ts, the landing page's own picks), photo first.
+  const heroCards: HeroCard[] = heroFromPicks(picks);
   const other = REGIONS[nearestRegion(r.region)];
   const preorderLink = { href: `/${r.region}/releases`, label: "Pre-orders" };
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-line bg-surface">
-        <div className="page relative grid gap-10 py-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center">
+      {/* The sports-card hero (owner, 2026-11-08: the KaeYoung / ScentCompare full-width hero with featured products, in a sports card
+          look of our own, globals.css .wx-hero): the words, search, region row, shortcuts and the stat line on the left, the two hot
+          products as trading cards on the right (under the words on a phone). The h1, the "Hot right now" h2 and every link are as before. */}
+      <section className="wx-hero">
+        <div className="wx-hero-in grid gap-8 pb-10 pt-6 sm:pb-12 sm:pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(340px,480px)] lg:items-center lg:gap-10">
           <div className="min-w-0">
             <Breadcrumbs items={[{ href: "/", label: "WaxCompare" }, { label: r.name }]} />
-            <div className="eyebrow">
+            <p className="wx-kicker">
               <Flag code={r.short} /> {r.name} · prices in {r.currency}
-            </div>
-            <h1 className="mt-3 max-w-3xl font-display text-3xl font-bold leading-[1.1] tracking-tight sm:text-5xl">
-              Compare hobby box &amp; blaster prices in <span className="text-brand">{r.inName}</span>
+            </p>
+            <h1 className="wx-h1 mt-3 max-w-3xl">
+              Compare hobby box &amp; blaster prices in <span className="wx-h1-accent">{r.inName}</span>
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-7 text-muted sm:text-lg">
               Today&rsquo;s sealed sports card prices and stock from {plural(storeCount, `${r.adjective} card shop`)}, cheapest first.
@@ -115,11 +120,8 @@ export default async function RegionHome({ params }: { params: { region: string 
               <SearchBox region={r.region} size="lg" />
             </div>
             <RegionChips region={r.region} className="mt-4" />
-            <nav
-              aria-label="Shop by type"
-              className="mt-4 flex flex-wrap gap-2"
-            >
-              <Link href={`/${r.region}/deals`} prefetch={false} className="chip min-h-10 border-brand/30 bg-brand-soft font-semibold text-brand-strong hover:border-brand/60">
+            <nav aria-label="Shop by type" className="scroller mt-4 gap-2 sm:flex-wrap sm:overflow-visible sm:[-webkit-mask-image:none] sm:[mask-image:none]">
+              <Link href={`/${r.region}/deals`} prefetch={false} className="chip min-h-10 border-brand/40 bg-brand-soft font-semibold text-brand-strong hover:border-brand/70">
                 <Icon name="tag" size={16} /> Deals
               </Link>
               <Link href={`/${r.region}/back-in-stock`} prefetch={false} className="chip min-h-10 border-open/30 bg-open-soft font-semibold text-open hover:border-open/60">
@@ -140,32 +142,27 @@ export default async function RegionHome({ params }: { params: { region: string 
                 );
               })}
             </nav>
-            <p className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
-              <span className="h-2 w-2 shrink-0 rounded-full bg-open motion-safe:animate-pulse" aria-hidden="true" />
-              <span>
-                <b className="tabular font-semibold text-ink">{storeCount.toLocaleString("en")}</b> stores
+            <p className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+              <span className="wx-stat">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-open motion-safe:animate-pulse" aria-hidden="true" />
+                <b className="tabular">{storeCount.toLocaleString("en")}</b> stores
               </span>
-              <span aria-hidden="true">·</span>
-              <span>
-                <b className="tabular font-semibold text-ink">{overview.inStock.toLocaleString("en")}</b> in stock
+              <span className="wx-stat">
+                <b className="tabular">{overview.inStock.toLocaleString("en")}</b> in stock
               </span>
-              <span aria-hidden="true">·</span>
+              <span className="wx-stat">
+                <b className="tabular">{overview.products.toLocaleString("en")}</b> products
+              </span>
               {/* A live <time>: the page is cached for a day, so a fixed "3 hours ago" would freeze. */}
-              <span>checked {overview.lastChecked ? <Ago iso={overview.lastChecked.toISOString()} initial={timeAgo(overview.lastChecked)} /> : "twice a day"}</span>
+              <span className="wx-stat">checked {overview.lastChecked ? <Ago iso={overview.lastChecked.toISOString()} initial={timeAgo(overview.lastChecked)} /> : "twice a day"}</span>
             </p>
           </div>
-          {hot.length > 0 && (
+          {heroCards.length > 0 && (
             <aside aria-labelledby="hot-now">
-              <h2 id="hot-now" className="eyebrow mb-3">
-                Hot right now
+              <h2 id="hot-now" className="wx-kicker mb-3">
+                Hot right now · most stocked
               </h2>
-              <ul className="grid gap-3">
-                {hot.map((p) => (
-                  <li key={p.slug}>
-                    <HotRow p={p} r={r} />
-                  </li>
-                ))}
-              </ul>
+              <HeroCards cards={heroCards} region={r.region} />
             </aside>
           )}
         </div>
@@ -300,34 +297,6 @@ export default async function RegionHome({ params }: { params: { region: string 
         <MarketReport report={report} />
       </div>
     </div>
-  );
-}
-
-function HotRow({ p, r }: { p: ProductCardData; r: RegionInfo }) {
-  const img = thumb(p.imageUrl, 200);
-  const pre = isPreorderSet(p.setCode);
-  return (
-    <Link
-      href={`/${r.region}/p/${p.slug}`}
-      prefetch={false}
-      className="group flex items-center gap-3 rounded-xl border border-line bg-surface p-2.5 pr-3 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
-    >
-      <span className="plate flex h-16 w-16 shrink-0 items-center justify-center">
-        {img ? <img src={img} alt={p.name} width={64} height={64} decoding="async" className="h-full w-full object-contain p-1" /> : <Icon name="tag" className="text-faint" />}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="line-clamp-2 text-sm font-semibold leading-snug group-hover:text-brand">{p.name}</span>
-        {/* stock first, then the price */}
-        <span className="mt-1 flex flex-wrap items-center gap-x-1.5" title={stockLabel(p, pre)}>
-          <StockPill state="open" preorder={pre} size="sm">
-            {stockHeadline(p, pre).text}
-          </StockPill>
-        </span>
-        <span className="mt-0.5 block text-sm text-muted">
-          From <span className="tabular font-display font-bold text-ink">{money(p.lowestPriceCents, r.market)}</span>
-        </span>
-      </span>
-    </Link>
   );
 }
 

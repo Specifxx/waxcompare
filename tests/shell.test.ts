@@ -125,7 +125,7 @@ test("the footer is drawn by each layout after its <main> (and by the 404 and er
 
 test("Header on a region page: search at every width (never in a hidden wrapper), the menu button, a compact region button", () => {
   const html = render(React.createElement(Header, { region: "us" }));
-  assert.match(html, /^<header class="sticky top-0 z-40 h-\[var\(--hdr\)\] border-b border-line bg-surface\/90 backdrop-blur-md">/);
+  assert.match(html, /^<header class="sticky top-0 z-40 h-\[var\(--hdr\)\] bg-surface\/90 backdrop-blur-md">/);
   const form = html.indexOf('role="search"');
   assert.ok(form > 0, "the search form is in the header");
   const wrapper = html.lastIndexOf("<div", form);
@@ -235,7 +235,7 @@ test("root layout: both faces use display 'optional' (no font-swap layout shift)
   const layout = src("app/layout.tsx");
   assert.equal(layout.match(/display: "optional"/g)?.length, 2);
   assert.match(layout, /Inter\(\{[^}]*display: "optional"/);
-  assert.match(layout, /Bricolage_Grotesque\(\{[^}]*display: "optional"/);
+  assert.match(layout, /Barlow_Condensed\(\{[^}]*display: "optional"/);
   assert.doesNotMatch(layout, /display: "swap"/);
   // The same pins as tests/affiliate.test.ts.
   assert.match(layout, /IMPACT_SITE_VERIFICATIONS\.map\(\(value\) =>[\s\S]*name: "impact-site-verification", value/);
@@ -262,8 +262,9 @@ test("landing metadata: hreflang for every region home plus x-default '/', a sho
 test("landing page: static and short: hero, one fair paragraph, the region's five, the hot buttons, and nothing else", () => {
   const page = src("app/(site)/page.tsx");
   assert.doesNotMatch(page, /prisma|@\/lib\/db|@\/lib\/data"/, "no database");
-  assert.match(page, /text-4xl[^"]*sm:text-6xl/);
-  assert.match(page, /Sealed sports card prices, <span className="text-brand">cheapest first\.<\/span>/);
+  // The sports-card hero (2026-11-08): the same h1 words, in .wx-h1, with two featured products beside them.
+  assert.match(page, /<h1 className="wx-h1[^"]*">\s*Sealed sports card prices, <span className="wx-h1-accent">cheapest first\.<\/span>/);
+  assert.match(page, /<SoftHeroCards initial=\{initialPicks\} \/>/);
   // No "Continue to <region>" step (owner, 2026-10-28): the search, then the shortcuts in the visitor's region.
   assert.match(page, /<form\s+id="landing-search"\s+action=\{`\/\$\{X_DEFAULT_REGION\}\/sealed`\}\s+method="get"/);
   assert.match(page, /<\/form>[\s\S]*<RegionSuggest formId="landing-search" links=\{HERO_LINKS\} \/>/);

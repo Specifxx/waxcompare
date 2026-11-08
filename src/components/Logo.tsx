@@ -31,7 +31,7 @@ export function Logo({ wordmark = "" }: { wordmark?: string }) {
   return (
     <span className="inline-flex items-center gap-2">
       <LogoMark className="h-8 w-8 shrink-0" />
-      <span className={`font-display text-[19px] font-extrabold tracking-tight ${wordmark}`}>
+      <span className={`font-display text-[23px] font-extrabold italic uppercase leading-none tracking-[0.01em] ${wordmark}`}>
         Wax<span className="text-brand">Compare</span>
       </span>
     </span>

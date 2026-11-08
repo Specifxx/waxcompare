@@ -15,6 +15,9 @@
   --brand-soft: 252 233 236;
   --brand-strong: 146 14 34; /* brand as TEXT on --brand-soft and on --surface: chips and .btn-soft */
   --spark: 212 168 72; /* brass, used sparingly: highlights only */
+  /* The sports-card look (2026-11-08): the hero's night navy and the trophy gold of its stripes. */
+  --navy: 11 22 52;
+  --gold: 246 186 30;
   --open: 20 118 56; /* 5.0:1 on --open-soft, 5.7:1 on --surface: the 12px stock pill is AA */
   --open-soft: 226 245 232;
   --sold: 100 104 115; /* 4.8:1 on --sold-soft: the 12px sold-out pill is AA */
@@ -47,7 +50,7 @@
     --ink: 238 238 241;
     --muted: 166 170 181;
     --faint: 140 144 156; /* 6.0:1 on --bg, 5.6:1 on --surface */
-    --brand: 255 122 136;
+    --brand: 255 96 110; /* a fuller jersey red than the old salmon (2026-11-08); brand-ink on it 6.9:1 */
     --brand-ink: 32 6 10;
     --brand-soft: 66 22 30;
     --brand-strong: 255 176 184; /* on --brand-soft and on --surface */
@@ -94,7 +97,7 @@ body {
 
 @layer components {
   .page {
-    @apply mx-auto w-full max-w-page px-4 sm:px-6;
+    @apply mx-auto w-full max-w-page px-4 sm:px-6 2xl:px-8;
   }
   .card {
     @apply rounded-xl border border-line bg-surface shadow-card;
@@ -738,6 +741,11 @@ body:has([data-ebay-no-prefooter]) [data-ebay-prefooter] {
   --xmas-pill-soft: #1e3a5f;
   --xmas-pill-border: rgb(185 28 28 / 0.4);
 }
+/* WaxCompare keeps Christmas very light (owner, 2026-11-08: "some of the christmas themes … are a bit too much … the theme must
+   match the domain"): no hat on the mark and no snow or trees in the hero (ChristmasDecor is no longer mounted); the gifts line stays. */
+:root[data-season="christmas"] .xmas-logo-hat {
+  display: none;
+}
 /* xmas-site:end */
 
 /* The beta forum (src/components/forum/forum.css) in this site's colours. */
@@ -772,13 +780,260 @@ html[data-geo="pending"] main { visibility: hidden; }
    the shell leaves 160px (a 136px rail and two 12px gutters) free on each side for them; from 1864px it is its full 1480px again
    and the rails sit just outside it. Pure CSS, the same on the server and in the browser: no layout shift when the rails mount. */
 @media (min-width: 1280px) {
-  /* The page's shell only: the header keeps its full width (the rails start below it), or its menu would not fit. */
+  /* The page's shell only: the header keeps its full width (the rails start below it), or its menu would not fit. Full width
+     (owner, 2026-11-08: "how it uses the full screen", as KaeYoung and ScentCompare do): the shell runs from the eBay rail's edge to
+     the TCGplayer rail's at every width, so the sidebar sits flush against the left rail and nothing floats in a gap. Margins, not a
+     max-width of 100vw - 272px: 100vw counts a desktop scrollbar, which would push the shell 8px under a rail. */
   .max-w-shell {
-    max-width: min(1480px, calc(100vw - 320px));
+    max-width: none;
+    width: auto;
+    margin-left: 136px;
+    margin-right: 136px;
   }
 }
 /* A rail's list scrolls inside it (up to ten tiles): a thin bar, and the page does not scroll on past the list's end. */
 .rail-scroll {
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+}
+
+/* ── The sports-card look (owner, 2026-11-08) ─────────────────────────────────────────────────────────────────────────────────────
+   "More sports themed … similar to Topps": our own take on classic trading-card packaging, with no maker's logo, wordmark or trade
+   dress. A night-navy hero with a halftone dot field and one bold diagonal stripe (jersey red, white, trophy gold), condensed italic
+   uppercase headlines, slanted pennant labels, a red-and-gold stripe under the header, and featured products drawn as trading cards:
+   white border, photo panel, a nameplate and a stat line. The hero is the same navy in both themes, so it carries its own dark tokens:
+   everything inside it (search box, chips, region row) uses the site's own classes and reads them from here. */
+.wx-stripe {
+  background: linear-gradient(rgb(var(--brand)) 0 55%, rgb(var(--gold)) 55% 100%);
+}
+.wx-hero {
+  --bg: 8 16 40;
+  --surface: 18 31 66;
+  --raised: 26 42 84;
+  --line: 52 70 118;
+  --ink: 255 255 255;
+  --muted: 196 205 226;
+  --faint: 160 172 200;
+  --brand: 230 36 56;
+  --brand-ink: 255 255 255;
+  --brand-soft: 74 20 40;
+  --brand-strong: 255 178 186;
+  --open: 92 214 138;
+  --open-soft: 18 56 40;
+  --pre: 176 166 255;
+  --pre-soft: 40 36 84;
+  --shadow: 0 0 0;
+  color-scheme: dark;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: rgb(var(--ink));
+  background-color: rgb(var(--navy));
+  background-image:
+    radial-gradient(ellipse 55% 85% at 12% 0%, rgb(38 72 160 / 0.6), transparent 70%),
+    radial-gradient(ellipse 40% 70% at 100% 100%, rgb(200 16 46 / 0.22), transparent 70%),
+    radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.07) 1px, transparent 1.6px);
+  background-size: auto, auto, 14px 14px;
+}
+/* The diagonal stripe, behind the featured cards (bottom-right on a phone). */
+.wx-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -30%;
+  bottom: -30%;
+  right: clamp(-60px, 6vw, 140px);
+  width: clamp(150px, 16vw, 250px);
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, rgb(200 16 46) 0 44%, rgb(255 255 255 / 0.95) 44% 52%, rgb(var(--gold)) 52% 70%, transparent 70%);
+  opacity: 0.85;
+  pointer-events: none;
+}
+/* A jersey stripe along the hero's foot. */
+.wx-hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: linear-gradient(rgb(200 16 46) 0 50%, rgb(var(--gold)) 50% 100%);
+  pointer-events: none;
+}
+.wx-hero-in {
+  @apply page relative;
+  max-width: 1440px;
+}
+.wx-hero .chip {
+  background-color: rgb(var(--surface) / 0.85);
+}
+.wx-hero .chip:hover {
+  border-color: rgb(255 255 255 / 0.45);
+}
+/* A slanted pennant label: the hero's eyebrow and the cards' heading. */
+.wx-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 1.1rem 0.3rem 0.65rem;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  background: rgb(200 16 46);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.wx-h1 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(2.35rem, 4.6vw + 0.6rem, 4.6rem);
+  font-style: italic;
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.25);
+}
+.wx-h1-accent {
+  color: rgb(var(--gold));
+}
+.wx-stat {
+  @apply inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line px-3 py-1 text-sm text-muted;
+  background: rgb(var(--surface) / 0.7);
+}
+.wx-stat b {
+  @apply font-bold text-ink;
+}
+/* Section headings across the site: condensed, italic, uppercase, a short red-and-gold bar above the kicker. */
+.wx-h2 {
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.wx-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 4px;
+  margin-right: 8px;
+  vertical-align: middle;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, rgb(var(--brand)) 0 60%, rgb(var(--gold)) 60% 100%);
+}
+
+/* The trading card. */
+.wx-tcard {
+  --card-c: 19 48 107;
+  --card-c2: 200 16 46;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 12px;
+  padding: 7px;
+  background: #fff;
+  color: #0b1430;
+  box-shadow: 0 18px 34px -14px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.12);
+  transform: rotate(-1.2deg);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.wx-tcard-b {
+  --card-c: 200 16 46;
+  --card-c2: 19 48 107;
+  transform: rotate(1.2deg) translateY(8px);
+}
+.wx-tcard:hover,
+.wx-tcard:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 40px -14px rgb(0 0 0 / 0.75), 0 0 0 2px rgb(var(--gold));
+}
+@media (prefers-reduced-motion: reduce) {
+  .wx-tcard { transition: none; }
+}
+.wx-tcard-art {
+  position: relative;
+  display: flex;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid rgb(var(--card-c));
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background:
+    radial-gradient(circle at 1px 1px, rgb(var(--card-c) / 0.08) 1px, transparent 1.6px) 0 0 / 10px 10px,
+    linear-gradient(160deg, #ffffff, #e3e8f3);
+}
+.wx-tcard-band {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  padding: 3px 14px 3px 8px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  background: rgb(var(--card-c));
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.wx-tcard-save {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  background: #e5f6ea;
+  color: #11683a;
+  font-size: 11px;
+  font-weight: 800;
+}
+.wx-tcard-plate {
+  display: flex;
+  align-items: center;
+  min-height: calc(2 * 1.1em + 16px);
+  padding: 8px 10px;
+  border-top: 3px solid rgb(var(--gold));
+  background: linear-gradient(100deg, rgb(var(--card-c)) 0 82%, rgb(var(--card-c2)) 82% 88%, rgb(var(--card-c)) 88%);
+  color: #fff;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  border-radius: 0 0 6px 6px;
+}
+.wx-tcard-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 4px 1px;
+}
+.wx-tcard-k {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5b6478;
+}
+.wx-tcard-v {
+  display: block;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #0b1430;
+}
+@media (max-width: 639.98px) {
+  /* Phones: the stripe sits low and faint, behind the cards, not through the chips; the save chip drops to the photo's foot so the
+     type band keeps the top. */
+  .wx-hero::before { top: 45%; opacity: 0.6; }
+  .wx-tcard-save { top: auto; bottom: 6px; }
+  .wx-tcard-band { font-size: 9px; }
+  .wx-tcard-plate { font-size: 13px; }
+  .wx-tcard-v { font-size: 18px; }
 }
