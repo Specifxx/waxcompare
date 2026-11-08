@@ -74,7 +74,9 @@ export function Header({ region, listed }: { region: Region | null; listed?: Rea
   const items = headerNavItems(built, undefined, listed);
   const groups = navGroups(built, undefined, listed);
   return (
-    <header className="sticky top-0 z-40 h-[var(--hdr)] border-b border-line bg-surface/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 h-[var(--hdr)] bg-surface/90 backdrop-blur-md">
+      {/* The jersey stripe along the header's foot (the sports-card look, 2026-11-08), in place of the hairline. */}
+      <span aria-hidden="true" className="wx-stripe pointer-events-none absolute inset-x-0 bottom-0 h-[4px]" />
       <div className="page flex h-full items-center gap-2 sm:gap-3 lg:gap-4 xl:max-w-shell">
         <Link href={home} className="flex h-11 shrink-0 items-center rounded-lg" aria-label={`WaxCompare${region ? ` ${REGIONS[region].name}` : ""} home`}>
           <Logo wordmark="hidden sm:inline" />

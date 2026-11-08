@@ -1352,3 +1352,22 @@ to its release page in a region where that release still lists something, otherw
 
 The sets index and the release pages show a date only where one is sourced. For an undated release the index shows
 "maker · year".
+## 2026-11-08 — The sports-card look and the full-width, featured-product hero
+
+Owner, 2026-11-08: "I really like how the KaeYoung and ScentCompare engine … feature some products on the hero and … uses the full
+screen", and "WaxCompare should be more sports themed … similar to Topps … some of the Christmas themes … are a bit too much: the theme
+must match the domain."
+
+- **Full width.** From 1280px the shell runs from the eBay rail's edge to the TCGplayer rail's (`.max-w-shell` margins of 136px, not a
+  max-width: `100vw` counts a desktop scrollbar), so the sidebar sits flush against the left rail; `.page` widened to 1440px.
+- **The hero** (landing page and every region home): words, search, region row, shortcuts and a stat line on the left; two products as
+  trading cards on the right (`components/home/HeroCards.tsx`), the region's most-stocked new boxes from `lib/picks.ts` (the landing
+  page's own picks: the server HTML has the US two, the browser swaps to the visitor's region through `/api/picks/<region>`). Same h1
+  words, same links, same "Hot right now" h2 on region homes; nothing in the cards is a heading.
+- **The look is our own**, in the spirit of classic sports card packaging and not a copy of any maker's: a night-navy hero with a halftone
+  field and one diagonal red/white/gold stripe, condensed italic uppercase headlines (Barlow Condensed, replacing Bricolage Grotesque on
+  the site; the share cards keep Bricolage), slanted pennant labels, a red-and-gold stripe under the header, and cards with a white
+  border, nameplate and stat line. No Topps, Panini or Upper Deck logo, wordmark, card design or colourway. The hero keeps its own dark
+  tokens in both themes.
+- **Christmas stays light here:** no snow, lights or trees in the hero (`ChristmasDecor` is no longer mounted) and no hat on the mark; the
+  small "Christmas gifts" line and the Black Friday strip stay.

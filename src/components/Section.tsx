@@ -22,8 +22,8 @@ export function Section({
       {/* wraps: a long "All … →" link drops under the title on a phone instead of widening the page */}
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
         <div className="min-w-0">
-          {kicker && <div className="eyebrow mb-1">{kicker}</div>}
-          <h2 className="font-display text-2xl font-bold tracking-tight sm:text-[28px]">{title}</h2>
+          {kicker && <div className="eyebrow wx-eyebrow mb-1">{kicker}</div>}
+          <h2 className="wx-h2 font-display text-[26px] font-extrabold leading-tight sm:text-[32px]">{title}</h2>
         </div>
         {href && (
           <Link href={href} prefetch={false} className="shrink-0 text-sm font-semibold text-brand hover:underline">

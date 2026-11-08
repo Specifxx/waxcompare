@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Barlow_Condensed, Inter } from "next/font/google";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { ShareArrival } from "@/components/ShareArrival";
 import { QuickView } from "@/components/QuickView";
@@ -20,7 +20,9 @@ import "@/components/site-reviews/site-reviews.css";
 // first visit keeps the size-adjusted fallback for that page instead of re-wrapping every line when the font lands (that swap
 // measured CLS 0.209 on /us/type/booster-boxes; 0 with "optional").
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "optional" });
-const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", display: "optional", weight: ["600", "700", "800"] });
+// The display face (2026-11-08, the sports-card look): Barlow Condensed, a condensed sans of the kind printed on jerseys and card
+// nameplates, upright and italic. Was Bricolage Grotesque (the share cards still draw it, src/app/fonts).
+const display = Barlow_Condensed({ subsets: ["latin"], variable: "--font-display", display: "optional", weight: ["600", "700", "800"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
