@@ -1334,3 +1334,21 @@ product and guide. `INDEXED_DETAIL_REGIONS` (`lib/index-tiers.ts`) is us, au, uk
 visitors, but their product, guide and tool pages are `noindex`, out of the sitemap and out of every hreflang set. Their
 home, sealed, set and type hubs stay indexable. The 3-listing product rule (`productNoindex`) is unchanged. Add a region
 back once the core is indexed (recheck ~2026-11-25).
+
+## 2026-11-08: only the more popular products are listed
+
+Owner, 2026-11-08: "cull it a bit so it only features the more popular products". MTG Compare's low-traction cull
+(mtgcompare #96) is the pattern. `lib/focus.ts` (pure, `tests/focus.test.ts`) decides it in the exporter, so only listed
+products reach `data/public/`. A product stays when Search Console shows people finding it (a click, or 10+ impressions
+in 56 days, any region), when two or more stores have it in stock in one market, or when it is a core box (hobby, jumbo,
+FOTL, Breaker's Delight, choice, mega, blaster, value box, hobby case) of a current release (this year's or last
+season's) that a store has in stock. Everything else is culled: older releases' single-store boxes, loose packs, tins,
+albums. On the 2026-11-08 data that took the catalogue from 5,005 products to about 1,300, and offers from 21,086 to
+12,669.
+
+Price history keeps every series, and every import still reads every store, so a product that qualifies again comes
+back at the same URL with its chart. A culled product's URL 301s (`data/public/culled.json`, `lib/culled.ts`). It goes
+to its release page in a region where that release still lists something, otherwise to its type page.
+
+The sets index and the release pages show a date only where one is sourced. For an undated release the index shows
+"maker · year".

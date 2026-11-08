@@ -96,8 +96,8 @@ export default async function SetsPage({ params }: { params: { region: string } 
       })}
 
       <p className="mt-10 max-w-2xl text-sm text-muted">
-        English-language sets from XY ({firstSetYear()}) on, each with its English release date. Sub-sets with no sealed product of their own
-        (trainer galleries, shiny vaults, promos, McDonald&rsquo;s collections) are left out. Upcoming sets and pre-orders are on the{" "}
+        A release is listed once two card shops we track sell it sealed. The makers publish no release dates we can source for most
+        of them, so a date is shown only where one is sourced. Upcoming releases with a date are on the{" "}
         <Link href={`/${r.region}/releases`} prefetch={false} className="font-semibold text-brand-strong hover:underline">
           release calendar
         </Link>
@@ -124,7 +124,7 @@ function SetRow({ r, s, c }: { r: RegionInfo; s: MtgSet; c: SetCount | undefined
       <span className="min-w-0 flex-1">
         <span className={`block font-semibold ${c ? "group-hover:text-brand" : ""}`}>{s.name}</span>
         <span className="block text-xs text-muted">
-          <time dateTime={s.releaseDate}>{pre ? `Out ${shortDate(s.releaseDate)}` : `Released ${shortDate(s.releaseDate)}`}</time>
+          {s.dateKnown ? <time dateTime={s.releaseDate}>{pre ? `Out ${shortDate(s.releaseDate)}` : `Released ${shortDate(s.releaseDate)}`}</time> : `${s.maker} · ${s.year}`}
           {pre && <span className="ml-1.5 inline-block whitespace-nowrap rounded-full bg-pre-soft px-1.5 py-px font-semibold text-pre">Pre-order</span>}
         </span>
       </span>
