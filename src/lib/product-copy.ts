@@ -9,11 +9,11 @@ import type { PerPackPick } from "./per-pack";
 import { withMtg } from "./seo";
 import { SITE_NAME } from "./site";
 
-/** The longest title that still gets the " | WaxCompare" suffix (R8): over it, the title goes out as title.absolute. */
+/** The longest title that still gets the " | SportsCardCompare" suffix (R8): over it, the title goes out as title.absolute. */
 export const TITLE_MAX = 65;
 const SUFFIX = ` | ${SITE_NAME}`;
 
-/** A title for Next's metadata: a plain string (templated, " | WaxCompare" added) or { absolute } when that would run past 65 characters. */
+/** A title for Next's metadata: a plain string (templated, " | SportsCardCompare" added) or { absolute } when that would run past 65 characters. */
 export type PageTitle = string | { absolute: string };
 
 /** The rendered <title> a PageTitle gives (for tests and the length check). */
@@ -40,7 +40,7 @@ export function openWhere(open: readonly { marketplace: boolean }[], noun: strin
 /**
  * The product page's <title>. Open somewhere: "MTG Bloomburrow Bundle — from $54.99 at 19 US stores and on TCGplayer"
  * ("from" is the cheapest open offer, which may be TCGplayer's: the "and on TCGplayer" keeps it from reading as a store's price). Nothing
- * open: "MTG Bloomburrow Bundle — price & stock in the UK". Templated with " | WaxCompare" when that fits in 65 characters.
+ * open: "MTG Bloomburrow Bundle — price & stock in the UK". Templated with " | SportsCardCompare" when that fits in 65 characters.
  */
 export function productTitle(o: { name: string; market: string; inName: string; cheapestCents: number | null; where: string | null }): PageTitle {
   const name = withMtg(o.name);
@@ -200,7 +200,7 @@ export function productIntro(o: {
   medianCents: number | null;
   openStores: number;
   storeCount: number;
-  /** The other regions WaxCompare lists it in. */
+  /** The other regions SportsCardCompare lists it in. */
   elsewhere: number;
 }): string[] {
   const name = withMtg(o.name);
@@ -208,7 +208,7 @@ export function productIntro(o: {
   const out: string[] = [];
   const what = o.set
     ? `${name} is ${/^[AEIOU]/i.test(o.productType) ? "an" : "a"} ${o.productType.toLowerCase()} of ${o.set.name}, a ${o.set.series.toLowerCase()} card release${o.set.maker ? ` from ${o.set.maker}` : ""}${o.preorder ? `, releasing on ${shortDate(o.set.releaseDate)}` : o.set.dateKnown ? `, released on ${shortDate(o.set.releaseDate)}` : ""}.`
-    : `${name} is a sealed sports card ${o.productType.toLowerCase()} that WaxCompare compares across ${o.adjective} card shops.`;
+    : `${name} is a sealed sports card ${o.productType.toLowerCase()} that SportsCardCompare compares across ${o.adjective} card shops.`;
   out.push([what, o.about, o.packs != null ? `It holds ${plural(o.packs, "pack")}.` : null].filter(Boolean).join(" "));
   const stock: string[] = [];
   if (o.cheapest) {
@@ -220,7 +220,7 @@ export function productIntro(o: {
   } else if (o.storeCount > 0) {
     stock.push(`None of the ${plural(o.storeCount, `${o.adjective} store`)} we track that list it has it in stock right now; the table shows each one's last price, and the stores are read about twice a day.`);
   }
-  if (o.elsewhere > 0) stock.push(`WaxCompare also compares it in ${plural(o.elsewhere, "other region")}, each in its own currency.`);
+  if (o.elsewhere > 0) stock.push(`SportsCardCompare also compares it in ${plural(o.elsewhere, "other region")}, each in its own currency.`);
   stock.push("Prices exclude shipping, so check the store’s delivery cost before you buy.");
   out.push(stock.join(" "));
   return out;

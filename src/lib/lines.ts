@@ -1,4 +1,4 @@
-// The product lines WaxCompare reads in a store title: maker, line, and which sports the line is sold in.
+// The product lines SportsCardCompare reads in a store title: maker, line, and which sports the line is sold in.
 //
 // A release is (year or season, line, sport, competition): "2025 Topps Chrome Baseball", "2024-25 Panini Prizm Basketball",
 // "2024-25 Topps Chrome UEFA Club Competitions". The line is the part that repeats every year, so this list is short and stable,

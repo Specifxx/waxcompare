@@ -14,7 +14,7 @@ import { backInStockData } from "@/lib/stock-data";
 
 // /<region>/back-in-stock: products the daily price history (lib/price-history.ts) shows with nothing open in one snapshot and in
 // stock in a later one, within the last week, and still in stock in the latest (lib/stock.ts backInStock). Under two days of
-// snapshots it says so and shows nothing. Below it, what WaxCompare started tracking lately (deals.ts newlyTracked), labelled as
+// snapshots it says so and shows nothing. Below it, what SportsCardCompare started tracking lately (deals.ts newlyTracked), labelled as
 // exactly that. Rendered per request and kept by Vercel's CDN for a day (next.config.js CDN_PAGES), never ISR; reads no cookie.
 export const dynamic = "force-dynamic";
 
@@ -45,14 +45,14 @@ export default async function BackInStockPage({ params }: { params: { region: st
           Store counts are independent stores; TCGplayer is shown apart. Stock moves fast: the store&rsquo;s own page is final.
         </p>
         <p className="mt-2 text-sm text-muted">
-          {data.days > 0 ? `From WaxCompare's daily snapshots: ${data.days} ${data.days === 1 ? "day" : "days"} so far${latest ? `, the latest ${latest}` : ""}.` : "WaxCompare's daily snapshots are not available right now."}
+          {data.days > 0 ? `From SportsCardCompare's daily snapshots: ${data.days} ${data.days === 1 ? "day" : "days"} so far${latest ? `, the latest ${latest}` : ""}.` : "SportsCardCompare's daily snapshots are not available right now."}
         </p>
       </header>
 
       <Section id="back" title="Back in stock" kicker={data.enough ? `Last ${BACK_DAYS} days` : undefined}>
         {!data.enough ? (
           <Empty actions={[{ href: `/${r.region}/sealed?stock=in`, label: "Everything in stock" }, { href: `/${r.region}/out-of-print`, label: "Older sets in stock" }]}>
-            Not enough history yet: this list needs at least {MIN_DAYS_BACK} daily snapshots, and WaxCompare has {data.days}. It fills in by itself as the days are recorded.
+            Not enough history yet: this list needs at least {MIN_DAYS_BACK} daily snapshots, and SportsCardCompare has {data.days}. It fills in by itself as the days are recorded.
           </Empty>
         ) : data.items.length ? (
           <ol className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-[repeat(2,minmax(0,1fr))]">
@@ -74,7 +74,7 @@ export default async function BackInStockPage({ params }: { params: { region: st
         {fresh.length ? (
           <ProductRail products={fresh} region={r.region} label="Newly listed" />
         ) : (
-          <Empty actions={[{ href: `/${r.region}/releases`, label: "Upcoming releases" }]}>WaxCompare hasn&rsquo;t started tracking anything new in {r.inName} in the last 14 days.</Empty>
+          <Empty actions={[{ href: `/${r.region}/releases`, label: "Upcoming releases" }]}>SportsCardCompare hasn&rsquo;t started tracking anything new in {r.inName} in the last 14 days.</Empty>
         )}
       </Section>
       {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ld) }} />}

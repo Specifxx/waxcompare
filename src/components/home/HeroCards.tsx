@@ -42,7 +42,7 @@ export function heroFromPicks(picks: RegionPick[]): HeroCard[] {
 }
 
 /**
- * The hero's featured products drawn as trading cards (WaxCompare's sports-card look, 2026-11-08: our own design, no maker's trade
+ * The hero's featured products drawn as trading cards (SportsCardCompare's sports-card look, 2026-11-08: our own design, no maker's trade
  * dress): a white border, the photo on a light panel with the product type on a corner band, a nameplate, and a stat line (the
  * cheapest store price, how many stores have it). Each is a plain link to the product page in the server HTML, with the quick view's
  * data attributes. Nothing here is a heading. Server and client safe (no data reads), so the landing page's region swap reuses it.

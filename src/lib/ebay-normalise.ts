@@ -159,7 +159,7 @@ export function baseItem(raw: unknown, marketplace: MarketplaceId, now: number, 
 }
 
 // ─── High-end sealed (the "chase" feed) ────────────────────────────────────────
-// WaxCompare's store rows are sealed only. The feed key "chase" is kept (feed keys, contexts and EPN sub-ids are stored and reported by
+// SportsCardCompare's store rows are sealed only. The feed key "chase" is kept (feed keys, contexts and EPN sub-ids are stored and reported by
 // it) but it now holds HIGH-END SEALED product: hobby, jumbo, FOTL and Breaker's Delight boxes, and hobby cases.
 
 /** The product types of the high-end sealed ("chase") feed. */

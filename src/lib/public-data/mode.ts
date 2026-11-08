@@ -1,6 +1,6 @@
 // Where public reads go (ported from RiftCompare's src/lib/public-data/mode.ts):
 //
-//   files     (WaxCompare's default since 2026-10-16) public reads come from the bundled files and never touch Neon; Neon serves
+//   files     (SportsCardCompare's default since 2026-10-16) public reads come from the bundled files and never touch Neon; Neon serves
 //             only the importers' writes and the rare query shape the file engine refuses (logged as [public-data:unsupported]).
 //             Missing or unreadable files also fall through to Neon, so a checkout without data/public/ still works.
 //   fallback  Neon first; when Neon cannot answer, public reads are served from the files for a minute before Neon is tried again.

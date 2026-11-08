@@ -58,7 +58,7 @@ test("render: name, date, days to go, prices linking each product page, and the 
   assert.match(html, /\$315/);
   assert.match(html, /pre-order at 2 stores/);
   assert.doesNotMatch(html, /MSRP|MTG|Magic/);
-  assert.match(html, /href="\/us\/sets\/2026-topps-chrome-baseball"/, "no pre-order hubs on WaxCompare: the release's own page");
+  assert.match(html, /href="\/us\/sets\/2026-topps-chrome-baseball"/, "no pre-order hubs on SportsCardCompare: the release's own page");
   assert.match(html, /See every store/);
 });
 

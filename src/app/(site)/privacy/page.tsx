@@ -6,7 +6,7 @@ import { CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description: "What WaxCompare collects (very little) and why.",
+  description: "What SportsCardCompare collects (very little) and why.",
   alternates: { canonical: `${SITE_URL}/privacy` },
 };
 
@@ -16,19 +16,19 @@ const LAST_UPDATED = "2 November 2026";
 export default function Privacy() {
   return (
     <div className="page max-w-3xl py-12">
-      <Breadcrumbs items={[{ href: "/", label: "WaxCompare" }, { label: "Privacy" }]} />
+      <Breadcrumbs items={[{ href: "/", label: "SportsCardCompare" }, { label: "Privacy" }]} />
       <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Privacy</h1>
       <p className="mt-2 text-sm text-faint">Last updated {LAST_UPDATED}</p>
       <div className="prose-dex mt-6">
         <p>
-          WaxCompare has no accounts and asks for your email only if you set a price alert (below).{" "}
+          SportsCardCompare has no accounts and asks for your email only if you set a price alert (below).{" "}
           {ADSENSE_CLIENT ? "We show ads from Google AdSense, which uses cookies (below)." : "It sets no advertising cookies."} Here is everything we collect.
         </p>
         <h2>Price alerts</h2>
         <p>
           If you ask to be emailed when a price drops, the form sends your email address, the product, your region and your price to our
           sister site RiftCompare&rsquo;s alert service. It keeps them only for that alert, emails you once to confirm, and deletes them when
-          you stop the alert (every email has a link) or after six months. WaxCompare itself never stores them. Details are in{" "}
+          you stop the alert (every email has a link) or after six months. SportsCardCompare itself never stores them. Details are in{" "}
           <a href="https://riftcompare.com/privacy#sister-alerts">RiftCompare&rsquo;s privacy policy</a>.
         </p>
         <h2>Analytics</h2>
@@ -48,7 +48,7 @@ export default function Privacy() {
           Store links are plain links. The eBay units on the site are advertisements, marked &ldquo;Ad&rdquo;; they load no ad script,
           tracking pixel or cookie from eBay.
           {" "}
-          The eBay listing strips load one thing from eBay: when a strip scrolls near the screen, your browser asks WaxCompare&rsquo;s own
+          The eBay listing strips load one thing from eBay: when a strip scrolls near the screen, your browser asks SportsCardCompare&rsquo;s own
           server for the listings it has stored (that request carries nothing about you; the listings were imported from eBay on a schedule (about once a
           day in the default setting) with our own key, never with your details), and then loads each listing&rsquo;s thumbnail <b>directly from eBay&rsquo;s image
           servers</b> (ebayimg.com), which shares your IP address and browser type with eBay. We ask your browser not to send the page address
@@ -65,16 +65,16 @@ export default function Privacy() {
               <a href="https://adssettings.google.com" rel="noopener noreferrer">Google&rsquo;s Ads Settings</a>, or opt out of some third-party vendors&rsquo; cookies at{" "}
               <a href="https://www.aboutads.info/choices" rel="noopener noreferrer">aboutads.info</a>. How Google uses data from sites that use its services is explained at{" "}
               <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer">policies.google.com/technologies/partner-sites</a>. In the UK,
-              the EEA and Switzerland you are asked for consent before personalised ads are shown. WaxCompare itself receives no personal data from these ads.
+              the EEA and Switzerland you are asked for consent before personalised ads are shown. SportsCardCompare itself receives no personal data from these ads.
             </p>
           </>
         )}
         <h2>Kept in your browser</h2>
         <p>
           The &ldquo;Recently viewed&rdquo; row remembers the last products you opened in each region. That list is kept only in this
-          browser (in its local storage, as product addresses and nothing else), is never sent to WaxCompare, and is removed when you
+          browser (in its local storage, as product addresses and nothing else), is never sent to SportsCardCompare, and is removed when you
           clear this site&rsquo;s data in your browser or press &ldquo;Clear&rdquo; on the row. Search suggestions work the same way: your
-          browser loads one list of products from WaxCompare, the same list for every visitor, and matches what you type against it on
+          browser loads one list of products from SportsCardCompare, the same list for every visitor, and matches what you type against it on
           your device, so the letters you type are not sent to us while you type.
         </p>
         <h2>Server logs</h2>

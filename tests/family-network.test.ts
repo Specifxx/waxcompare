@@ -48,7 +48,7 @@ test("KaeYoung is never in the network, and every label is region-neutral", () =
 test("clusters: cards, hobby (Gundam's Gunpla too) and tech", () => {
   assert.deepEqual(clusterSisters("figure", "hobby").map((s) => s.id), ["gundam", "wargame"]);
   assert.deepEqual(clusterSisters("empire", "tech").map((s) => s.id), ["cam"]);
-  assert.equal(clusterSisters("rift", "cards").length, 9, "WaxCompare (sealed sports cards) joins the card sites");
+  assert.equal(clusterSisters("rift", "cards").length, 9, "SportsCardCompare (sealed sports cards) joins the card sites");
   // Card sites list only card sites (Gundam's Gunpla side does not pull hobby sites into its footer).
   assert.deepEqual(footerSisters("gundam").map((s) => s.id), ["rift", "op", "dex", "mtg", "wax", "lorcana", "ygo", "cyberpunk", "bandai"]);
   for (const id of ["rift", "op", "dex", "mtg", "wax", "gundam", "lorcana", "ygo", "cyberpunk", "bandai"] as const) {
@@ -90,7 +90,7 @@ test("buildFeed caps each group and ranks deals by saving", () => {
 test("pickTiles: one per sister, the visitor's region first, then the US, then the other kind", () => {
   const feeds = [
     feed("op", [deal({ region: "US" }), deal({ region: "AU", currency: "AUD", cents: 15000, refCents: 19000, url: "https://opcompare.app/au/x" })]),
-    feed("mtg", [deal({ url: "https://waxcompare.app/us/p/x", refLabel: "median store price" })]),
+    feed("mtg", [deal({ url: "https://sportscardcompare.com/us/p/x", refLabel: "median store price" })]),
     feed("dex", [{ kind: "preorder", cluster: "cards", region: "AU", title: "Box", url: "https://dexcompare.app/au/p/box", cents: 20000, currency: "AUD", store: "S", releaseDate: "2026-11-14" }]),
     feed("figure", [deal({ cluster: "hobby", url: "https://figurecompare.com/figure/x" })]),
   ];

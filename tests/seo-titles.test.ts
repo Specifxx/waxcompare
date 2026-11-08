@@ -1,4 +1,4 @@
-// lib/seo-titles.ts: every price page's <title> as a results page shows it is at most 60 characters (with " | WaxCompare" only when
+// lib/seo-titles.ts: every price page's <title> as a results page shows it is at most 60 characters (with " | SportsCardCompare" only when
 // that still fits), every description at most 160, led by the query people search; and the route files use these builders.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -12,7 +12,7 @@ import { fitDescription, seoCopy, shortName, shownTitle, type SeoTitle } from ".
 function rule(t: SeoTitle, label: string) {
   const shown = shownTitle(t);
   assert.ok(shown.length <= 60, `${label}: "${shown}" is ${shown.length}`);
-  if (typeof t !== "string") assert.ok(t.absolute.length + " | WaxCompare".length > 60, `${label}: absolute for a title that fits the suffix`);
+  if (typeof t !== "string") assert.ok(t.absolute.length + " | SportsCardCompare".length > 60, `${label}: absolute for a title that fits the suffix`);
   assert.doesNotMatch(shown, /\bMTG\b|\bMagic\b/, `${label}: an MTG word`);
   assert.equal(findBannedCopy(shown), null, label);
 }
@@ -46,7 +46,7 @@ test("region pages: home, deals, cheapest packs, this week, guides, stores, sets
 
 test("type pages lead with '<type> prices in <region>', and keep the live from-price when it fits", () => {
   const hobby = PRODUCT_TYPES.find((t) => t.slug === "hobby-boxes")!;
-  assert.equal(shownTitle(seoCopy.typeTitle(hobby, REGIONS.us, 20, 9895)), "Hobby Box prices in the US: from $98.95 | WaxCompare");
+  assert.equal(shownTitle(seoCopy.typeTitle(hobby, REGIONS.us, 20, 9895)), "Hobby Box prices in the US: from $98.95 | SportsCardCompare");
   for (const t of PRODUCT_TYPES)
     for (const r of REGION_LIST)
       for (const [open, from] of [[0, null], [3, 999], [1234, 1234567]] as const) {

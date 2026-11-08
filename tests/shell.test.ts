@@ -47,9 +47,9 @@ const hrefs = (html: string) => [...html.matchAll(/href="([^"]*)"/g)].map((m) =>
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
 
-test("Footer on a region page: Shop, Latest releases, Explore and WaxCompare, then the regions; every link internal", () => {
+test("Footer on a region page: Shop, Latest releases, Explore and SportsCardCompare, then the regions; every link internal", () => {
   const html = render(React.createElement(Footer, { region: "au" }));
-  for (const t of ["Shop", "Latest releases", "Explore", "WaxCompare"]) assert.match(html, new RegExp(`<h2 class="eyebrow mb-2">${t}</h2>`), t);
+  for (const t of ["Shop", "Latest releases", "Explore", "SportsCardCompare"]) assert.match(html, new RegExp(`<h2 class="eyebrow mb-2">${t}</h2>`), t);
   const links = hrefs(html);
   for (const h of [
     "/au/type/hobby-boxes",
@@ -79,10 +79,10 @@ test("Footer on a region page: Shop, Latest releases, Explore and WaxCompare, th
   // every link is internal now: the sister sites are listed once on /our-sites (2026-11-08)
   for (const h of links) if (h !== "mailto:compareempire@gmail.com") assert.match(h, /^\//, `${h} is internal`);
   assert.ok(links.includes("/our-sites"));
-  assert.equal(footerColumns("au").length, 5); // Shop, Latest releases, Explore, Guides (every guide: no orphans), WaxCompare
+  assert.equal(footerColumns("au").length, 5); // Shop, Latest releases, Explore, Guides (every guide: no orphans), SportsCardCompare
 });
 
-test("Footer: the family inbox beside /contact (owner, 2026-11-01), the two-line disclosure, and no 'operated by WaxCompare'", () => {
+test("Footer: the family inbox beside /contact (owner, 2026-11-01), the two-line disclosure, and no 'operated by SportsCardCompare'", () => {
   for (const region of ["us", null] as const) {
     const html = render(React.createElement(Footer, { region }));
     assert.match(html, /href="mailto:compareempire@gmail\.com"/);
@@ -94,16 +94,16 @@ test("Footer: the family inbox beside /contact (owner, 2026-11-01), the two-line
     // the footer links the history-backed /back-in-stock page by its name; nothing else history-backed is allowed
     assert.equal(findBannedCopy(html.replace(/<[^>]+>/g, " "), { history: true }), null);
     assert.equal(findBannedCopy(html.replace(/<a [^>]*href="\/[a-z]{2}\/back-in-stock"[^>]*>Back in stock<\/a>/g, " ").replace(/<[^>]+>/g, " ")), null);
-    if (OPERATOR === SITE_NAME) assert.doesNotMatch(html, /operated by/i, "never the circular 'WaxCompare is operated by WaxCompare'");
+    if (OPERATOR === SITE_NAME) assert.doesNotMatch(html, /operated by/i, "never the circular 'SportsCardCompare is operated by SportsCardCompare'");
   }
   assert.match(src("components/Footer.tsx"), /OPERATOR !== SITE_NAME && ` Operated by \$\{OPERATOR\}\.`/);
 });
 
-test("Footer with no region: Regions and WaxCompare columns only, and no region-scoped link", () => {
+test("Footer with no region: Regions and SportsCardCompare columns only, and no region-scoped link", () => {
   const html = render(React.createElement(Footer, { region: null }));
   assert.deepEqual(
     footerColumns(null).map((c) => c.title),
-    ["Regions", "WaxCompare"],
+    ["Regions", "SportsCardCompare"],
   );
   assert.doesNotMatch(html, /Latest releases|>Shop<|>Explore</);
   const links = hrefs(html);
@@ -176,7 +176,7 @@ test("the sidebar (xl): product types, sets, deals and the rest, under each layo
   const groups = navGroups("au", "2026-10-28");
   assert.deepEqual(groups.map((g) => g.title), ["Shop by product", "Releases", "Deals & stock", "More"]);
   for (const l of groups.flatMap((g) => g.links)) assert.match(l.href, /^\/au\/|^\/blog$|^\/creators$|^\/forum$/, l.href);
-  assert.ok(!groups.flatMap((g) => g.links).some((l) => l.href.includes("/preorders/")), "no pre-order hubs on WaxCompare");
+  assert.ok(!groups.flatMap((g) => g.links).some((l) => l.href.includes("/preorders/")), "no pre-order hubs on SportsCardCompare");
   assert.deepEqual(groups[0].links.slice(0, 4).map((l) => l.href), ["/au/type/hobby-boxes", "/au/type/jumbo-boxes", "/au/type/mega-boxes", "/au/type/blaster-boxes"]);
   assert.equal(groups[1].links.at(-1)!.href, "/au/sets");
   assert.ok(navGroups("us", "2026-11-25")[2].links.some((l) => l.label === "Black Friday"), "Black Friday in season");

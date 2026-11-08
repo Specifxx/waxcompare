@@ -6,7 +6,7 @@ import { GUIDES } from "../src/content/guides";
 
 test("llms.txt names the site and links every guide", async () => {
   const body = await llms().text();
-  assert.match(body, /^# WaxCompare\n/);
+  assert.match(body, /^# SportsCardCompare\n/);
   assert.doesNotMatch(body, /\bMTG\b|Magic/);
   for (const g of GUIDES) assert.ok(body.includes(`/guides/${g.slug})`), g.slug);
 });

@@ -262,7 +262,7 @@ export async function HolidaySalePage({ event, params }: { event: SaleEvent } & 
           ))}
         </ul>
         <p className="mt-3 text-sm leading-6 text-muted">
-          WaxCompare compares sealed product, not single cards, so these are searches of live graded listings, not prices we checked. Paid links: we may earn a commission, at no cost to you.
+          SportsCardCompare compares sealed product, not single cards, so these are searches of live graded listings, not prices we checked. Paid links: we may earn a commission, at no cost to you.
         </p>
         <div className="mt-6">
           <EbayStrip region={r.region} context="sealed" placement="price-watch" search={{ kind: "card", query: "" }} />

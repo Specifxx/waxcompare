@@ -33,7 +33,7 @@ test("Accept-Language → region only when a tag names a country we compare", ()
 
 test("/api/geo: the header first, then the language; private and uncached", async () => {
   const ask = async (h: Record<string, string>) => {
-    const res = GET(new Request("https://waxcompare.app/api/geo", { headers: h }));
+    const res = GET(new Request("https://sportscardcompare.com/api/geo", { headers: h }));
     assert.equal(res.headers.get("cache-control"), "private, no-store");
     return res.json();
   };

@@ -1,7 +1,7 @@
-name: WaxCompare eBay import
+name: SportsCardCompare eBay import
 
-# The daily eBay listing import for WaxCompare (the repository root): searches eBay's Browse API with
-# WaxCompare's own keys and REPLACES the EbayListing rows the website's listing strips read. The website never
+# The daily eBay listing import for SportsCardCompare (the repository root): searches eBay's Browse API with
+# SportsCardCompare's own keys and REPLACES the EbayListing rows the website's listing strips read. The website never
 # calls eBay and holds no eBay credential: the keys live only here, in GitHub Actions.
 #
 # A run, in order (DEPLOY.md, "The catalogue sweep"): (1) the fixed feeds: chase, sealed, types, sets (265 calls);
@@ -40,7 +40,7 @@ name: WaxCompare eBay import
 # run late; the 26 h bound leaves two hours for that, and a run that never comes only blanks the strips (to a search link).
 #
 # Secrets (Settings → Secrets and variables → Actions):
-#   EBAY_CLIENT_ID, EBAY_CLIENT_SECRET   the Production keyset (App ID / Cert ID) of WaxCompare's own eBay
+#   EBAY_CLIENT_ID, EBAY_CLIENT_SECRET   the Production keyset (App ID / Cert ID) of SportsCardCompare's own eBay
 #                                    application. Without them the job writes a skip message and exits 0.
 # Variables (same page, "Variables" tab), all optional:
 #   EBAY_DAILY_CAP (2500, max 2500)  most Browse calls per Pacific day, across every run of the day (kept in the database); this site's SHARE of the keyset
@@ -94,7 +94,7 @@ jobs:
   import:
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    # WaxCompare has no hosted database (DECISIONS.md 2026-11-07): each run gets an empty Postgres that dies with the runner,
+    # SportsCardCompare has no hosted database (DECISIONS.md 2026-11-07): each run gets an empty Postgres that dies with the runner,
     # seeded from the committed data (scripts/seed-from-public.ts), and the result is exported back to main.
     services:
       postgres:

@@ -1,5 +1,5 @@
 import { regionBootScript } from "./region-boot";
-// The markets WaxCompare compares within. A market is a region whose stores
+// The markets SportsCardCompare compares within. A market is a region whose stores
 // all charge in ONE currency, so "cheapest" is always a like-for-like number a
 // buyer there is actually offered. Pure module: safe in client components
 // (notFound() from next/navigation is itself usable on either side).
@@ -49,7 +49,7 @@ export const REGIONS: Record<Region, RegionInfo> = {
 // Cross-border buys (an EU store's prices are its own country's VAT; a store abroad may ship to you): one honest sentence, no numbers.
 export const DUTIES_NOTE = "Buying from a store in another country can add import duties or tax on delivery; the store's checkout or the carrier tells you.";
 
-// The regions WaxCompare serves. New Zealand and Singapore stay defined (the engine's tables name them) but are not served: the
+// The regions SportsCardCompare serves. New Zealand and Singapore stay defined (the engine's tables name them) but are not served: the
 // 2026-11-07 store probe found too few shops there to compare (NZ: 9 shops, 18 boxes sold by two or more; SG: 4 and 13), so their
 // pages would be thin. Add one back here once its shops are in src/data/stores.json (DECISIONS.md 2026-11-07).
 export const LIVE_REGIONS: readonly Region[] = ["us", "ca", "au", "uk", "eu"];
@@ -112,7 +112,7 @@ export function regionFromTimeZone(tz: string | undefined | null): Region | null
 }
 
 // ─── Region from the visitor's country (the landing page's suggestion, src/app/api/geo) ────────────────────────────────────────
-// Vercel's x-vercel-ip-country is an ISO 3166-1 alpha-2 code. Only the markets WaxCompare compares map to a region; anywhere else
+// Vercel's x-vercel-ip-country is an ISO 3166-1 alpha-2 code. Only the markets SportsCardCompare compares map to a region; anywhere else
 // gets no suggestion (the landing page then shows its region grid without one, never a wrong currency).
 
 /** The eurozone: the countries the EU market's stores (and its euro prices) serve. */

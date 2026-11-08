@@ -1,5 +1,5 @@
-// eBay Marketplace Account Deletion endpoint, required for WaxCompare's own production Browse API keyset (ported from
-// FigureCompare). WaxCompare stores no eBay user data (only listing prices, titles and photos), so a notification needs no
+// eBay Marketplace Account Deletion endpoint, required for SportsCardCompare's own production Browse API keyset (ported from
+// FigureCompare). SportsCardCompare stores no eBay user data (only listing prices, titles and photos), so a notification needs no
 // action: it is acknowledged. Runs only when eBay calls it; no page uses it. Keep it deployed while the keyset exists.
 import { createHash } from "node:crypto";
 import { SITE_URL } from "@/lib/site";

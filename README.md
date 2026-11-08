@@ -1,8 +1,8 @@
-# WaxCompare
+# SportsCardCompare
 
 Sealed sports cards (hobby boxes, jumbo and FOTL boxes, cases, Breaker's Delight, blasters, megas, hangers, value packs and
 packs) compared across independent card shops in each region, in that region's own currency, with live stock. eBay listings
-and Amazon sit above the stores as labelled marketplaces. Live at **waxcompare.app**.
+and Amazon sit above the stores as labelled marketplaces. Live at **sportscardcompare.com**.
 
 A port of MTG Compare's sealed engine (`Specifxx/mtgcompare`, itself DexCompare's sealed app), started 2026-11-07. A Compare
 Empire site: the price alerts run on RiftCompare's shared service, and the family links list the other card sites.
@@ -36,7 +36,7 @@ exports every public table back to `data/public/` and commits it to `main`. The 
 (`src/lib/public-data/`). See DEPLOY.md, "Where the data lives".
 
 - `scripts/import.ts`: every store in `src/data/stores.json` (Shopify `products.json` or WooCommerce's Store API), twice a day.
-- `scripts/ebay-import.ts`: eBay's Browse API with WaxCompare's own keyset, 2,500 calls a day, once a day.
+- `scripts/ebay-import.ts`: eBay's Browse API with SportsCardCompare's own keyset, 2,500 calls a day, once a day.
 - `scripts/amazon-asins.ts` / `scripts/fetch-amazon-prices.ts`: Amazon ASINs in the import, Amazon prices in each build (never
   committed; shown for 24 hours).
 - `scripts/probe-stores.ts` / `scripts/registry-from-probe.ts`: how the store list was found and is refreshed.
@@ -50,7 +50,7 @@ visitor's region in the browser (time zone, then their own pick), never by redir
 ## Money
 
 Every paid link goes through `src/lib/affiliate.ts`, is `rel="sponsored"` and labelled. eBay (EPN campaign 5339155912, custom id
-`wax-<market>-<feed>`) and Amazon (`compareempire-22` until a WaxCompare tag exists) are pinned above the store rows, never counted
+`wax-<market>-<feed>`) and Amazon (`compareempire-22` until a SportsCardCompare tag exists) are pinned above the store rows, never counted
 as a store, never "best price", never a deal. Topps' own US shop is an ordinary store row, sorted by price like the rest; its
 link turns into a Topps Impact deep link once that programme approves (`TOPPS_IMPACT_LINK`, one line). Store rows are always
 sorted by price, and commission never decides the order.

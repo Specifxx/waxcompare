@@ -77,7 +77,7 @@ export function outline(r: RegionInfo, data: GuideData): GuideOutline {
       },
       faqSection([
         { q: "When is Black Friday 2026?", a: "Friday 27 November 2026. Cyber Monday is Monday 30 November 2026. Many stores start earlier in the week." },
-        { q: `Where can I find sports card Black Friday deals in ${r.inName}?`, a: `WaxCompare's Black Friday page lists the sealed boxes the cheapest store in ${r.inName} sells well under the other stores today, updated every day through Black Friday and Cyber Monday.` },
+        { q: `Where can I find sports card Black Friday deals in ${r.inName}?`, a: `SportsCardCompare's Black Friday page lists the sealed boxes the cheapest store in ${r.inName} sells well under the other stores today, updated every day through Black Friday and Cyber Monday.` },
         { q: "Do these prices include shipping?", a: "No: each is the store's listed price, excluding delivery. Check the store's delivery cost before you buy." },
       ]),
       whereToBuy(r, { links: [{ href: bf, label: "Black Friday deals" }, { href: cm, label: "Cyber Monday deals" }] }),

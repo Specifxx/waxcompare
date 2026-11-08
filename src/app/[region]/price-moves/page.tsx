@@ -66,7 +66,7 @@ export default async function PriceMovesPage({ params }: { params: { region: str
           or another lists it; this is what the shelves did, not where they are going.
         </p>
         <p className="mt-2 text-sm text-muted">
-          {data.days > 0 ? `From WaxCompare's daily snapshots: ${data.days} ${data.days === 1 ? "day" : "days"} so far${latest ? `, the latest ${latest}` : ""}.` : "WaxCompare's daily snapshots are not available right now."}
+          {data.days > 0 ? `From SportsCardCompare's daily snapshots: ${data.days} ${data.days === 1 ? "day" : "days"} so far${latest ? `, the latest ${latest}` : ""}.` : "SportsCardCompare's daily snapshots are not available right now."}
           {setNames.length > 0 && <> Sets watched: {setNames.join(", ")}.</>}
         </p>
       </header>
@@ -74,7 +74,7 @@ export default async function PriceMovesPage({ params }: { params: { region: str
       {!data.enough ? (
         <div className="mt-8">
           <Empty actions={[{ href: `/${r.region}/deals`, label: "Deals today" }, { href: `/${r.region}/back-in-stock`, label: "Back in stock" }]}>
-            Not enough history yet: a week-over-week move needs {MIN_DAYS_MOVES} daily snapshots, and WaxCompare has {data.days}. This page fills in by itself once it has them.
+            Not enough history yet: a week-over-week move needs {MIN_DAYS_MOVES} daily snapshots, and SportsCardCompare has {data.days}. This page fills in by itself once it has them.
           </Empty>
         </div>
       ) : (

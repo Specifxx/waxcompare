@@ -1,6 +1,6 @@
 // Loads the committed public data (data/public/*.json) and the eBay call counter (data/state/ebay-calls.json) into the import job's
 // own throwaway Postgres (a GitHub Actions service container), so an import starts from yesterday's rows exactly as if the database
-// had been kept. WaxCompare has NO hosted database (DECISIONS.md 2026-11-07): the committed files are the only copy, the jobs run on
+// had been kept. SportsCardCompare has NO hosted database (DECISIONS.md 2026-11-07): the committed files are the only copy, the jobs run on
 // an empty Postgres that dies with the runner, and nothing in it is private (models.ts PUBLIC_MODELS, plus the call counter).
 //
 //   DATABASE_URL=postgres://…localhost… npx tsx scripts/seed-from-public.ts

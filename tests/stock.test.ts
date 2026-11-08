@@ -164,7 +164,7 @@ test("the stock pages render from data/public: force-dynamic, breadcrumbs JSON-L
     const t = text(html);
     assert.equal(findBannedCopy(t, { history }), null, `${route}: "${findBannedCopy(t, { history })}"`);
     assert.doesNotMatch(t, /investment|will rise|guaranteed/i, route);
-    if (route === "price-moves" && days < MIN_DAYS_MOVES) assert.match(t, /Not enough history yet: a week-over-week move needs 8 daily snapshots, and WaxCompare has \d+/);
+    if (route === "price-moves" && days < MIN_DAYS_MOVES) assert.match(t, /Not enough history yet: a week-over-week move needs 8 daily snapshots, and SportsCardCompare has \d+/);
     if (route === "back-in-stock" && days < 2) assert.match(t, /Not enough history yet/);
     assert.doesNotMatch(t, /\bMTG\b|Magic: The Gathering/, route);
   }

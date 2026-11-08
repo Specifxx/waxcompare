@@ -75,16 +75,10 @@ export function ogCard({ lines, sub, chips, tag, size = 64 }: OgCard): ImageResp
       >
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: 650 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <svg width="64" height="64" viewBox="0 0 64 64">
-              <rect width="64" height="64" rx="14" fill="#0f1c40" />
-              <rect x="12" y="13" width="24" height="34" rx="3" fill="#3d5fb3" stroke="#070d20" strokeWidth="1.2" transform="rotate(-12 26 32)" />
-              <rect x="21" y="10" width="25" height="35" rx="3" fill="#f6f7fb" stroke="#070d20" strokeWidth="1.2" transform="rotate(8 34 30)" />
-              <rect x="24" y="13" width="19" height="22" rx="1.5" fill="#c3d0ee" transform="rotate(8 34 30)" />
-              <circle cx="43" cy="45" r="11" fill="#d8233a" stroke="#070d20" strokeWidth="1.2" />
-              <path d="M43.00 40.00 L44.23 43.30 L47.76 43.45 L45.00 45.65 L45.94 49.05 L43.00 47.10 L40.06 49.05 L41.00 45.65 L38.24 43.45 L41.77 43.30 Z" fill="#fff3f4" />
-            </svg>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img width={64} height={64} alt="SportsCardCompare logo" src={LOGO_MARK} />
             <div style={{ display: "flex", fontSize: 42, fontWeight: 800, letterSpacing: -1 }}>
-              Wax<span style={{ color: BRAND }}>Compare</span>
+              SportsCard<span style={{ color: BRAND }}>Compare</span>
             </div>
             {tag && (
               <div style={{ display: "flex", marginLeft: 8, padding: "4px 14px", borderRadius: 999, background: INK, color: "#ffffff", fontSize: 22, fontWeight: 600 }}>{tag}</div>
@@ -155,3 +149,6 @@ export function wrapWords(text: string, max: number): string[] {
   if (line) out.push(line);
   return out;
 }
+
+/** The logo mark (public/logo.svg), drawn by satori as an image. */
+const LOGO_MARK = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzFkNGZkOCIvPgogIDxnIHRyYW5zZm9ybT0icm90YXRlKC0yNCAzMiA1OCkiPgogICAgPHJlY3QgeD0iMjAiIHk9IjEyIiB3aWR0aD0iMjQiIGhlaWdodD0iMzYiIHJ4PSIzIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMwYjFhM2QiIHN0cm9rZS13aWR0aD0iMSIvPgogICAgPHJlY3QgeD0iMjIuNSIgeT0iMTQuNSIgd2lkdGg9IjE5IiBoZWlnaHQ9IjI0IiByeD0iMS41IiBmaWxsPSIjMGY3YTNmIi8+CiAgICA8ZWxsaXBzZSBjeD0iMjgiIGN5PSIyMSIgcng9IjUiIHJ5PSIzLjIiIGZpbGw9IiM4YjRhMWMiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAyOCAyMSkiLz4KICAgIDxwYXRoIGQ9Ik0yNS42IDIxLjhsNC42LTIuNiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8L2c+CiAgPGcgdHJhbnNmb3JtPSJyb3RhdGUoMjQgMzIgNTgpIj4KICAgIDxyZWN0IHg9IjIwIiB5PSIxMiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjM2IiByeD0iMyIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMGIxYTNkIiBzdHJva2Utd2lkdGg9IjEiLz4KICAgIDxyZWN0IHg9IjIyLjUiIHk9IjE0LjUiIHdpZHRoPSIxOSIgaGVpZ2h0PSIyNCIgcng9IjEuNSIgZmlsbD0iI2ZmN2ExYSIvPgogICAgPGNpcmNsZSBjeD0iMzYiIGN5PSIyMSIgcj0iNC42IiBmaWxsPSIjZmZiMDY2IiBzdHJva2U9IiM3YTMzMDAiIHN0cm9rZS13aWR0aD0iMSIvPgogICAgPHBhdGggZD0iTTMxLjQgMjFoOS4yTTM2IDE2LjR2OS4yIiBzdHJva2U9IiM3YTMzMDAiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjIwIiB5PSI5IiB3aWR0aD0iMjQiIGhlaWdodD0iMzgiIHJ4PSIzIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMwYjFhM2QiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgICA8cmVjdCB4PSIyMi41IiB5PSIxMS41IiB3aWR0aD0iMTkiIGhlaWdodD0iMjYiIHJ4PSIxLjUiIGZpbGw9IiNkMTE5MmYiLz4KICAgIDxnIGZpbGw9IiNmZmYiPgogICAgICA8Y2lyY2xlIGN4PSIzMSIgY3k9IjE3IiByPSIyLjkiLz4KICAgICAgPHBhdGggZD0iTTI4LjMgMjAuNmg1LjRsMS44IDcuMi0xLjguOS45IDguMWgtMi43bC0uOS02LjMtLjkgNi4zaC0yLjdsLjktOC4xLTEuOC0uOXoiLz4KICAgICAgPHBhdGggZD0iTTMzLjcgMjEuNWw3LjItNy4yIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8L2c+CiAgICA8cmVjdCB4PSIyMi41IiB5PSI0MCIgd2lkdGg9IjE5IiBoZWlnaHQ9IjQiIHJ4PSIxIiBmaWxsPSIjMGIxYTNkIi8+CiAgPC9nPgo8L3N2Zz4K";

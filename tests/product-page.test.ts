@@ -148,7 +148,7 @@ test("sold out: the callout's eBay box is the server's search (soldout-ebay, Ad,
   assert.ok(box.length < html.length, "a labelled unit: data-ad=soldout-ebay");
   assert.match(box, /class="ad-pill[^"]*">Ad</);
   assert.match(box, /aria-label="eBay"/);
-  const ebay = links(html).filter((l) => new URL(l.href, "https://waxcompare.app").hostname.endsWith("ebay.co.uk"));
+  const ebay = links(html).filter((l) => new URL(l.href, "https://sportscardcompare.com").hostname.endsWith("ebay.co.uk"));
   assert.equal(ebay.length, 1, "ONE eBay link in the server HTML: the search (the listing is browser-only)");
   const u = new URL(ebay[0].href);
   assert.equal(u.searchParams.get("customid"), "wax-uk-soldout-ebay");
@@ -271,10 +271,10 @@ test("the title: name + the cheapest open price and where; fits 65 or goes absol
   assert.deepEqual(t, { absolute: "2025 Topps Chrome Baseball Hobby Box — from $245 at 19 US stores" });
   const sold = productTitle({ name: "2025 Bowman Baseball Jumbo Box", market: "UK", inName: "the UK", cheapestCents: null, where: null });
   assert.deepEqual(sold, { absolute: "2025 Bowman Baseball Jumbo Box — price & stock in the UK" }, "too long for the suffix");
-  assert.equal(renderedTitle("short"), "short | WaxCompare");
+  assert.equal(renderedTitle("short"), "short | SportsCardCompare");
   assert.doesNotMatch(JSON.stringify([t, sold]), /MTG|Magic/);
-  assert.deepEqual(fitTitle("x".repeat(52)), "x".repeat(52), "52 + ' | WaxCompare' = 65");
-  assert.deepEqual(fitTitle("x".repeat(53)), { absolute: "x".repeat(53) });
+  assert.deepEqual(fitTitle("x".repeat(45)), "x".repeat(45), "45 + ' | SportsCardCompare' = 65");
+  assert.deepEqual(fitTitle("x".repeat(46)), { absolute: "x".repeat(46) });
   assert.equal(shortDate("2026-07-17"), "17 Jul 2026");
   assert.equal(releaseChip("2026-07-17", false), "Released 17 Jul 2026");
   assert.equal(releaseChip("2026-11-06", true), "Pre-order · out 6 Nov 2026");

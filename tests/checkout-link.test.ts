@@ -22,7 +22,7 @@ test("the cart permalink, and the offer link that uses it", () => {
   const link = offerLink("cherry", `${PRODUCT}?variant=${ID}`, "au", "product-best");
   const u = new URL(link.href);
   assert.equal(u.pathname, `/cart/${ID}:1`);
-  assert.equal(u.searchParams.get("utm_source"), "waxcompare");
+  assert.equal(u.searchParams.get("utm_source"), "sportscardcompare");
   assert.equal(u.searchParams.get("utm_content"), "checkout");
   assert.ok(isCheckoutLink(link.href));
   assert.equal(offerLink("cherry", PRODUCT, "au", "product-best").href, PRODUCT, "no variant → product page, untouched");

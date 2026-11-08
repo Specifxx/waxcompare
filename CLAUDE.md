@@ -1,6 +1,6 @@
 # Working in this repo
 
-WaxCompare (waxcompare.app) is a **sealed-only sports card** price comparison site: hobby, jumbo and FOTL boxes, cases, blasters,
+SportsCardCompare (sportscardcompare.com) is a **sealed-only sports card** price comparison site: hobby, jumbo and FOTL boxes, cases, blasters,
 megas, hangers and packs, compared across independent card shops in each region, with eBay, Amazon and Topps links. A port of MTG
 Compare's sealed engine (itself DexCompare's), started 2026-11-07 (owner approved the niche 2026-11-06). Read `README.md`, then
 `DEPLOY.md`, then `DECISIONS.md` (entries before 2026-11-07 are MTG Compare's and DexCompare's; the engine's rules come from them).
@@ -61,7 +61,7 @@ prices into the git-ignored `data/amazon-live/`; `lib/amazon-live.ts` gives the 
 ## eBay
 
 - Only `scripts/ebay-import.ts` (GitHub Actions) calls eBay's Browse API; the website never calls eBay and holds no eBay credential.
-- WaxCompare has its OWN keyset (owner, 2026-11-06: a new site never shares a sister's keys), capped at 2,500 calls a day
+- SportsCardCompare has its OWN keyset (owner, 2026-11-06: a new site never shares a sister's keys), capped at 2,500 calls a day
   (`EBAY_DAILY_CAP`). Never raise it, or point the import at another site's keys, without the owner.
 - eBay rows are labelled ads, pinned above the stores, never counted as a store and never re-ranked into store rows.
 

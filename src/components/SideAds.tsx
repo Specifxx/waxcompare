@@ -13,7 +13,7 @@ import { EbayMark } from "./EbayMark";
 import { OutboundLink } from "./OutboundLink";
 import { AdDock, DockGate, DockTile, DOCK_LINK, type DockSide } from "./AdDock";
 
-// The two side rails (ported from DexCompare 2026-11-06, owner: "I really want those ads to be on WaxCompare"; DexCompare's brief, 2026-11-03: "a lot of space on the very, very left … and the very, very right … the left side could be
+// The two side rails (ported from DexCompare 2026-11-06, owner: "I really want those ads to be on SportsCardCompare"; DexCompare's brief, 2026-11-03: "a lot of space on the very, very left … and the very, very right … the left side could be
 // eBay and the right side TCGplayer … only if you can fit it. If you can't fit it, then don't use the ads"): real sealed eBay listings
 // stacked down the far left of a wide screen, the newest sets' TCGplayer products down the far right, both OUTSIDE the page shell
 // (max-w-shell, 1480px), fixed beside it under the sticky header.

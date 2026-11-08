@@ -172,7 +172,7 @@ export async function generateMetadata({ params }: { params: { region: string; s
   const gap = priceGap(open.filter((o) => !o.marketplace).map((o) => ({ priceCents: o.priceCents, storeName: o.storeName })));
   return {
     ...meta,
-    // " | WaxCompare" only where the whole title still fits in 65 characters (title.absolute otherwise)
+    // " | SportsCardCompare" only where the whole title still fits in 65 characters (title.absolute otherwise)
     title,
     // With a real price gap here, the share card draws it (app/og/p/[region]/[slug], lib/share-link.ts); else the photo.
     openGraph: {

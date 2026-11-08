@@ -7,7 +7,7 @@ import { priceGap, shareText, shareUrl } from "../src/lib/share-link";
 const read = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
 
 test("every shared link carries utm_source=share and its medium", () => {
-  assert.equal(shareUrl("https://waxcompare.app", "/us/p/x", "product"), "https://waxcompare.app/us/p/x?utm_source=share&utm_medium=product");
+  assert.equal(shareUrl("https://sportscardcompare.com", "/us/p/x", "product"), "https://sportscardcompare.com/us/p/x?utm_source=share&utm_medium=product");
 });
 
 test("the price gap needs two stores and a real spread", () => {

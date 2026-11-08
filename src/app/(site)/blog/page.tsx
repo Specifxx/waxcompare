@@ -21,7 +21,7 @@ export default function BlogIndex() {
   const ld = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "WaxCompare blog",
+    name: "SportsCardCompare blog",
     itemListElement: POSTS.map((p, i) => ({
       "@type": "ListItem",
       position: i + 1,
@@ -32,12 +32,12 @@ export default function BlogIndex() {
   return (
     <div className="page py-8">
       <Breadcrumbs
-        items={[{ href: "/", label: "WaxCompare" }, { label: "Blog" }]}
+        items={[{ href: "/", label: "SportsCardCompare" }, { label: "Blog" }]}
       />
       <header className="max-w-3xl">
         <div className="eyebrow">Blog</div>
         <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          The WaxCompare blog
+          The SportsCardCompare blog
         </h1>
         <p className="mt-3 text-lg leading-8 text-muted">
           New sports card releases and sealed prices across the markets we

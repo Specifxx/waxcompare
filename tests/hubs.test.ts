@@ -99,7 +99,7 @@ test("topStores: the most in stock, read within 72 hours, at most ten", () => {
 
 // ─── The calendar file ─────────────────────────────────────────────────────────
 
-const TREK = { code: "trk", name: "Star Trek", date: "2026-11-13", url: "https://waxcompare.app/au/sets/star-trek", stamp: new Date("2026-10-14T09:30:00Z") };
+const TREK = { code: "trk", name: "Star Trek", date: "2026-11-13", url: "https://sportscardcompare.com/au/sets/star-trek", stamp: new Date("2026-10-14T09:30:00Z") };
 
 test("ics helpers: TEXT escapes, folding never splits a character, the next day across a month and a year", () => {
   assert.equal(escapeIcsText("a,b;c\\d\ne"), "a\\,b\\;c\\\\d\\ne");
@@ -125,7 +125,7 @@ test("AddToCalendar: a real button the server renders at its final size, named f
 // ─── The pages' wiring ─────────────────────────────────────────────────────────
 
 
-// ─── WaxCompare (2026-11-07): sports releases, built from their parts (data/sets/releases.json starts empty) ───────────────────
+// ─── SportsCardCompare (2026-11-07): sports releases, built from their parts (data/sets/releases.json starts empty) ───────────────────
 import { partsOf, releaseFor } from "../src/lib/sets";
 
 const chrome = releaseFor(partsOf("2025|chrome|baseball")!, "2026-10-01");
@@ -183,8 +183,8 @@ test("the type pages: no pack counts or MSRPs are claimed, and every box slug ha
 });
 
 test("the calendar file: a dated release as an all-day event, a code made safe for the UID", () => {
-  const ics = buildIcs({ code: dated.code, name: dated.name, date: dated.releaseDate, url: "https://waxcompare.app/us/sets/2025-topps-chrome-baseball", stamp: new Date("2026-11-07T00:00:00Z") } as never);
-  assert.match(ics, /UID:2025-chrome-baseball-release@waxcompare\.app/);
+  const ics = buildIcs({ code: dated.code, name: dated.name, date: dated.releaseDate, url: "https://sportscardcompare.com/us/sets/2025-topps-chrome-baseball", stamp: new Date("2026-11-07T00:00:00Z") } as never);
+  assert.match(ics, /UID:2025-chrome-baseball-release@sportscardcompare\.com/);
   assert.match(ics, /DTSTART;VALUE=DATE:20261203/);
   assert.match(ics, /DTEND;VALUE=DATE:20261204/);
   assert.match(ics, /SUMMARY:2025 Topps Chrome Baseball release/);

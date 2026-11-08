@@ -1,7 +1,7 @@
 // Outbound links. The site earns only through affiliate links, and only two:
 //   • eBay Partner Network: plain SEARCH links (the header item, the product page's marketplace
 //     rows, the strips' "See all" and compact CTA) and LISTING links. The listings are imported
-//     once a day by a GitHub Actions job with WaxCompare's own Browse API keys
+//     once a day by a GitHub Actions job with SportsCardCompare's own Browse API keys
 //     (scripts/ebay-import.ts, lib/ebay-api.ts) and stored in our database; the website never
 //     calls eBay and holds no eBay credential. Listing links carry eBay's own affiliate URL
 //     (campaign below) exactly as eBay returned it (listingHref only validates); its customid is set per feed at import time.
@@ -388,11 +388,11 @@ export const TCGPLAYER_IMPACT_LINK = process.env.NEXT_PUBLIC_TCGPLAYER_IMPACT_LI
 
 // Impact's site-ownership tokens for this account's promotional properties. The
 // first is the one every CompareEmpire site renders; the second is the token
-// Impact issued for waxcompare.app. Both are rendered, so neither verification lapses while Impact
+// Impact issued for sportscardcompare.com. Both are rendered, so neither verification lapses while Impact
 // re-checks a property for its token. Rendered by app/layout.tsx.
 export const IMPACT_SITE_VERIFICATIONS: readonly string[] = [
   "ebb0400c-dec0-45ae-a56e-e7bb1596e965",
-  "a11ca5e9-2699-42c9-bf8d-09074aae9cec", // WaxCompare's own Impact property (the old singles site rendered it)
+  "a11ca5e9-2699-42c9-bf8d-09074aae9cec", // SportsCardCompare's own Impact property (the old singles site rendered it)
 ];
 
 // TCGPLAYER.key in stores.ts. Not imported from there: stores.ts pulls in the
@@ -519,7 +519,7 @@ export function offerLink(store: string, url: string, region: Region, placement:
   const cart = shopifyCartUrl(url);
   if (cart) {
     const c = new URL(cart);
-    c.searchParams.set("utm_source", "waxcompare");
+    c.searchParams.set("utm_source", "sportscardcompare");
     c.searchParams.set("utm_medium", "referral");
     c.searchParams.set("utm_content", "checkout");
     return { href: c.toString(), rel: REL_STORE, sponsored: false };

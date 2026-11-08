@@ -33,7 +33,7 @@ const RAW: unknown[] = FIXTURE.itemSummaries;
 const by = (needle: string) => RAW.find((r) => (r as { title: string }).title.includes(needle));
 
 // ─── the high-end sealed ("chase") feed ─────────────────────────────────────────
-// WaxCompare lists no single cards: the "chase" feed key holds hobby, jumbo, FOTL and Breaker's Delight boxes and hobby cases, through
+// SportsCardCompare lists no single cards: the "chase" feed key holds hobby, jumbo, FOTL and Breaker's Delight boxes and hobby cases, through
 // the same classifier as every other feed.
 
 test("normaliseChase: accepts the good fixtures and keeps only whitelisted fields, with shipping", () => {

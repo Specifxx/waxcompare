@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: { params: { region: string } 
     ...meta,
     title,
     // The region's own share card (app/og/[region]): what a link to /au or /us shows on Reddit, Discord or X.
-    openGraph: { ...meta.openGraph, images: [ogCardImage(`/og/${r.region}`, `WaxCompare: sealed sports card prices across ${n} ${r.adjective} card shops`)] },
+    openGraph: { ...meta.openGraph, images: [ogCardImage(`/og/${r.region}`, `SportsCardCompare: sealed sports card prices across ${n} ${r.adjective} card shops`)] },
   };
 }
 
@@ -106,7 +106,7 @@ export default async function RegionHome({ params }: { params: { region: string 
       <section className="wx-hero">
         <div className="wx-hero-in grid gap-8 pb-10 pt-6 sm:pb-12 sm:pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(340px,480px)] lg:items-center lg:gap-10">
           <div className="min-w-0">
-            <Breadcrumbs items={[{ href: "/", label: "WaxCompare" }, { label: r.name }]} />
+            <Breadcrumbs items={[{ href: "/", label: "SportsCardCompare" }, { label: r.name }]} />
             <p className="wx-kicker">
               <Flag code={r.short} /> {r.name} · prices in {r.currency}
             </p>
@@ -289,7 +289,7 @@ export default async function RegionHome({ params }: { params: { region: string 
 
         {overview.products === 0 && (
           <div className="mt-10">
-            <Empty actions={[{ href: `/${other.region}`, label: `WaxCompare ${other.name}` }]}>We&rsquo;re still reading {r.adjective} stores for the first time. Check back shortly.</Empty>
+            <Empty actions={[{ href: `/${other.region}`, label: `SportsCardCompare ${other.name}` }]}>We&rsquo;re still reading {r.adjective} stores for the first time. Check back shortly.</Empty>
           </div>
         )}
       </div>
@@ -394,7 +394,7 @@ function HowItWorks({ r, stores }: { r: RegionInfo; stores: number }) {
   return (
     <section className="mt-16" aria-labelledby="how">
       <h2 id="how" className="font-display text-xl font-bold tracking-tight">
-        How WaxCompare works
+        How SportsCardCompare works
       </h2>
       <ol className="mt-4 grid gap-3 md:grid-cols-3">
         {steps.map((s) => (

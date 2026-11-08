@@ -41,7 +41,7 @@ for attempt in 1 2 3 4 5; do
     echo "[publish] main already has this snapshot."
     exit 0
   fi
-  git commit -q -m "WaxCompare data: $(date -u +%Y-%m-%dT%H:%MZ) ($WHY)$MARK" -m "Public data export (data/public/), the files the site reads. WaxCompare has no hosted database."
+  git commit -q -m "SportsCardCompare data: $(date -u +%Y-%m-%dT%H:%MZ) ($WHY)$MARK" -m "Public data export (data/public/), the files the site reads. SportsCardCompare has no hosted database."
   if git push -q origin HEAD:main; then
     echo "[publish] pushed $(git rev-parse --short HEAD) on attempt $attempt."
     exit 0

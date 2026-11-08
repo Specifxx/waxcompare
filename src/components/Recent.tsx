@@ -9,7 +9,7 @@ import type { Region } from "@/lib/regions";
 type Rail = (typeof import("./ProductRail"))["ProductRail"];
 
 // "Recently viewed": the last products a visitor opened, per region, kept ONLY in their browser (localStorage
-// `wax-recent-<region>`, slugs only). Nothing is sent to WaxCompare and there is no account: the privacy page says so, and clearing
+// `wax-recent-<region>`, slugs only). Nothing is sent to SportsCardCompare and there is no account: the privacy page says so, and clearing
 // the site's data (or the rail's own "Clear") removes it. Every storage access is wrapped: a private window, blocked storage or a
 // full quota means no rail, never an error.
 //
@@ -148,7 +148,7 @@ export function RecentlyViewed({ region, exclude }: { region: Region; exclude?: 
       </div>
       <Rail products={cards} region={region} label="Recently viewed" />
       <p className="mt-3 text-xs leading-5 text-muted">
-        Current prices and stock{checkedAt ? ` (checked ${timeAgo(checkedAt)})` : ""}. This list stays in your browser; WaxCompare never receives it.
+        Current prices and stock{checkedAt ? ` (checked ${timeAgo(checkedAt)})` : ""}. This list stays in your browser; SportsCardCompare never receives it.
       </p>
     </section>
   );

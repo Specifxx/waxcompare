@@ -1,11 +1,11 @@
-// WaxCompare's forum settings (the rules are in ./core.ts, docs/forum.md).
+// SportsCardCompare's forum settings (the rules are in ./core.ts, docs/forum.md).
 import type { ForumSite } from "./core";
 
 export const FORUM_SITE: ForumSite = {
   site: "waxcompare",
-  siteName: "WaxCompare",
+  siteName: "SportsCardCompare",
   repo: "Specifxx/waxcompare",
-  hosts: ["waxcompare.app", "www.waxcompare.app"],
+  hosts: ["sportscardcompare.com", "www.sportscardcompare.com"],
   base: "/forum",
   topic: "sealed sports cards",
   intro: "Talk sealed sports card prices, new releases, hobby vs retail and what you're chasing with other collectors.",
@@ -55,5 +55,5 @@ export const FORUM_SITE: ForumSite = {
       ]
     }
   ],
-  reserved: ["waxcompare", "wax compare", "topps", "panini"],
+  reserved: ["waxcompare", "wax compare", "sportscardcompare", "sports card compare", "topps", "panini"],
 };

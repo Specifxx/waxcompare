@@ -12,7 +12,7 @@ import { Flag } from "@/components/Flag";
 
 type FooterLink = { href: string; label: string };
 
-/** The footer's link columns. Region pages get Shop, Latest releases, Explore and WaxCompare; pages with no region, Regions and WaxCompare. Pure (no database). */
+/** The footer's link columns. Region pages get Shop, Latest releases, Explore and SportsCardCompare; pages with no region, Regions and SportsCardCompare. Pure (no database). */
 export function footerColumns(region: Region | null, listed?: ReadonlySet<string> | null): { title: string; links: FooterLink[] }[] {
   const site: FooterLink[] = [
     { href: "/about", label: "About & how it works" },
@@ -31,7 +31,7 @@ export function footerColumns(region: Region | null, listed?: ReadonlySet<string
   if (!region) {
     return [
       { title: "Regions", links: [...REGION_LIST.map((r) => ({ href: `/${r.region}`, label: r.name })), { href: COUNTRY_GUIDE.path, label: "Prices by country" }] },
-      { title: "WaxCompare", links: site },
+      { title: "SportsCardCompare", links: site },
     ];
   }
   const s = (key: SectionKey, label: string) => ({ href: sectionHref(region, key), label });
@@ -48,7 +48,7 @@ export function footerColumns(region: Region | null, listed?: ReadonlySet<string
     },
     // Every guide offered in the region (components/seo/HubLinks): no guide is an orphan.
     ...footerSeoSections(region).filter((sec) => sec.title === "Guides"),
-    { title: "WaxCompare", links: site },
+    { title: "SportsCardCompare", links: site },
   ];
 }
 
@@ -70,7 +70,7 @@ export function Footer({ region, listed }: { region: Region | null; listed?: Rea
           <Link href={r ? `/${r.region}` : "/"} className="inline-flex min-h-10 items-center gap-2 font-display text-lg font-extrabold tracking-tight">
             <LogoMark className="h-7 w-7" />
             <span>
-              Wax<span className="text-brand">Compare</span>
+              SportsCard<span className="text-brand">Compare</span>
             </span>
             {r && (
               <span className="ml-1 rounded-full border border-line px-2 py-0.5 font-sans text-xs font-semibold text-muted">

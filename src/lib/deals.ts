@@ -183,13 +183,13 @@ for (const s of SETS) {
   if (any) MSRP_SETS.push(s.code);
 }
 
-// ─── New on WaxCompare ──────────────────────────────────────────────────────────
+// ─── New on SportsCardCompare ──────────────────────────────────────────────────────────
 
-/** How far back "first seen by WaxCompare" looks. */
+/** How far back "first seen by SportsCardCompare" looks. */
 export const NEW_DAYS = 14;
 /**
- * A day on which WaxCompare created this many products or more is an import event (the 2026-09-25 launch created 7,007; a
- * re-grouping re-creates hundreds), not new listings: its products are left out of "New on WaxCompare".
+ * A day on which SportsCardCompare created this many products or more is an import event (the 2026-09-25 launch created 7,007; a
+ * re-grouping re-creates hundreds), not new listings: its products are left out of "New on SportsCardCompare".
  */
 export const BULK_DAY = 200;
 
@@ -344,9 +344,9 @@ export async function belowMsrpUS(take = 24): Promise<ProductCardData[]> {
 }
 
 /**
- * Products WaxCompare first saw in the last NEW_DAYS days that are open in this market, newest first. One read: a CTE counts the
+ * Products SportsCardCompare first saw in the last NEW_DAYS days that are open in this market, newest first. One read: a CTE counts the
  * Product rows created per day since newSince() and drops every day with BULK_DAY or more (imports, re-groupings), as
- * newlyTrackedFilter does. Product.createdAt is when WaxCompare created the row, not a release date: the page says so.
+ * newlyTrackedFilter does. Product.createdAt is when SportsCardCompare created the row, not a release date: the page says so.
  */
 export async function newlyTracked(market: Market, take = 24, now = new Date()): Promise<ProductCardData[]> {
   const since = newSince(now).toISOString();
@@ -432,7 +432,7 @@ export function nearestRegion(region: Region): Region {
 }
 
 const SUFFIX = ` | ${SITE_NAME}`;
-/** A page title: the layout's " | WaxCompare" template when the whole fits in 65 characters, otherwise the title alone (absolute). */
+/** A page title: the layout's " | SportsCardCompare" template when the whole fits in 65 characters, otherwise the title alone (absolute). */
 export function fitTitle(title: string): string | { absolute: string } {
   return title.length + SUFFIX.length <= 65 ? title : { absolute: title };
 }
@@ -484,7 +484,7 @@ export const digestCopy = {
     `What’s releasing in the next ${SOON_DAYS} days and open for pre-order, what came out in the last ${JUST_RELEASED_DAYS}, and what’s cheaper than most ${r.adjective} card shops today. Every number is today’s, checked against each store’s own listings.`,
   description: (r: R) =>
     `Sports card releases in the next ${SOON_DAYS} days with pre-orders, releases just out, and sealed boxes cheaper than most ${r.adjective} card shops today.`,
-  newLabel: `First seen by WaxCompare in the last ${NEW_DAYS} days — not necessarily new releases`,
+  newLabel: `First seen by SportsCardCompare in the last ${NEW_DAYS} days — not necessarily new releases`,
 };
 
 export const homeCopy = {

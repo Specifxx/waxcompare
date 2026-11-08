@@ -1,4 +1,4 @@
-// WaxCompare's eBay keyset is its own, 2,500 Browse calls a day (owner's rule: a new site never shares a sister's keys; raise
+// SportsCardCompare's eBay keyset is its own, 2,500 Browse calls a day (owner's rule: a new site never shares a sister's keys; raise
 // nothing without the owner). The importer's defaults, the clamp and the workflow's fallbacks all say 2,500, and the day's spend
 // survives the job's throwaway database through data/state/ebay-calls.json.
 import { test } from "node:test";

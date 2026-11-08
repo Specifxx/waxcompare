@@ -16,7 +16,7 @@ export function SinglesNote({ r, className = "page mt-14" }: { r: RegionInfo; cl
           Looking for single card prices?
         </h2>
         <p className="mt-2">
-          WaxCompare compares <strong className="text-ink">sealed sports cards</strong>: hobby, jumbo, mega and blaster boxes, cases and packs, across card shops in{" "}
+          SportsCardCompare compares <strong className="text-ink">sealed sports cards</strong>: hobby, jumbo, mega and blaster boxes, cases and packs, across card shops in{" "}
           {r.inName}. Single cards, graded cards, breaks and store-made repacks are left out, so every product page compares the same factory-sealed item from shop to
           shop.
         </p>

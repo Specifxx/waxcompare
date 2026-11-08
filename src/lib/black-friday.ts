@@ -3,7 +3,7 @@
 // WHAT IT LISTS, AND WHAT IT NEVER SAYS. Today's products whose cheapest in-stock price is furthest under the median of the stores
 // that have it (lib/deals.ts, the same 10% bar as the /deals page and every card's badge), ranked by how far under; and, once the
 // site has a week of its own daily snapshots (lib/price-history.ts), the products whose price today is under their own recent
-// typical price. Never a "was" price, a countdown, "ends soon" or "limited time": the stores set their own sales, and WaxCompare only
+// typical price. Never a "was" price, a countdown, "ends soon" or "limited time": the stores set their own sales, and SportsCardCompare only
 // knows what they ask when it last checked. Nothing here may match BANNED_COPY (lib/copy-rules.ts).
 import type { RegionInfo } from "./regions";
 

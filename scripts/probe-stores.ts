@@ -1,4 +1,4 @@
-// Probe candidate stores LIVE and decide which ones WaxCompare should read.
+// Probe candidate stores LIVE and decide which ones SportsCardCompare should read.
 //
 //   npx tsx scripts/probe-stores.ts --in candidates.json [--in more.json] \
 //     [--out probe-output/probe.json] [--write] [--min 3] [--concurrency 8]

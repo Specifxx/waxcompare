@@ -13,7 +13,7 @@ export function outline(r: RegionInfo, data: GuideData): GuideOutline {
   return {
     intro: (
       <Lede>
-        Sealed sports card boxes are sold online by independent card shops as well as the big retailers. WaxCompare reads {r.adjective} card shops’ own
+        Sealed sports card boxes are sold online by independent card shops as well as the big retailers. SportsCardCompare reads {r.adjective} card shops’ own
         listings and puts their prices side by side, in {r.currency}. Here’s who has the most in stock today.
       </Lede>
     ),

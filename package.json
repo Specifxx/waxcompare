@@ -2,7 +2,7 @@
   "name": "waxcompare",
   "version": "1.0.0",
   "private": true,
-  "description": "WaxCompare — compare Magic: The Gathering sealed product prices and stock across independent stores.",
+  "description": "SportsCardCompare — compare Magic: The Gathering sealed product prices and stock across independent stores.",
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "prisma generate && (tsx scripts/fetch-awin.ts || true) && (tsx scripts/fetch-amazon-prices.ts || true) && next build",

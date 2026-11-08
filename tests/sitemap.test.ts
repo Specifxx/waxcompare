@@ -15,9 +15,9 @@ const onSite = (entries: { url: string }[]) => {
   }
 };
 
-test("SITE_URL has no trailing slash and defaults to waxcompare.app", () => {
+test("SITE_URL has no trailing slash and defaults to sportscardcompare.com", () => {
   assert.ok(!SITE_URL.endsWith("/"));
-  if (!process.env.NEXT_PUBLIC_SITE_URL) assert.equal(SITE_URL, "https://waxcompare.app");
+  if (!process.env.NEXT_PUBLIC_SITE_URL) assert.equal(SITE_URL, "https://sportscardcompare.com");
 });
 
 test("sitemap ids: 0 = static, 1..N = REGION_LIST order", () => {
@@ -43,7 +43,7 @@ test("static sitemap: root, trust pages, every region's landing pages, every sto
   for (const r of REGION_LIST) for (const p of ["", "/sealed", "/sets", "/stores", "/releases", "/deals", "/this-week", "/guides"]) assert.ok(urls.has(`${SITE_URL}/${r.region}${p}`), `${r.region}${p}`);
   const at = (p: string) => entries.find((e) => e.url === `${SITE_URL}${p}`)!;
   assert.deepEqual([at("/au/deals").changeFrequency, at("/au/deals").priority, at("/au/deals").lastModified], ["daily", 0.7, when]);
-  assert.ok(!urls.has(`${SITE_URL}/au/cheapest-packs`) && !urls.has(`${SITE_URL}/au/preorders`), "routes WaxCompare does not have");
+  assert.ok(!urls.has(`${SITE_URL}/au/cheapest-packs`) && !urls.has(`${SITE_URL}/au/preorders`), "routes SportsCardCompare does not have");
   assert.deepEqual([at("/au/this-week").changeFrequency, at("/au/this-week").priority], ["daily", 0.5]);
   assert.deepEqual([at("/au/guides").changeFrequency, at("/au/guides").priority, at("/au/guides").lastModified], ["weekly", 0.5, undefined], "an editorial index: no import-time lastmod");
   for (const s of STORES) assert.ok(urls.has(`${SITE_URL}/${s.market.toLowerCase()}/stores/${s.key}`), s.key);

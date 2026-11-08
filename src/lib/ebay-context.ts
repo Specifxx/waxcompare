@@ -4,7 +4,7 @@
 // server: ebay-context-parse.ts).
 //
 // Where the data comes from: scripts/ebay-import.ts, a GitHub Actions job that runs once a day
-// with WaxCompare's own keys, searches eBay's Browse API and REPLACES each feed's rows in the
+// with SportsCardCompare's own keys, searches eBay's Browse API and REPLACES each feed's rows in the
 // EbayListing table. The web route (src/app/api/ebay/[region]/route.ts) only READS that table:
 // no eBay call, no token, no secret exists in the web runtime.
 //

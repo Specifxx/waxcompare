@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   // Large image previews and full snippets in Google (Search, Discover, Images), as RiftCompare does.
   // A page that sets its own `robots` (noindex) replaces this whole object.
   robots: { googleBot: { "max-image-preview": "large", "max-snippet": -1 } },
-  // Search Console ownership of waxcompare.app (owner, 2026-10-16); GOOGLE_SITE_VERIFICATION replaces it.
+  // Search Console ownership of sportscardcompare.com (owner, 2026-10-16); GOOGLE_SITE_VERIFICATION replaces it.
   verification: { google: process.env.GOOGLE_SITE_VERIFICATION || "N0wgTl_HUriBqcifrYzMsLDL2KYnnzOY7q8AG0XUS_U" },
 };
 

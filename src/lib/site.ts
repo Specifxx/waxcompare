@@ -2,8 +2,8 @@
 // every canonical, hreflang, JSON-LD, robots and sitemap URL is built on it, so
 // a wrong value here is a wrong value in every one of them. NEXT_PUBLIC_SITE_URL
 // in Vercel overrides the default; DEPLOY.md, "Domains" says what to set.
-export const SITE_NAME = "WaxCompare";
-export const SITE_URL = normaliseOrigin(process.env.NEXT_PUBLIC_SITE_URL) ?? "https://waxcompare.app";
+export const SITE_NAME = "SportsCardCompare";
+export const SITE_URL = normaliseOrigin(process.env.NEXT_PUBLIC_SITE_URL) ?? "https://sportscardcompare.com";
 // The mailbox the footer, contact, terms and privacy pages (and the scrapers' From header) give: the Compare Empire
 // family inbox, compareempire@gmail.com, for every site without its own (owner, 2026-11-01: "the sites that they don't,
 // just use compareempire@gmail.com"). NEXT_PUBLIC_CONTACT_EMAIL overrides it.
@@ -61,7 +61,7 @@ export function sectionHref(region: string, key: SectionKey): string {
   return `/${region}${SECTION_PATHS[key]}`;
 }
 
-/** "https://waxcompare.app/" → "https://waxcompare.app"; garbage → null. */
+/** "https://sportscardcompare.com/" → "https://sportscardcompare.com"; garbage → null. */
 function normaliseOrigin(v: string | undefined): string | null {
   if (!v) return null;
   try {

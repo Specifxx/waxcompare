@@ -29,7 +29,7 @@ const DESCRIPTION = `Compare sealed sports card hobby box, blaster and mega box 
 
 /**
  * The landing page's metadata. hreflang: the seven region homes, and x-default this page, the region chooser that every region
- * home names as its own x-default (seo.ts regionAlternates): the return links. `absolute`: the layout's "%s | WaxCompare" template
+ * home names as its own x-default (seo.ts regionAlternates): the return links. `absolute`: the layout's "%s | SportsCardCompare" template
  * would brand it twice. The share card is the site's (app/opengraph-image.tsx).
  */
 export const metadata: Metadata = {

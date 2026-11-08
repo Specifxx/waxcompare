@@ -44,9 +44,9 @@ export const POST_BY_SLUG: ReadonlyMap<string, Post> = new Map(
 );
 export const postPath = (slug: string) => `/blog/${slug}`;
 
-/** The <title>: the template adds " | WaxCompare" when the whole still fits in 60; otherwise the title alone. */
+/** The <title>: the template adds " | SportsCardCompare" when the whole still fits in 60; otherwise the title alone. */
 export function postMetaTitle(title: string): string | { absolute: string } {
-  return title.length + " | WaxCompare".length <= 60
+  return title.length + " | SportsCardCompare".length <= 60
     ? title
     : { absolute: title };
 }

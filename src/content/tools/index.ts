@@ -17,7 +17,7 @@ export interface ToolFaq {
 
 export interface Tool {
   slug: ToolSlug;
-  /** The H1 and the <title> (with " | WaxCompare" where it fits in 65 characters). */
+  /** The H1 and the <title> (with " | SportsCardCompare" where it fits in 65 characters). */
   title: string;
   /** Meta description and the index card's text: at most 160 characters. */
   description: string;
@@ -44,7 +44,7 @@ export const TOOLS: readonly Tool[] = [
     kicker: "Value checker",
     lede: "Search any sealed sports card box to see what independent card shops charge for it today, and how a price you were quoted compares.",
     about: [
-      "The value checker reads the same data as the rest of WaxCompare: every independent store we track in your region, read about twice a day, with each store's own listed price and whether it has the product in stock. Search a hobby, jumbo, mega or blaster box, and it shows the cheapest in-stock price, the median of the stores that have it in stock, and how many stores have it.",
+      "The value checker reads the same data as the rest of SportsCardCompare: every independent store we track in your region, read about twice a day, with each store's own listed price and whether it has the product in stock. Search a hobby, jumbo, mega or blaster box, and it shows the cheapest in-stock price, the median of the stores that have it in stock, and how many stores have it.",
       "Type a price into the box under the result and the checker tells you where that price sits: under the cheapest store, between the cheapest and the median, or above what most stores ask. That makes it useful when a local card shop quotes a price, a friend offers you a box, or a marketplace listing looks cheap: you can see in a few seconds what the same product costs from a store right now.",
       "Sealed product only. For a single card, check recent sold listings on eBay instead. The checker never guesses what a product will be worth later: it reports what stores ask today, and says when they were last checked.",
     ],
@@ -55,9 +55,9 @@ export const TOOLS: readonly Tool[] = [
       "Optional: type the price you were offered to see how it compares.",
     ],
     faq: [
-      { q: "Where do the prices come from?", a: "From the independent online stores WaxCompare reads in your region, about twice a day. Each price is the store's own listed price, excluding shipping, and the result says when the stores were last checked." },
+      { q: "Where do the prices come from?", a: "From the independent online stores SportsCardCompare reads in your region, about twice a day. Each price is the store's own listed price, excluding shipping, and the result says when the stores were last checked." },
       { q: "What does the median mean here?", a: "The middle price of the stores that have the product in stock today. Half of those stores ask less and half ask more. It needs at least two stores in stock; with fewer, the checker shows the cheapest price alone." },
-      { q: "Can it value a single card?", a: "No. WaxCompare compares sealed product: hobby, jumbo, mega and blaster boxes, cases and packs. For a single card, look at recent sold listings for the same card at the same grade." },
+      { q: "Can it value a single card?", a: "No. SportsCardCompare compares sealed product: hobby, jumbo, mega and blaster boxes, cases and packs. For a single card, look at recent sold listings for the same card at the same grade." },
       { q: "Does a price under the median mean it is a good buy?", a: "It means it is cheaper than most stores ask today. Check the seller, the shipping cost and the shrink-wrap before you pay, especially when a price is far below every store's." },
       { q: "Why is a product missing?", a: "The checker lists products that at least one store in your region has in stock or that two or more stores list. A product no store we track sells in your region won't appear." },
     ],
@@ -101,7 +101,7 @@ export function toolRegions(_t: Tool): Region[] {
 
 export const toolHref = (region: Region, slug: ToolSlug) => `/${region}/tools/${slug}`;
 
-/** The <title>: " | WaxCompare" when it still fits in 65 characters. */
+/** The <title>: " | SportsCardCompare" when it still fits in 65 characters. */
 export function toolMetaTitle(title: string): string | { absolute: string } {
-  return title.length + " | WaxCompare".length <= 65 ? title : { absolute: title };
+  return title.length + " | SportsCardCompare".length <= 65 ? title : { absolute: title };
 }

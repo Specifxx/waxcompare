@@ -129,7 +129,7 @@ export function preorderGuideBySlug(slug: string, today = todayIso()): { guide: 
 }
 
 /** The path under a region: /<region>/preorders/<set slug>, for a set whose page is live. */
-// WaxCompare has no /preorders pages (removed 2026-11-07): a release's pre-orders are on its release page. Always null, so no
+// SportsCardCompare has no /preorders pages (removed 2026-11-07): a release's pre-orders are on its release page. Always null, so no
 // link, banner or sitemap URL points at a page that does not exist.
 export function preorderPath(_region: string, _setCode: string, _today = todayIso()): string | null {
   return null;
@@ -137,5 +137,5 @@ export function preorderPath(_region: string, _setCode: string, _today = todayIs
 
 /** Every set that has not released yet (by lib/sets.ts), with its guide (written, else blank), soonest release first. */
 export function openPreorderGuides(_today = todayIso()): { guide: PreorderGuide; set: MtgSet }[] {
-  return []; // no /preorders pages on WaxCompare (see preorderPath)
+  return []; // no /preorders pages on SportsCardCompare (see preorderPath)
 }

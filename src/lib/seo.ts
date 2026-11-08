@@ -22,7 +22,7 @@ export function withMtg(name: string): string {
 }
 
 // The eurozone is one market with one page per URL (/eu/…), but nobody in Germany searches with en-IE. These are the euro
-// countries whose English-language searches WaxCompare's EU stores serve: the same /eu URL is listed under each, beside en-IE.
+// countries whose English-language searches SportsCardCompare's EU stores serve: the same /eu URL is listed under each, beside en-IE.
 export const EU_HREFLANGS: readonly string[] = ["en-DE", "en-NL", "en-FR", "en-BE", "en-AT", "en-ES", "en-IT", "en-FI", "en-PT", "en-LU"];
 
 /**
@@ -243,7 +243,7 @@ export function itemListJsonLd(opts: { name: string; path: string; items: { path
 }
 
 /**
- * A guide's Article. Author and publisher are WaxCompare (the Organization), never an invented person. `published` and
+ * A guide's Article. Author and publisher are SportsCardCompare (the Organization), never an invented person. `published` and
  * `updated` are ISO editorial dates ("2026-10-14"), never the data refresh time. The image is the site's share card unless the
  * guide has its own.
  */

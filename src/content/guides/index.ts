@@ -20,7 +20,7 @@ export type GuideSlug = "hobby-vs-blaster-vs-mega-box" | "where-to-buy-sealed-sp
 
 export interface Guide {
   slug: GuideSlug;
-  /** The H1, the Article headline and the <title>. With " | WaxCompare" it should fit in 60 characters; past that it goes out as title.absolute. */
+  /** The H1, the Article headline and the <title>. With " | SportsCardCompare" it should fit in 60 characters; past that it goes out as title.absolute. */
   title: string;
   /**
    * The title as the region's copy says it, with "{in}" for the region ("MTG booster box prices in {in}" → "… in Australia"): the
@@ -110,9 +110,9 @@ export function guideFor(slug: string, region: Region): Guide | null {
   return g && guideRegions(g).includes(region) ? g : null;
 }
 
-/** The <title>: the template adds " | WaxCompare" (13 characters) when the whole still fits in 60; otherwise the title alone. */
+/** The <title>: the template adds " | SportsCardCompare" (13 characters) when the whole still fits in 60; otherwise the title alone. */
 export function guideMetaTitle(title: string): string | { absolute: string } {
-  return title.length +  " | WaxCompare".length <= 60 ? title : { absolute: title };
+  return title.length +  " | SportsCardCompare".length <= 60 ? title : { absolute: title };
 }
 
 /** A guide's title in one region's copy: `titleIn` with the region's "in" name, else `title`. */

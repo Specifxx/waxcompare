@@ -12,7 +12,7 @@ function boot(path: string, tz: string, opts: { saved?: string; ua?: string; alt
   vm.runInNewContext(REGION_BOOT_SCRIPT, {
     URL,
     navigator: { userAgent: opts.ua ?? "Mozilla/5.0 (iPhone) Safari/604.1" },
-    location: { pathname: path, search: "", hash: "", href: `https://waxcompare.app${path}`, replace: (u: string) => (moved = u) },
+    location: { pathname: path, search: "", hash: "", href: `https://sportscardcompare.com${path}`, replace: (u: string) => (moved = u) },
     localStorage: { getItem: () => opts.saved ?? null, setItem() {} },
     sessionStorage: { getItem: () => null, setItem() {} },
     Intl: { DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: tz }) }) },
@@ -24,7 +24,7 @@ function boot(path: string, tz: string, opts: { saved?: string; ua?: string; alt
       querySelector: (sel: string) => {
         const lang = /hreflang="([^"]+)"/.exec(sel)?.[1] ?? "";
         const href = opts.alternates?.[lang];
-        return href ? { href: `https://waxcompare.app${href}` } : null;
+        return href ? { href: `https://sportscardcompare.com${href}` } : null;
       },
     },
   });

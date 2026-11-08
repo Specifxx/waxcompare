@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Vercel "Ignored Build Step" for WaxCompare, wired from vercel.json's `ignoreCommand`. Vercel runs it
+# Vercel "Ignored Build Step" for SportsCardCompare, wired from vercel.json's `ignoreCommand`. Vercel runs it
 # in the project's Root Directory (the repository root) before each deployment. Vercel's contract:
 #
 #   exit 0  → skip: no deployment is built for this push
@@ -12,7 +12,7 @@
 # plus one per code push. Now the twice-daily sealed import's data commit is the release
 # (scripts/publish-public-data.sh adds the marker for it); the eBay import's data commit and ordinary
 # code commits ride the next one, as on the sister sites. A release out of turn: put [deploy] in the
-# subject of a commit that changes the app, or run "WaxCompare release" (release.yml), which
+# subject of a commit that changes the app, or run "SportsCardCompare release" (release.yml), which
 # lands an empty [deploy] commit.
 # DEPLOY.md, "Where the data lives".
 #
@@ -32,7 +32,7 @@
 #
 # VERCEL_ENV and VERCEL_GIT_COMMIT_MESSAGE are Vercel system environment variables, available to this
 # step; without the message, `git log -1` reads it (Vercel clones with a history depth of 10).
-# Pattern: RiftCompare's and WaxCompare's scripts/vercel-ignore-build.sh.
+# Pattern: RiftCompare's and SportsCardCompare's scripts/vercel-ignore-build.sh.
 # Pinned by tests/vercel-ignore-build.test.ts.
 set -u
 

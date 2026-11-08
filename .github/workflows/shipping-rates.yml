@@ -1,4 +1,4 @@
-name: WaxCompare shipping rates
+name: SportsCardCompare shipping rates
 
 # Weekly: measure what each Shopify store in src/data/stores.json really charges to post ONE sealed product, from its own storefront
 # quote, to several addresses per market (scripts/probe-shipping-rates.ts; addresses in src/lib/shipping-probe.ts), then condense the
@@ -109,7 +109,7 @@ jobs:
             cp /tmp/shipping-rates.json "$F"
             git add "$F"
             if git diff --cached --quiet; then echo "main already has it."; exit 0; fi
-            git commit -q -m "WaxCompare shipping rates: $(date -u +%Y-%m-%d) (shipping-rates.yml run ${GITHUB_RUN_ID})" -m "Measured from each store's own checkout (scripts/probe-shipping-rates.ts)."
+            git commit -q -m "SportsCardCompare shipping rates: $(date -u +%Y-%m-%d) (shipping-rates.yml run ${GITHUB_RUN_ID})" -m "Measured from each store's own checkout (scripts/probe-shipping-rates.ts)."
             if git push -q origin HEAD:main; then echo "Pushed $(git rev-parse --short HEAD)."; exit 0; fi
             sleep $((attempt * 5))
           done

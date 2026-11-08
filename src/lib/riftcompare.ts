@@ -11,7 +11,7 @@
 
 const RIFT = "https://riftcompare.com";
 /**
- * WaxCompare (2026-10-21): RiftCompare has no Magic section yet, so no product page links one (riftHistoryHref is always null).
+ * SportsCardCompare (2026-10-21): RiftCompare has no Magic section yet, so no product page links one (riftHistoryHref is always null).
  * When it has one, set this to its path ("/mtg") and the links come back on every product page in scope.
  */
 export const RIFT_SECTION: string | null = null;
@@ -35,6 +35,6 @@ export function riftHistoryHref(p: { imageUrl: string | null | undefined; setRel
   if (!RIFT_SECTION) return null;
   const id = tcgplayerIdFromImage(p.imageUrl);
   if (id == null || !p.setReleaseDate || p.setReleaseDate < RIFT_SCOPE_START || /\bCase$/.test(p.productType)) return null;
-  const q = new URLSearchParams({ q: p.name, utm_source: "waxcompare", utm_medium: "referral", utm_campaign: "wax-product" });
+  const q = new URLSearchParams({ q: p.name, utm_source: "sportscardcompare", utm_medium: "referral", utm_campaign: "wax-product" });
   return `${RIFT}${RIFT_SECTION}/tcgplayer/${id}?${q}`;
 }

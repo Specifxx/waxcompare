@@ -1,6 +1,6 @@
 // The guides (src/content/guides) and the blog (src/lib/blog): the registries' rules, and every body rendered as a crawler sees it on
 // fixture data: its copy never matches BANNED_COPY or talks about pull rates, EV or investing, never claims a pack count, and never
-// carries a word of the Magic site it was ported from. WaxCompare is a new domain: no old URL to keep.
+// carries a word of the Magic site it was ported from. SportsCardCompare is a new domain: no old URL to keep.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
@@ -108,7 +108,7 @@ test("registry: unique slugs, titles and descriptions, ISO editorial dates, desc
     assert.ok(g.updated >= g.published, g.slug);
     assert.ok(g.description.length <= 160, `${g.slug}: description is ${g.description.length} characters`);
     const t = guideMetaTitle(g.title);
-    assert.ok((typeof t === "string" ? `${t} | WaxCompare` : t.absolute).length <= 60, `${g.slug}: <title> over 60 characters`);
+    assert.ok((typeof t === "string" ? `${t} | SportsCardCompare` : t.absolute).length <= 60, `${g.slug}: <title> over 60 characters`);
     assert.doesNotMatch(`${g.title} ${g.description} ${g.kicker}`, OTHER_SITE, g.slug);
     assert.equal(findBannedCopy(`${g.title} ${g.description} ${g.kicker}`), null, g.slug);
     assert.ok(GUIDE_MODULES[g.slug], `${g.slug}: a body module`);
@@ -194,7 +194,7 @@ test("blog registry: unique slugs, real dates, short descriptions, a module each
     for (const d of [p.published, p.updated]) assert.equal(new Date(`${d}T00:00:00Z`).toISOString().slice(0, 10), d, p.slug);
     assert.ok(p.description.length <= 160, `${p.slug}: description is ${p.description.length}`);
     const t = postMetaTitle(p.title);
-    assert.ok((typeof t === "string" ? `${t} | WaxCompare` : t.absolute).length <= 70, `${p.slug}: <title>`);
+    assert.ok((typeof t === "string" ? `${t} | SportsCardCompare` : t.absolute).length <= 70, `${p.slug}: <title>`);
     assert.equal(findBannedCopy(`${p.title} ${p.description}`), null, p.slug);
     assert.doesNotMatch(`${p.title} ${p.description}`, OTHER_SITE, p.slug);
     assert.ok(POST_MODULES[p.slug], p.slug);

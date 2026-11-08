@@ -12,7 +12,7 @@ export default function NotFound() {
         <div className="font-display text-7xl font-bold tracking-tight text-brand">404</div>
         <h1 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl">This page sold out.</h1>
         <p className="mx-auto mt-3 max-w-md text-muted">
-          We couldn&rsquo;t find it. WaxCompare compares <b>sealed</b> sports cards: hobby, jumbo, mega and blaster boxes and more.
+          We couldn&rsquo;t find it. SportsCardCompare compares <b>sealed</b> sports cards: hobby, jumbo, mega and blaster boxes and more.
         </p>
         <NotFoundSearch />
         {/* One eBay unit (a slim listing strip, or the compact CTA row), on the eBay site of the region in the URL (US outside one). */}

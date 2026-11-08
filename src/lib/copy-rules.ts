@@ -1,4 +1,4 @@
-// What generated copy must never say. WaxCompare keeps no price history and reads each store's CURRENT price and stock, so
+// What generated copy must never say. SportsCardCompare keeps no price history and reads each store's CURRENT price and stock, so
 // it cannot know that a price dropped, that something is back in stock, that it sells fast or that it is a good investment;
 // it says "today", "right now" or "checked N h ago" instead. Every page that builds sentences from data (titles, ledes, badges,
 // value checks, digests, guides) is tested against BANNED_COPY, and the server HTML of each new route is swept with it.

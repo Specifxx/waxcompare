@@ -15,7 +15,7 @@ import { faqJsonLd, jsonLd } from "@/lib/seo";
 // page when it was cut short (2026-10-25), with its FAQPage JSON-LD: the markup goes only where the answers are shown.
 const FAQ: { q: string; a: string }[] = [
   {
-    q: "What is WaxCompare?",
+    q: "What is SportsCardCompare?",
     a: `A free price-comparison site for sealed sports cards: hobby, jumbo, mega, blaster and hanger boxes, cases and packs of baseball, basketball, football, soccer, hockey, F1 and more. It reads ${STORES.length} independent card shops in ${REGION_LIST.length} regions and ranks every product's listings in stock first, cheapest first.`,
   },
   {
@@ -23,8 +23,8 @@ const FAQ: { q: string; a: string }[] = [
     a: "About twice a day. Every listing says when it was last read, and a store that hasn’t answered for three days is marked as not checked recently, never guessed.",
   },
   {
-    q: "Does WaxCompare sell cards?",
-    a: "No. Every buy button goes to the store’s own website, and you buy from the store. WaxCompare keeps no accounts and asks for no email.",
+    q: "Does SportsCardCompare sell cards?",
+    a: "No. Every buy button goes to the store’s own website, and you buy from the store. SportsCardCompare keeps no accounts and asks for no email.",
   },
   {
     q: "Do stores pay to be listed?",
@@ -36,13 +36,13 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Why can’t I find single cards, breaks or repacks?",
-    a: "WaxCompare compares factory-sealed product only, so every product page compares like with like. Single cards, graded cards, break spots, repacks, mystery boxes, supplies and store-made bundles are left out on purpose.",
+    a: "SportsCardCompare compares factory-sealed product only, so every product page compares like with like. Single cards, graded cards, break spots, repacks, mystery boxes, supplies and store-made bundles are left out on purpose.",
   },
 ];
 
 export const metadata: Metadata = {
-  title: "How WaxCompare works",
-  description: "How WaxCompare finds sealed sports card prices and stock, what it does and doesn't store, how it makes money, and how card shops get listed.",
+  title: "How SportsCardCompare works",
+  description: "How SportsCardCompare finds sealed sports card prices and stock, what it does and doesn't store, how it makes money, and how card shops get listed.",
   alternates: { canonical: `${SITE_URL}/about` },
 };
 
@@ -50,11 +50,11 @@ export const metadata: Metadata = {
 export default function About() {
   return (
     <div className="page max-w-3xl py-12">
-      <Breadcrumbs items={[{ href: "/", label: "WaxCompare" }, { label: "About" }]} />
-      <h1 className="font-display text-4xl font-extrabold tracking-tight">How WaxCompare works</h1>
+      <Breadcrumbs items={[{ href: "/", label: "SportsCardCompare" }, { label: "About" }]} />
+      <h1 className="font-display text-4xl font-extrabold tracking-tight">How SportsCardCompare works</h1>
       <div className="prose-dex mt-6">
         <p>
-          WaxCompare compares <b>sealed sports cards</b> — hobby, jumbo, mega, blaster and hanger boxes, hobby cases and packs, of every sport
+          SportsCardCompare compares <b>sealed sports cards</b> — hobby, jumbo, mega, blaster and hanger boxes, hobby cases and packs, of every sport
           the makers print — across {STORES.length} independent card shops in {REGION_LIST.length} regions. It does one job: show you who has something
           in stock and who is cheapest.
         </p>
@@ -132,7 +132,7 @@ export default function About() {
         </p>
         <ul>
           <li>
-            <b>Single and graded cards</b> — a rookie card, an autograph, a PSA or BGS slab, a card &ldquo;pulled from&rdquo; a box. WaxCompare compares no singles.
+            <b>Single and graded cards</b> — a rookie card, an autograph, a PSA or BGS slab, a card &ldquo;pulled from&rdquo; a box. SportsCardCompare compares no singles.
           </li>
           <li>
             <b>Breaks, spots and repacks</b> — &ldquo;Pick Your Team&rdquo; spots, random-team breaks, store repacks and mystery boxes. There is no like-for-like price for those.
@@ -174,13 +174,13 @@ export default function About() {
 
         <h2>What we don&rsquo;t keep</h2>
         <p>
-          WaxCompare keeps one snapshot a day of each product&rsquo;s cheapest in-stock price and how many stores have it in stock
+          SportsCardCompare keeps one snapshot a day of each product&rsquo;s cheapest in-stock price and how many stores have it in stock
           (the price history on product pages, from the first import in November 2026), and nothing more about the stores&rsquo; past listings. It keeps no
           data about you: no accounts, no emails, no cookies. We count page views and clicks on buy links, without knowing who made them. See{" "}
           <Link href="/privacy">privacy</Link>.
         </p>
 
-        <h2 id="money">How WaxCompare makes money</h2>
+        <h2 id="money">How SportsCardCompare makes money</h2>
         <p>
           {ADSENSE_CLIENT ? "Through one Google ad in some guides, and through affiliate links of only two kinds" : "Through affiliate links, and only two kinds"}: <b>eBay</b> (the eBay Partner Network) and <b>Amazon</b> (Amazon Associates). If you
           buy through one we may earn a small commission, at no cost to you &mdash; the price is the same as going direct. Every one is
@@ -257,7 +257,7 @@ export default function About() {
         <h3 id="stores-pay-nothing" className="mb-2 mt-6 font-display text-base font-bold text-ink">Stores</h3>
         <p>
           Links to stores are plain links: stores pay us nothing. No one pays to be listed or to rank higher, and commissions never change the
-          order &mdash; it is price and stock, nothing else. WaxCompare is not endorsed by eBay or Amazon.
+          order &mdash; it is price and stock, nothing else. SportsCardCompare is not endorsed by eBay or Amazon.
         </p>
 
         <h2 id="stores">For stores</h2>

@@ -1,6 +1,6 @@
 // The <title>s and meta descriptions of the price pages, as search results show them. Every page's generateMetadata builds its
 // words here, so one rule holds site-wide (tests/seo-titles.test.ts):
-//   • A rendered title (with the layout's " | WaxCompare" when it fits) is at most 60 characters; a description at most 160.
+//   • A rendered title (with the layout's " | SportsCardCompare" when it fits) is at most 60 characters; a description at most 160.
 //   • A title leads with the query people type ("Hobby box prices in the US", "2025 Topps Chrome Baseball Hobby Box price",
 //     "Where to buy sports cards in Canada"), then the live extras (the from-price) while they fit.
 //   • It is written as candidates, most specific first: the first that fits goes out (fitFirst). Long names and long region names
@@ -143,7 +143,7 @@ export const seoCopy = {
     fitDescription(
       n > 0
         ? `${plural(n, "sealed sports card product")} that ${r.adjective} card shops had none of in one daily check and have in stock again in the next: hobby, mega and blaster boxes.`
-        : `Sealed sports cards that ${r.adjective} card shops had none of in one daily check and have in stock again in the next, from WaxCompare's daily snapshots.`,
+        : `Sealed sports cards that ${r.adjective} card shops had none of in one daily check and have in stock again in the next, from SportsCardCompare's daily snapshots.`,
     ),
   movesTitle: (r: R) => fitFirst(`Hobby box price moves this week in ${r.inName}`, `Price moves this week: ${r.inName}`),
   movesDescription: (r: R) =>

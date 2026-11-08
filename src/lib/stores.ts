@@ -1,4 +1,4 @@
-// The store registry: every store WaxCompare reads, with the collections that
+// The store registry: every store SportsCardCompare reads, with the collections that
 // hold its Pokémon sealed stock. Lives in src/data/stores.json so the probe
 // (scripts/probe-stores.ts) can regenerate it and a human can edit it.
 //
@@ -47,7 +47,7 @@ export const TCGPLAYER: StoreConfig = {
 };
 
 /** Everything the importer reads: the stores, then the marketplaces. */
-// WaxCompare has no marketplace source: TCGplayer does not sell sealed sports product. TCGPLAYER stays defined for shared code.
+// SportsCardCompare has no marketplace source: TCGplayer does not sell sealed sports product. TCGPLAYER stays defined for shared code.
 export const SOURCES: StoreConfig[] = [...STORES];
 export const STORE_BY_KEY = new Map([...SOURCES, TCGPLAYER].map((s) => [s.key, s]));
 

@@ -38,14 +38,14 @@ export default async function PostPage({ params }: Params) {
   const more = POSTS.filter((x) => x.slug !== p.slug).slice(0, 3);
   return (
     <div className="page py-8">
-      <Breadcrumbs items={[{ href: "/", label: "WaxCompare" }, { href: "/blog", label: "Blog" }, { label: p.title }]} />
+      <Breadcrumbs items={[{ href: "/", label: "SportsCardCompare" }, { href: "/blog", label: "Blog" }, { label: p.title }]} />
       <div className="lg:grid lg:grid-cols-[minmax(0,68ch)_14rem] lg:gap-x-12 xl:gap-x-20">
         <article className="min-w-0 max-w-[68ch]">
           <header>
             <div className="eyebrow">{p.kicker}</div>
             <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{p.title}</h1>
             <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
-              <span className="font-medium text-ink">By WaxCompare</span>
+              <span className="font-medium text-ink">By SportsCardCompare</span>
               <span aria-hidden="true">·</span>
               <span>
                 Updated <time dateTime={p.updated}>{formatRelease(p.updated)}</time>

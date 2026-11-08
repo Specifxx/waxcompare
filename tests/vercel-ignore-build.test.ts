@@ -77,10 +77,10 @@ test("production builds a release only: [deploy] in the SUBJECT and the app chan
     const label = env ?? "VERCEL_ENV unset";
     // Code commits and the eBay import's data commit ride the next release.
     assert.equal(gate(repo(true, "Fix the product page"), env, "Fix the product page").status, SKIP, label);
-    const ebay = "WaxCompare data: 2026-10-16T08:40Z (ebay-import.yml run 1)";
+    const ebay = "SportsCardCompare data: 2026-10-16T08:40Z (ebay-import.yml run 1)";
     assert.equal(gate(repo(true, ebay), env, ebay).status, SKIP, label);
     // The sealed import's data commit is the release (scripts/publish-public-data.sh ... release).
-    const data = "WaxCompare data: 2026-10-16T08:52Z (sealed-import.yml run 2) [deploy]";
+    const data = "SportsCardCompare data: 2026-10-16T08:52Z (sealed-import.yml run 2) [deploy]";
     assert.equal(gate(repo(true, data), env, data).status, BUILD, label);
     assert.equal(gate(repo(true, "Urgent fix [DEPLOY]"), env, "Urgent fix [DEPLOY]").status, BUILD, `${label}: any case`);
     assert.equal(gate(repo(true, "Fix"), env, "Fix\n\nThe body says [deploy] in prose.").status, SKIP, `${label}: subject only`);
@@ -97,19 +97,19 @@ test("an empty [deploy] commit is a release (release.yml)", () => {
   git(dir, "init", "-q", "-b", "main");
   git(dir, "add", ".");
   git(dir, "commit", "-q", "-m", "base");
-  git(dir, "commit", "-q", "--allow-empty", "-m", "WaxCompare release [deploy]");
+  git(dir, "commit", "-q", "--allow-empty", "-m", "SportsCardCompare release [deploy]");
   const app = join(dir, "apps/dex");
-  assert.equal(gate(app, "production", "WaxCompare release [deploy]").status, BUILD);
-  assert.equal(gate(app, "production", "WaxCompare release").status, SKIP, "an empty commit without the marker is nothing");
+  assert.equal(gate(app, "production", "SportsCardCompare release [deploy]").status, BUILD);
+  assert.equal(gate(app, "production", "SportsCardCompare release").status, SKIP, "an empty commit without the marker is nothing");
   const wf = readFileSync(join(ROOT, ".github/workflows/release.yml"), "utf8");
-  assert.match(wf, /git commit --allow-empty -m "WaxCompare release \[deploy\]"/);
+  assert.match(wf, /git commit --allow-empty -m "SportsCardCompare release \[deploy\]"/);
   assert.doesNotMatch(wf, /^\s+schedule:/m, "the imports are the schedule");
 });
 
 test("the sealed import's data commit carries the marker; the eBay import's does not", () => {
   const pub = src("scripts/publish-public-data.sh");
   assert.match(pub, /\[ "\$\{2:-\}" = "release" \] && MARK=" \[deploy\]"/);
-  assert.match(pub, /git commit -q -m "WaxCompare data: [^"]*\$MARK"/);
+  assert.match(pub, /git commit -q -m "SportsCardCompare data: [^"]*\$MARK"/);
   const wf = (f: string) => readFileSync(join(ROOT, ".github/workflows", f), "utf8");
   // One release a day (2026-10-17): the 20:47 UTC run, a manual run and the schema sync; the 08:47 run rides it.
   const sealed = wf("sealed-import.yml");

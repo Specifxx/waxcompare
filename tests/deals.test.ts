@@ -1,4 +1,4 @@
-// Value discovery (src/lib/deals.ts): the deals bar, the per-pack ranking, below US MSRP, the "new on WaxCompare" bulk-day guard,
+// Value discovery (src/lib/deals.ts): the deals bar, the per-pack ranking, below US MSRP, the "new on SportsCardCompare" bulk-day guard,
 // the deals page's sections and the copy the deals / cheapest-packs / this-week / region home pages print. Pure parts only, with
 // fixtures; the pages' sources are checked for the rules every new route follows (ISR, one strip, capped reads).
 import { test } from "node:test";
@@ -121,7 +121,7 @@ test("pickBelowMsrp: no MSRP is claimed for any sports box, so nothing is 'below
   assert.deepEqual(pickBelowMsrp([card({ productType: "Hobby Box", lowestPriceCents: 100 }), card({ productType: "Blaster Box", lowestPriceCents: 100 })]), []);
 });
 
-// ─── New on WaxCompare ──────────────────────────────────────────────────────────
+// ─── New on SportsCardCompare ──────────────────────────────────────────────────────────
 
 test("newlyTrackedFilter: the last 14 whole days, minus every day with 200+ creations (imports, re-groupings), newest first", () => {
   const now = new Date("2026-10-14T09:00:00Z");
@@ -209,12 +209,12 @@ test("deals, cheapest-packs, this-week and home copy: never a history, urgency o
   assert.match(RRP_NOTE, /MSRP/);
 });
 
-test("fitTitle: the ' | WaxCompare' template when the whole fits in 65 characters, else the title alone", () => {
+test("fitTitle: the ' | SportsCardCompare' template when the whole fits in 65 characters, else the title alone", () => {
   for (const r of REGION_LIST) {
     for (const t of [dealsCopy.title(r), packsCopy.title(r), digestCopy.title(r), homeCopy.title(r, 68)]) {
       const fit = fitTitle(t);
-      const shown = typeof fit === "string" ? `${fit} | WaxCompare` : fit.absolute;
-      assert.ok(typeof fit === "string" ? shown.length <= 65 : t.length + " | WaxCompare".length > 65, `${r.region}: ${shown}`);
+      const shown = typeof fit === "string" ? `${fit} | SportsCardCompare` : fit.absolute;
+      assert.ok(typeof fit === "string" ? shown.length <= 65 : t.length + " | SportsCardCompare".length > 65, `${r.region}: ${shown}`);
       assert.match(shown, /sports card|hobby box/i);
       assert.doesNotMatch(shown, /\bMTG\b|\bMagic\b/);
     }

@@ -17,7 +17,7 @@ import { Chevron, ShippingToggle, StoreRows, type StoreRowData } from "./OfferRo
 
 // The region's offers, ranked (in the US that includes TCGplayer's, badged as a marketplace), and, with `ebay`, ONE eBay row among
 // them: the product's lowest-priced own eBay listing, ranked by its price among the stores you can buy from now, tinted, labelled "Ad",
-// with eBay's blue button (EbayStrip.tsx OfferRowsWithEbay, lib/ebay-offer-row.ts). The owner's call: WaxCompare compares websites, and
+// with eBay's blue button (EbayStrip.tsx OfferRowsWithEbay, lib/ebay-offer-row.ts). The owner's call: SportsCardCompare compares websites, and
 // eBay is one. When the eBay listing is cheaper than every store you can buy from it is the best price ("Best price" on it, "Best store
 // price" on the cheapest store, and the product page's best-price card shows it: BestPriceCard.tsx); nothing counts it (the title's store
 // count, the median).
@@ -108,7 +108,7 @@ export function OfferTable({
         <p>
           Prices are each store&rsquo;s own, in {r.currency}, read from their public product listings about twice a day; each row says when.
           &ldquo;Not checked recently&rdquo; means we couldn&rsquo;t read that store for over three days, so its stock is unknown. No store pays
-          to be listed or to rank higher: <Link href="/about" prefetch={false} className="underline underline-offset-2 hover:text-ink">how WaxCompare works</Link>.
+          to be listed or to rank higher: <Link href="/about" prefetch={false} className="underline underline-offset-2 hover:text-ink">how SportsCardCompare works</Link>.
           {tcg && " TCGplayer is a US marketplace of many sellers, pinned under eBay and Amazon; its link is an affiliate link, and outside the US its price is in US$ and never compared with the stores'."}
           {amazon && !amazon.live && ` ${amazon.name} is pinned under eBay: with no price from Amazon it is a search, never ranked or the best price, and its link is an affiliate link. ${AMAZON_DISCLOSURE}`}
           {amazon?.live && ` ${amazon.name} is pinned under eBay with Amazon's own price for this listing, shown with its time and never ranked or the best price; its link is an affiliate link. ${AMAZON_DISCLOSURE} * ${AMAZON_PRICE_DISCLAIMER}`}
@@ -183,7 +183,7 @@ export function offerRowsData({
       ...(o.marketplace ? {} : { cart: { productUrl: o.url, currency: r.currency } }),
     };
   });
-  // No TCGplayer row on WaxCompare (2026-11-07): TCGplayer's affiliate catalogue is card games, not sealed sports cards, so the pinned
+  // No TCGplayer row on SportsCardCompare (2026-11-07): TCGplayer's affiliate catalogue is card games, not sealed sports cards, so the pinned
   // row would be a search that finds nothing. Only a real TCGplayer offer in `offers` (none today) would still be a row.
   const tcg = pin && tcgOffer ? tcgRow(tcgOffer, pin, region, placement, now) : null;
   const amazon = pin ? amazonRow(pin.productName, region, now, pin.amazon ?? null) : null;

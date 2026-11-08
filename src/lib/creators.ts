@@ -1,6 +1,6 @@
-// Sports card creators featured on /creators (owner, 2026-10-30: "a section on WaxCompare, just like on RiftCompare"), modelled on
+// Sports card creators featured on /creators (owner, 2026-10-30: "a section on SportsCardCompare, just like on RiftCompare"), modelled on
 // RiftCompare's lib/content/creators.ts. A hand-curated list a commit edits: no database, no form, no account. A creator mentions or
-// links WaxCompare in their content; in return they get a card here and a face in the homepage strip. Use the creator's own
+// links SportsCardCompare in their content; in return they get a card here and a face in the homepage strip. Use the creator's own
 // spelling and handles, and only links they show publicly. Not called "partners" anywhere: that word means the affiliate links.
 
 export type CreatorPlatform = "Instagram" | "YouTube" | "Threads" | "TikTok" | "Facebook" | "X" | "Twitch" | "Website";

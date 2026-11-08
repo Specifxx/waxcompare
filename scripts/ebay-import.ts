@@ -28,7 +28,7 @@
 // --dry-run prints the plan and the expected calls: no network and no database writes (it does read the product tables); the
 // sweep's coverage shows only in a real run (the summary's Sweep table).
 // Env: DATABASE_URL; EBAY_CLIENT_ID / EBAY_CLIENT_SECRET (WAXCOMPARE_EBAY_CLIENT_ID / _SECRET win when set);
-// optional EBAY_DAILY_CAP (2500, max 2500: WaxCompare's own keyset, 2,500 a day; never raised without the owner;
+// optional EBAY_DAILY_CAP (2500, max 2500: SportsCardCompare's own keyset, 2,500 a day; never raised without the owner;
 // EBAY_RUN_CAP (2500), EBAY_SWEEP_CALLS (2100), EBAY_LISTING_MAX_AGE_HOURS (26).
 // Exit 1: token failure (only eBay's OAuth error category is printed), a search refusal or the circuit breaker, or fewer than
 // half of the planned feeds finished (the fixed feeds and the per-product searches; a per-product search that completed with no
@@ -68,7 +68,7 @@ async function main() {
     process.exit(2);
   }
   if (!dry && !keysPresent(process.env as EbayEnv)) {
-    summaryFile(["## WaxCompare eBay import", "", "EBAY_CLIENT_ID / EBAY_CLIENT_SECRET are not set for this job: nothing imported (the site keeps showing the previous listings until they age out)."]);
+    summaryFile(["## SportsCardCompare eBay import", "", "EBAY_CLIENT_ID / EBAY_CLIENT_SECRET are not set for this job: nothing imported (the site keeps showing the previous listings until they age out)."]);
     return;
   }
 
@@ -77,7 +77,7 @@ async function main() {
     { dryRun: dry, only, maxCalls, force: flag("force") },
   );
 
-  const lines = ["## WaxCompare eBay import", "", ...runReport(summary), ...(dry ? ["", "### Capacity model", "", ...capacityReport(summary.plan)] : [])];
+  const lines = ["## SportsCardCompare eBay import", "", ...runReport(summary), ...(dry ? ["", "### Capacity model", "", ...capacityReport(summary.plan)] : [])];
   summaryFile(lines);
   await prisma.$disconnect();
 

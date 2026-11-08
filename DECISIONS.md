@@ -1371,3 +1371,19 @@ must match the domain."
   tokens in both themes.
 - **Christmas stays light here:** no snow, lights or trees in the hero (`ChristmasDecor` is no longer mounted) and no hat on the mark; the
   small "Christmas gifts" line and the Black Friday strip stay.
+
+## 2026-11-08: renamed SportsCardCompare, with the fanned player cards logo
+
+Owner, 2026-11-08: "rebrand waxcompare to sportscardcompare … the domain I'll buy is sportscardcompare.com eventually", and he
+picked the fanned player cards logo (three player cards like a hand, a batter in front, a football and a basketball behind) for
+being sports-trading-card themed. `SITE_NAME` is SportsCardCompare, the wordmark is "SportsCard" + red "Compare", and every icon
+(icon.svg, logo.svg, apple-icon, icon-192/512, favicon.ico, the share cards' mark) is the new drawing.
+
+The domain isn't bought yet, and the site lives at its .vercel.app address. So `next.config.js` sets `NEXT_PUBLIC_SITE_URL` from
+Vercel's own production domain (`VERCEL_PROJECT_PRODUCTION_URL`) whenever the variable isn't set. Canonicals, the sitemap and
+JSON-LD name the address the site really serves, and the build after sportscardcompare.com is added in Vercel switches to it with no
+code change. Outside a Vercel production build the default is https://sportscardcompare.com.
+
+Internal ids keep the old name on purpose: the repo (Specifxx/waxcompare), the Vercel project, workflow concurrency groups, the
+family-feed path, and the "waxcompare" key RiftCompare's shared report and forum services know the site by. Store `utm_source` is
+now "sportscardcompare".

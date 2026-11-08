@@ -37,8 +37,19 @@ const securityHeaders = [
 const CDN_CACHE = "public, s-maxage=86400, stale-while-revalidate=86400";
 const CDN_PAGES = ["/", "/:region(au|us|uk|ca|eu)", "/:region(au|us|uk|ca|eu)/:path*", "/guides/:slug", "/blog", "/blog/:slug", "/forum", "/forum/:path*", "/widgets", "/widgets/:path*"];
 
+// The canonical origin (src/lib/site.ts SITE_URL). Until the owner buys sportscardcompare.com (2026-11-08) the site lives at its
+// .vercel.app address, so a production build with no NEXT_PUBLIC_SITE_URL takes Vercel's own production domain: canonicals, the
+// sitemap and JSON-LD then name the address the site really serves, and the day the domain is added in Vercel the next build
+// switches to it by itself. Set here, the value is the same on the server and in the browser.
+const SITE_ORIGIN =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+  (process.env.VERCEL_ENV === "production" && process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.replace(/^https?:\/\//, "")}`
+    : "");
+
 const nextConfig = {
   reactStrictMode: true,
+  ...(SITE_ORIGIN ? { env: { NEXT_PUBLIC_SITE_URL: SITE_ORIGIN } } : {}),
   // The public data files (data/public/, ~25 MB: src/lib/public-data/) ride with every server function, which reads them instead of
   // Neon. Only when the build will read them (PUBLIC_DATA_MODE "files", the default, or "fallback").
   experimental: {

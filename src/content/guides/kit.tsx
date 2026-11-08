@@ -412,7 +412,7 @@ export function whereToBuy(r: RegionInfo, opts: { links?: { href: string; label:
       <>
         <Prose>
           <p>
-            WaxCompare puts {r.adjective} card shops side by side: each one’s own listed price in {r.currency}, excluding shipping, ranked by price and stock. Stores
+            SportsCardCompare puts {r.adjective} card shops side by side: each one’s own listed price in {r.currency}, excluding shipping, ranked by price and stock. Stores
             pay nothing to be listed, and commissions never change the order.
           </p>
           <p>

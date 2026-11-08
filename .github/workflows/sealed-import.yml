@@ -1,15 +1,15 @@
-name: WaxCompare sealed import
+name: SportsCardCompare sealed import
 
 # Reads every store in src/data/stores.json into the job's own throwaway Postgres (seeded from the committed data, so it starts
 # from yesterday's rows), adds every release 2+ stores now sell to data/sets/releases.json, exports the whole database to
 # data/public/ and commits it to main. Twice a day. No eBay API calls: no eBay credentials are passed to this job at all.
 #
-# No database secret: WaxCompare has no hosted database (DECISIONS.md 2026-11-07).
+# No database secret: SportsCardCompare has no hosted database (DECISIONS.md 2026-11-07).
 # Secrets (Settings → Secrets and variables → Actions), optional:
 #   REVALIDATE_SECRET     same value as REVALIDATE_SECRET in Vercel; without it pages refresh within 24h.
 #   AMAZON_CREATORS_AU_*  the Creators API credential the ASIN step uses (a no-op without it).
 # Variable (same page, "Variables" tab):
-#   SITE_URL              e.g. https://waxcompare.app
+#   SITE_URL              e.g. https://sportscardcompare.com
 #
 
 on:
@@ -39,7 +39,7 @@ jobs:
   import:
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    # WaxCompare has no hosted database (DECISIONS.md 2026-11-07): each run gets an empty Postgres that dies with the runner,
+    # SportsCardCompare has no hosted database (DECISIONS.md 2026-11-07): each run gets an empty Postgres that dies with the runner,
     # seeded from the committed data (scripts/seed-from-public.ts), and the result is exported back to main.
     services:
       postgres:
@@ -81,7 +81,7 @@ jobs:
       - name: Import
         env:
           REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
-          NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL || 'https://waxcompare.app' }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL || 'https://sportscardcompare.com' }}
           ONLY: ${{ inputs.only }}
           # The expired-eBay-listing purge at the end of the import uses the same age bound as the eBay import
           # (a repository variable; blank = 26 hours).

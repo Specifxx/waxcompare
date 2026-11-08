@@ -1,10 +1,10 @@
-# Deploying WaxCompare on Vercel
+# Deploying SportsCardCompare on Vercel
 
-WaxCompare (waxcompare.app) compares **sealed sports cards**: hobby boxes, jumbo and FOTL boxes, cases, blasters, megas, hangers
+SportsCardCompare (sportscardcompare.com) compares **sealed sports cards**: hobby boxes, jumbo and FOTL boxes, cases, blasters, megas, hangers
 and packs, across independent card shops in each region, with eBay, Amazon and Topps affiliate links. It is a port of MTG
 Compare's sealed engine (itself DexCompare's, `Specifxx/CompareEmpire`, `apps/dexcompare-sealed`), started 2026-11-07. Several
 sections below describe mechanics that came across unchanged; where an example still names a Magic or Pokémon product, the
-mechanism is the same and WaxCompare's product types are in `src/lib/sealed-title.ts`.
+mechanism is the same and SportsCardCompare's product types are in `src/lib/sealed-title.ts`.
 
 ## Where the data lives: GitHub
 
@@ -18,7 +18,7 @@ each other's snapshot.
 
 ONE release a day puts new prices live: the 20:47 UTC sealed import's data commit, whose subject carries `[deploy]`, the only
 thing production builds (`scripts/vercel-ignore-build.sh`, which also holds builds to one per 12 hours). The 08:47 import's commit,
-the eBay import's and every code commit ride it; a manual import run and "WaxCompare release" (`release.yml`) release out of turn.
+the eBay import's and every code commit ride it; a manual import run and "SportsCardCompare release" (`release.yml`) release out of turn.
 Code commits never carry `[deploy]`.
 
 **Caching.** Every data page is `force-dynamic` and Vercel's CDN keeps each response for a day (`next.config.js` `CDN_PAGES`,
@@ -30,11 +30,11 @@ Repo **Specifxx/waxcompare** → Settings → Secrets and variables → Actions:
 
 | Kind | Name | Used for |
 | --- | --- | --- |
-| Secret | `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` | WaxCompare's OWN eBay keyset (never a sister site's), for the daily eBay import only. Without them that job writes a skip note and exits green. `WAXCOMPARE_EBAY_CLIENT_ID` / `_SECRET` win when set. |
+| Secret | `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` | SportsCardCompare's OWN eBay keyset (never a sister site's), for the daily eBay import only. Without them that job writes a skip note and exits green. `WAXCOMPARE_EBAY_CLIENT_ID` / `_SECRET` win when set. |
 | Secret | `AMAZON_CREATORS_AU_CLIENT_ID`, `_SECRET`, `_VERSION` | the Compare Empire Creators API credential (ASINs in the import, prices in the build). A no-op without them. |
 | Secret | `REVALIDATE_SECRET` | optional; the same value as `REVALIDATE_SECRET` in Vercel. |
 | Secret | `PSI_API_KEY` | optional; the weekly PageSpeed check. |
-| Variable | `SITE_URL` | optional; default `https://waxcompare.app`. |
+| Variable | `SITE_URL` | optional; default `https://sportscardcompare.com`. |
 | Variable | `EBAY_DAILY_CAP`, `EBAY_RUN_CAP`, `EBAY_SWEEP_CALLS` | optional; unset they are 2,500 / 2,500 / 2,100. 2,500 is the cap the owner set for this site's keyset; never raise it without him. |
 
 The workflows need **Settings → Actions → General → Workflow permissions: Read and write** (the import commits `data/public/`).
@@ -42,10 +42,10 @@ The workflows need **Settings → Actions → General → Workflow permissions: 
 ## 2. First run
 
 1. Merge to `main` (scheduled workflows run only from the default branch).
-2. Actions → **WaxCompare sealed import** → **Run workflow**. The first run reads every store in `src/data/stores.json` (about
+2. Actions → **SportsCardCompare sealed import** → **Run workflow**. The first run reads every store in `src/data/stores.json` (about
    20–40 minutes), adds every release two or more stores sell to `data/sets/releases.json`, exports `data/public/` and commits it
    with `[deploy]` in the subject: that commit is the first release with prices.
-3. Then Actions → **WaxCompare eBay import** → Run workflow, once the eBay secrets exist (the strips show an eBay search link until then).
+3. Then Actions → **SportsCardCompare eBay import** → Run workflow, once the eBay secrets exist (the strips show an eBay search link until then).
 4. From then on both run by themselves (sealed import 20:47 and 08:47 UTC, eBay 08:37 UTC).
 
 ## 3. Vercel
@@ -58,7 +58,7 @@ Environment variables the site reads (all optional):
 
 | Name | What |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | the canonical origin, default `https://waxcompare.app` (no trailing slash) |
+| `NEXT_PUBLIC_SITE_URL` | the canonical origin, default `https://sportscardcompare.com` (no trailing slash) |
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | AdSense publisher id, or `off` |
 | `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_OPERATOR` | the contact address and who runs the site |
 | `REVALIDATE_SECRET` | the import's page-refresh call |
@@ -66,19 +66,19 @@ Environment variables the site reads (all optional):
 | `AMAZON_CREATORS_AU_*` | Production only: the build's Amazon price fetch |
 
 **To deploy right now** without waiting for the evening import (only when the owner says it is urgent): Actions →
-**WaxCompare release** → Run workflow.
+**SportsCardCompare release** → Run workflow.
 
 ## 4. Domains
 
-Vercel project → Settings → **Domains**: add `waxcompare.app` as the primary, and `www.waxcompare.app` as a **Redirect to
-`waxcompare.app` (308 permanent)**, only once Vercel shows the apex as valid. Follow Vercel's DNS instructions at the registrar.
+Vercel project → Settings → **Domains**: add `sportscardcompare.com` as the primary, and `www.sportscardcompare.com` as a **Redirect to
+`sportscardcompare.com` (308 permanent)**, only once Vercel shows the apex as valid. Follow Vercel's DNS instructions at the registrar.
 `.app` domains are HTTPS-only (HSTS-preloaded), which Vercel handles. Upper-case region prefixes (`/AU`, `/AU/sets`) 308 to the
 lower-case page (`src/middleware.ts`); any other unknown path is a plain 404.
 
 ## 5. Search Console
 
-Add the `waxcompare.app` property (DNS verification, or `GOOGLE_SITE_VERIFICATION` in Vercel and a redeploy), then submit
-`https://waxcompare.app/sitemap.xml`.
+Add the `sportscardcompare.com` property (DNS verification, or `GOOGLE_SITE_VERIFICATION` in Vercel and a redeploy), then submit
+`https://sportscardcompare.com/sitemap.xml`.
 
 That URL is a **sitemap index** (`src/app/sitemap.xml/route.ts`) listing `/sitemap/0.xml` (the static pages, every active store
 page and, per region, `/deals`, `/cheapest-packs`, `/this-week`, `/guides` and each guide offered there, plus the region-less
@@ -94,9 +94,9 @@ On by default with the owner's publisher ID, `ca-pub-6842128782879909` (`DEFAULT
 **build** time, so redeploy after changing it.
 
 1. Site-wide this gives: the `google-adsense-account` meta and the AdSense script in every page's `<head>` (what AdSense's site
-   review checks), `https://waxcompare.app/ads.txt` with Google's authorised-seller line, and the AdSense paragraphs on
+   review checks), `https://sportscardcompare.com/ads.txt` with Google's authorised-seller line, and the AdSense paragraphs on
    `/privacy` (cookies, opt-outs) and `/about` ("how we make money").
-2. In AdSense → Sites, add `waxcompare.app` and press **Verify** / **Request review**. The landing page (`/`) is what the reviewer
+2. In AdSense → Sites, add `sportscardcompare.com` and press **Verify** / **Request review**. The landing page (`/`) is what the reviewer
    reads first: its original text (what the site is, how it compares, the buying guides, the questions answered in full) sits in
    the first screens of the server HTML, and its one eBay unit is last.
 3. Nothing to set in Vercel for this: the ID is in the code.
@@ -114,7 +114,7 @@ On by default with the owner's publisher ID, `ca-pub-6842128782879909` (`DEFAULT
 
 Each region home (`/au`, `/us` …) and each guide (the by-country one included) has its own 1200×630 share card, drawn at build
 from the registry (`src/lib/og-card.tsx`; routes `/og/<region>` and `/og/guides/<slug>`; no database). It is the thumbnail Reddit, Discord and X
-show for a link. To preview one, open `https://waxcompare.app/og/au`. Reddit caches a link's thumbnail when it is first
+show for a link. To preview one, open `https://sportscardcompare.com/og/au`. Reddit caches a link's thumbnail when it is first
 posted, so check the card before posting.
 
 ## Security headers
@@ -132,10 +132,10 @@ connect and frame sources for when it is switched on.
 
 ## Ad rules (the growth release, 2026-10)
 
-> Inherited from MTG Compare's 2026-10 growth release; the rules hold here unchanged, and the units' names are WaxCompare's.
+> Inherited from MTG Compare's 2026-10 growth release; the rules hold here unchanged, and the units' names are SportsCardCompare's.
 
 The owner approved these changes to the site's own advertising rules; `src/lib/ebay-ads.ts` (its header), README.md
-("eBay listing strips") and the About page ("How WaxCompare makes money") say the same.
+("eBay listing strips") and the About page ("How SportsCardCompare makes money") say the same.
 
 **Changed**
 
@@ -240,7 +240,7 @@ compact "search" CTA and the in-feed tile report under the strip's own placement
 | `listings-digest` | `/<region>/this-week`: the sealed strip after "Releasing soon" |
 | `listings-guide` | a guide (`/<region>/guides/<slug>`): its one strip, after the first data block (the guide's own context: generic sealed or its type's feed) |
 | `browse-search` | `/<region>/sealed` with a search query and results: ONE query-matched box after the first four results (the slot the unfiltered list's strip uses, so a search page never has more units than the unfiltered one): "See "<query>" on eBay — Buy It Now ↗" and, in the US, "Search TCGplayer ↗" (Impact `sharedid`), with "Ad" and the affiliate note. Client-only: the query never reaches cached HTML or the database. Zero results keep `browse-empty` |
-| `listings-offer-row` | product page: the eBay ROW OF THE PRICE TABLE (the owner's call, 2026-10-11: WaxCompare compares websites, and eBay is one). The product's lowest-priced OWN eBay listing (never its type's or generic listings; never one under 40% of the cheapest store price, where the stores price in the eBay site's currency), ranked by its price among the in-stock stores (a tie stays with the store; NZ/SG, whose listings are in A$/US$, after the in-stock stores), tinted (the sponsored tint, an eBay-blue edge), labelled "Ad", eBay's blue "View on eBay" button, "updated N h ago" on the row; with no listing it is an eBay search for the product after the in-stock stores (that is also the server HTML: the listing is fetched as the page runs and then moves to its rank). The table shows 8 rows (the eBay row ranked among them) and puts the rest in two server-rendered drawers, split after ranking so the visible height never changes. When it is a NEW listing cheaper than every in-stock store (not on a pre-order product) it IS the best price (the owner's call, 2026-10-11): "Best price" on it, "Best store price" on the cheapest store, and the best-price card shows it (`listings-best-price`). Never counted in the store count or the median, never in JSON-LD, meta, OG, the sitemap or the "from" prices elsewhere |
+| `listings-offer-row` | product page: the eBay ROW OF THE PRICE TABLE (the owner's call, 2026-10-11: SportsCardCompare compares websites, and eBay is one). The product's lowest-priced OWN eBay listing (never its type's or generic listings; never one under 40% of the cheapest store price, where the stores price in the eBay site's currency), ranked by its price among the in-stock stores (a tie stays with the store; NZ/SG, whose listings are in A$/US$, after the in-stock stores), tinted (the sponsored tint, an eBay-blue edge), labelled "Ad", eBay's blue "View on eBay" button, "updated N h ago" on the row; with no listing it is an eBay search for the product after the in-stock stores (that is also the server HTML: the listing is fetched as the page runs and then moves to its rank). The table shows 8 rows (the eBay row ranked among them) and puts the rest in two server-rendered drawers, split after ranking so the visible height never changes. When it is a NEW listing cheaper than every in-stock store (not on a pre-order product) it IS the best price (the owner's call, 2026-10-11): "Best price" on it, "Best store price" on the cheapest store, and the best-price card shows it (`listings-best-price`). Never counted in the store count or the median, never in JSON-LD, meta, OG, the sitemap or the "from" prices elsewhere |
 | `listings-best-price` | product page: the best-price card's eBay button, when the product's eBay listing (the price-table row's) is NEW and cheaper than every in-stock store, and the product is not a pre-order: the TOP of the card turns to it (its price, per-pack price, "Best price in stock · <shipping>", "eBay · Ad · updated N h ago · vs <cheapest store price> <store>", and the median/MSRP badges for it, on one line, only where the store's card has them). Below the rule the card stays the stores' facts ("up to … — you save …", median, "best store price … MSRP"). Not in NZ or SG (A$/US$ listings are not compared). The server HTML is the store's card; the swap happens in the browser, the two tops stacked in one space of fixed lines (no layout shift); the Marketplaces panel keeps its TCGplayer row on such pages |
 | `listings-best-price-alt` | product page: one line under the best-price card's headline when a STORE is the best price (the owner, 2026-10-28: "promote eBay more"): "eBay · Ad · Also on eBay: <the product's own new listing's price> · View ↗", the same listing as the table's eBay row (`useEbayPick`, no second fetch). Its own price only: no "+N%" or other figure derived from it. Not on pre-orders, NZ or SG. Never an estimated or invented price |
 | `best-price-ebay-search` | the same line as a labelled eBay search ("Compare listings on eBay · Search ↗") when the product has no listing to show, or when its listing is already the headline; it is also the server HTML, so the line never moves when the listing arrives |
@@ -320,20 +320,20 @@ underperforms:
 ## eBay listings: the daily import
 
 > **Inherited from DexCompare (2026-10-21) through MTG Compare.** The sections below describe mechanics this site runs unchanged. Their
-> examples (set names, "ETB", "Pokemon …" queries) and measured numbers are DexCompare's; WaxCompare's queries name the year, maker,
+> examples (set names, "ETB", "Pokemon …" queries) and measured numbers are DexCompare's; SportsCardCompare's queries name the year, maker,
 > line and sport, and its product types are in `src/lib/sealed-title.ts`.
 
 The image strips on the site ("Chase cards on eBay", "Sealed Pokémon on eBay", "<Set> chase cards on
 eBay", "<Product> on eBay") show **real eBay listings**: photo, title, price as eBay returns it, shipping,
 and how old the data is, each tile an affiliate link. They are **imported once a day** by a GitHub Actions
-job (`.github/workflows/ebay-import.yml`, `scripts/ebay-import.ts`) with WaxCompare's own eBay keys
+job (`.github/workflows/ebay-import.yml`, `scripts/ebay-import.ts`) with SportsCardCompare's own eBay keys
 and stored in two small tables; the website only **reads** them. Scraping eBay is a Terms violation and eBay
 blocks it; the Browse API is the only compliant source. **Every product page asks for its own listings**, which come
 first from the **catalogue sweep** (below): broad searches paged 200 listings a call, each listing handed to the
 product the repo's classifier says it is, so one call can feed dozens of products, cheap ones included.
 
 > **READ THIS FIRST: the 5,000 calls/day limit belongs to the eBay APPLICATION (the keyset), not to this site.**
-> WaxCompare runs on its OWN eBay keyset, a separate eBay application the owner created for it (owner, 2026-11-06: a new site never
+> SportsCardCompare runs on its OWN eBay keyset, a separate eBay application the owner created for it (owner, 2026-11-06: a new site never
 > shares an existing site's keys), capped at **2,500** calls a day (`EBAY_DAILY_CAP`, also the importer's hard maximum). The importer's
 > counter (`EbayCallDay`) counts only the searches THIS importer makes; it cannot see any other site's calls, and eBay's own counter
 > (which a 429 comes from) adds every user of the keyset. So if the keyset were ever shared with another site, set `EBAY_DAILY_CAP` to
@@ -416,7 +416,7 @@ also cover every product.
 
 ### What to set up
 
-1. **A Production keyset for WaxCompare's own eBay application** (developer.ebay.com → Application Keys → Production:
+1. **A Production keyset for SportsCardCompare's own eBay application** (developer.ebay.com → Application Keys → Production:
    "App ID" is the client id, "Cert ID" the secret; a Sandbox keyset does not work: the code only calls `api.ebay.com`).
    The Buy APIs are access-controlled: if the token works but searches answer 403, the keyset has not been granted Buy API
    access yet (apply from the application's page; eBay's Partner Network questionnaire, up to 10 business days). The 5,000
@@ -436,7 +436,7 @@ also cover every product.
    budget day and gets the full run cap, whatever manual runs were made the day before. (An earlier slot, before the reset, was the LAST
    run of its day: a manual "run it now" earlier that day left it only the 400-call slack, and most product strips went dark for ~18 h.)
    It is also a good time for the audience: 09:37 / 10:37 in the UK / central Europe, 19:37 in Sydney, 04:37 in New York, 01:37 in Los Angeles.
-5. **Run it now**: Actions → **WaxCompare eBay import** → **Run workflow**. Inputs: `only` (a comma-separated
+5. **Run it now**: Actions → **SportsCardCompare eBay import** → **Run workflow**. Inputs: `only` (a comma-separated
    subset of `chase, sealed, types, sets, sweep, items`; the input's own description predates `sweep`, which it accepts too), `force` (buy every feed again; a normal run does not re-buy a feed whose rows are less than 2 hours old, so an accidental second dispatch, or a re-run after a failure, spends nothing on what is already fresh), `dry_run` (prints the plan and the expected calls: no eBay call, no
    database write), `probe` (measures the catalogue sweep instead of importing: about 60 Browse calls, each reserved against the daily cap,
    match counts and sample titles in the log, **no listing written**; see "The catalogue sweep"). The job runs `prisma db push` first (two new tables, no data loss), and the importer creates the
@@ -810,7 +810,7 @@ compact search row.
 | --- | --- |
 | "Displayed item listing information may not be more than six (6) hours older" (prong 1) and "other eBay Content ... no more than twenty-four (24) hours older" (prong 2) (API License Agreement 8.1(c), "Age of Displayed eBay Content") | **Not met in the default daily mode** (26 h bound): disclosed ("Updated 9 h ago", "imported about once a day"), bounded (26 h), and switchable to a compliant mode (above). The growth release shows listing prices on more surfaces (sold-out box, Marketplaces panel, buy bar, grid tiles), each with the listing's age; the hour of edge caching never shows a row past the bound (the browser re-checks it) |
 | Delete copies when no longer required (3.1(b)); delete eBay Content that is no longer publicly available (8.1(b)(1)) | Rows are deleted when older than the bound + 4 h, by the importer (start and end of each run) and the store import; a refresh replaces, never appends; no history |
-| eBay content not "co-mingled or combined with non-eBay Content" (8.1(b)(2)) | **Not met on the product page, by the owner's choice (2026-10-11, widened by the growth release, 2026-10)**: the product's cheapest eBay listing is a row of the store price table (`listings-offer-row`), ranked by price among the stores, because WaxCompare compares websites and eBay is one; when that listing is cheaper than every in-stock store it counts as the product's best price (`listings-best-price`). The growth release extends the same listing (the same request, `useEbayPick`; never a second fetch) to three more places beside store content: the **sold-out box** shows its price (`listings-soldout-best`), the **Marketplaces panel** shows its price when the card is not already eBay (`listings-marketplace`), and the phone **buy bar** repeats whichever of those the top of the page shows (`product-sticky`). The in-feed **grid tiles** sit among product cards (framed, labelled, never in a table). Mitigations: every one is visibly eBay's (tint or frame, eBay-blue button, the eBay wordmark, "Ad", the listing's age) and the listing is never counted (store count, median). Strips still hold eBay listings only, in a dashed unit of their own. **To go back, per surface**: the table row and the card: drop `ebay=` from the product page's `<OfferTable>` (the row and its note go with it) and pass `ebay={null}` to its `<BestPriceCard>`; the sold-out box: remove `<SoldOutEbay>` from the callout (`src/components/Marketplaces.tsx`), leaving the server's `soldout-ebay` search button; the panel: remove `<PanelEbayPrice>`, leaving the `product-marketplace` search row; the buy bar: give it no eBay listing (it then repeats the store, TCGplayer or the eBay search), or remove `<StickyBuyBar>` from the product page; the grid tiles: drop the `tiles` prop from the `<ProductGrid>`s |
+| eBay content not "co-mingled or combined with non-eBay Content" (8.1(b)(2)) | **Not met on the product page, by the owner's choice (2026-10-11, widened by the growth release, 2026-10)**: the product's cheapest eBay listing is a row of the store price table (`listings-offer-row`), ranked by price among the stores, because SportsCardCompare compares websites and eBay is one; when that listing is cheaper than every in-stock store it counts as the product's best price (`listings-best-price`). The growth release extends the same listing (the same request, `useEbayPick`; never a second fetch) to three more places beside store content: the **sold-out box** shows its price (`listings-soldout-best`), the **Marketplaces panel** shows its price when the card is not already eBay (`listings-marketplace`), and the phone **buy bar** repeats whichever of those the top of the page shows (`product-sticky`). The in-feed **grid tiles** sit among product cards (framed, labelled, never in a table). Mitigations: every one is visibly eBay's (tint or frame, eBay-blue button, the eBay wordmark, "Ad", the listing's age) and the listing is never counted (store count, median). Strips still hold eBay listings only, in a dashed unit of their own. **To go back, per surface**: the table row and the card: drop `ebay=` from the product page's `<OfferTable>` (the row and its note go with it) and pass `ebay={null}` to its `<BestPriceCard>`; the sold-out box: remove `<SoldOutEbay>` from the callout (`src/components/Marketplaces.tsx`), leaving the server's `soldout-ebay` search button; the panel: remove `<PanelEbayPrice>`, leaving the `product-marketplace` search row; the buy bar: give it no eBay listing (it then repeats the store, TCGplayer or the eBay search), or remove `<StickyBuyBar>` from the product page; the grid tiles: drop the `tiles` prop from the `<ProductGrid>`s |
 | No derived statistics (8.1(d)) | None: no average, median, "% below"; prices shown as returned, never converted, counted, averaged, or in JSON-LD, meta, OG or the sitemap; the exceptions, the owner's calls: the price table's eBay row (above) is placed by its price among the stores', and when it is the cheapest it is the best price, with that card's per-pack price and median/MSRP comparisons computed from it in the browser (`listings-best-price`); never a count or a median, never server-rendered; the order within a product's feed is "lowest price first, before shipping" (shown on the strip) and says nothing else; the catalogue sweep's counts (listings matched, products found) stay in the job's log and summary, never on the site |
 | "Only surface FIXED PRICE items"; eBay's own image; shipping separate; "indicate when the item is not new" (Buy APIs Requirements) | `buyingOptions:{FIXED_PRICE}`; `*.ebayimg.com` thumbnails as plain `<img>`; the first shipping option is shown on the tile; the condition is shown when it is not new |
 | Use the URL returned in `itemAffiliateWebUrl` | Every link is that URL **exactly as returned** (the importer checks it is one eBay item page with our campaign id and stores eBay's own string; the browser checks an eBay item URL with a numeric `campid` and changes nothing in it). `customid` is the per-feed `affiliateReferenceId` the importer sent (`dex-<market>-<feed kind>`). Only when eBay sends no usable one is `itemWebUrl` tagged with the same EPN parameters |
@@ -832,22 +832,22 @@ Run `scripts/ebay-check.ts` once the keys are in, then one manual import, and re
 
 ## Checking it works
 
-- `https://waxcompare.app/au` shows products, "Last checked" a few minutes/hours ago.
-- `https://waxcompare.app/sitemap.xml` lists eight files, and
+- `https://sportscardcompare.com/au` shows products, "Last checked" a few minutes/hours ago.
+- `https://sportscardcompare.com/sitemap.xml` lists eight files, and
   `/sitemap/2.xml` (US) has a couple of thousand `/us/p/…` URLs. A regional
   file with no products means the database is empty or unreachable (the build
   writes empty regional files when it cannot reach the database, and a preview
   build always does; the first
   import's page refresh fills them).
 - `view-source:` of any page: `<link rel="canonical">` and every `hrefLang`
-  say `https://waxcompare.app/…`. If they say another host, fix
+  say `https://sportscardcompare.com/…`. If they say another host, fix
   `NEXT_PUBLIC_SITE_URL` and redeploy.
 - `/AU` answers 308 to `/au`; `/foo` answers 404 with the branded page.
 - A product page lists stores with *In stock* / *Sold out* and "checked … ago".
 - `/us`, `/us/deals`, `/us/cheapest-packs`, `/us/this-week`, `/us/guides` and one guide, an in-stock and a sold-out product,
   and `/api/browse/us` answer 200; `view-source:` of any of them holds no `ebayimg.com`, no `/itm/` and no eBay price (eBay
   data only ever arrives in the browser).
-- `curl -sI "https://waxcompare.app/api/ebay/us?c=sealed"` shows `cache-control: public, max-age=60, s-maxage=3600,
+- `curl -sI "https://sportscardcompare.com/api/ebay/us?c=sealed"` shows `cache-control: public, max-age=60, s-maxage=3600,
   stale-while-revalidate=82800` (or `public, max-age=30, s-maxage=600` while the feed is empty), and a second request within the
   hour answers `x-vercel-cache: HIT` (the edge may rewrite the header it passes on, so if it looks different, read it in the
   Vercel function logs).
@@ -880,9 +880,9 @@ the week before, should be flat or lower; the Vercel logs should have no `[egres
 
 ## PageSpeed check
 
-`.github/workflows/psi-dexcompare.yml` runs Google PageSpeed Insights on `https://waxcompare.app` (`/us`, one in-stock product,
+`.github/workflows/psi-dexcompare.yml` runs Google PageSpeed Insights on `https://sportscardcompare.com` (`/us`, one in-stock product,
 `/us/sealed`, `/us/type/booster-boxes`; phone and desktop) **every Monday at 06:23 UTC** and on demand (Actions → **PageSpeed
-check WaxCompare** → Run workflow; the `paths` input takes other paths). It needs the repository secret **`PSI_API_KEY`**
+check SportsCardCompare** → Run workflow; the `paths` input takes other paths). It needs the repository secret **`PSI_API_KEY`**
 (Google Cloud console → APIs & Services → enable "PageSpeed Insights API" → Credentials → API key; restrict it to that API).
 Without the secret the job writes "skipped" to its summary and succeeds. A run makes 8 API calls and takes about two minutes;
 it fails only when every call fails (a wrong key). Read the job summary: the lab score, LCP, CLS and TBT, and the real-user (field)
@@ -913,7 +913,7 @@ morning: Neon's network transfer, as above.
   are free. If the repo is ever made private, twice a day is ~2,000+ minutes a
   month — change the two `cron:` lines in
   `.github/workflows/sealed-import.yml` to one.
-- **eBay API: WaxCompare's own keyset, in GitHub Actions only.** One import a day makes at most 2,500 Browse
+- **eBay API: SportsCardCompare's own keyset, in GitHub Actions only.** One import a day makes at most 2,500 Browse
   calls (the run cap; the daily cap, 2,500 across every run, is kept in the database), most of them catalogue
   sweep pages; the website makes none. The job's timeout is 90 minutes. Nothing here can
   spend Rift Compare's eBay quota unless both sites share one keyset (the owner's other site shares the
@@ -923,7 +923,7 @@ morning: Neon's network transfer, as above.
   the same approved account as Rift Compare. Every page carries Impact's
   `impact-site-verification` tags (the account's shared token, as on the other
   CompareEmpire sites, and the token Impact issued for this site's own
-  property, `f20df7de-…`); in Impact, check that `waxcompare.app` is listed as a promotional
+  property, `f20df7de-…`); in Impact, check that `sportscardcompare.com` is listed as a promotional
   property of that account.
 - **When the import goes red**: fewer than half the stores read, nothing
   requested read at all, or TCGplayer not read for 48 hours (its offers show
@@ -936,7 +936,7 @@ morning: Neon's network transfer, as above.
   Vercel build. A push to `main` that changes `prisma/schema.prisma` starts
   that job on its own (a two-minute TCGplayer-only run, which also recomputes
   every product's stats), so a new column — e.g. `ProductStat.marketplaceOpen`
-  — lands at about the same time as the deploy. Check Actions → **WaxCompare
+  — lands at about the same time as the deploy. Check Actions → **SportsCardCompare
   sealed import** went green after such a merge; until the column exists, new
   pages that aren't cached yet fail to render. An added column with a default
   is safe for the old code.

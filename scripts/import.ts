@@ -42,7 +42,7 @@ async function revalidate(): Promise<string> {
 
 // Fewer product URLs than this across every region's sitemap means the live
 // sitemap is broken (a failed query, a stale copy, the wrong database), not
-// quiet (WaxCompare's catalogue is smaller than DexCompare's ~8,000: the floor is 200). A full import is the only run that can
+// quiet (SportsCardCompare's catalogue is smaller than DexCompare's ~8,000: the floor is 200). A full import is the only run that can
 // judge it, so --only runs skip the check.
 const MIN_SITEMAP_PRODUCTS = 200;
 
@@ -112,7 +112,7 @@ async function main() {
   // "N stores" counts independent stores only; a marketplace is reported by name.
   const marketplaces = summary.marketplaces.map((m) => `${m.name} ${m.ok ? `read (${m.offers} offers)` : "NOT read"}`);
   const lines = [
-    `## WaxCompare import`,
+    `## SportsCardCompare import`,
     ``,
     [
       ...(summary.stores ? [`${summary.ok}/${summary.stores} stores read`] : []),

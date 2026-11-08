@@ -52,7 +52,7 @@ test("the sitemap: strong products only; sets and types from three comparable pr
   assert.match(route, /c >= MIN_HUB_PRODUCTS/);
   // regionSitemap itself lists what it is given
   const urls = regionSitemap(REGIONS.uk, { typeLabels: [], setCodes: [], productSlugs: ["a"], lastmod: null }).map((e) => e.url);
-  assert.deepEqual(urls, ["https://waxcompare.app/uk/p/a"]);
+  assert.deepEqual(urls, ["https://sportscardcompare.com/uk/p/a"]);
 });
 
 test("thin section pages: noindex by the same rule the sitemap leaves them out by", () => {
@@ -68,7 +68,7 @@ test("thin section pages: noindex by the same rule the sitemap leaves them out b
   const all = staticSitemap({}, undefined, "2026-10-25").map((e) => e.url);
   const some = staticSitemap({}, undefined, "2026-10-25", { uk: ["/price-moves", "/deals"], eu: ["/deals"] }).map((e) => e.url);
   const gone = all.filter((u) => !some.includes(u));
-  assert.deepEqual(gone.sort(), ["https://waxcompare.app/eu/deals", "https://waxcompare.app/uk/deals", "https://waxcompare.app/uk/price-moves"]);
+  assert.deepEqual(gone.sort(), ["https://sportscardcompare.com/eu/deals", "https://sportscardcompare.com/uk/deals", "https://sportscardcompare.com/uk/price-moves"]);
 });
 
 test("empty set and type pages are real 404s, never an empty 200", () => {

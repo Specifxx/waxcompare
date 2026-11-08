@@ -197,7 +197,7 @@ export function SoldOutCallout({
 }) {
   const r = REGIONS[region];
   const us = r.market === "US";
-  // A TCGplayer button only for a real TCGplayer match (none on WaxCompare today: TCGplayer does not carry sealed sports cards).
+  // A TCGplayer button only for a real TCGplayer match (none on SportsCardCompare today: TCGplayer does not carry sealed sports cards).
   const tcg = tcgplayer ? tcgplayerLink(region, productName, tcgplayer, "product-soldout") : null;
   const tcgOpen = !us && tcgplayer && offerStock(tcgplayer) === "open";
   const tcgBtn = tcg && (

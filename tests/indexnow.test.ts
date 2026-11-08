@@ -16,24 +16,24 @@ test("the key: IndexNow's format, INDEXNOW_KEY overrides the default, a malforme
 
 test("the sitemap index is followed to its pages, never submitting the child sitemaps themselves", async () => {
   const fx: Record<string, string> = {
-    "https://waxcompare.app/sitemap.xml":
-      '<sitemapindex><sitemap><loc>https://waxcompare.app/sitemap/0.xml</loc></sitemap><sitemap><loc>https://waxcompare.app/sitemap/1.xml</loc></sitemap></sitemapindex>',
-    "https://waxcompare.app/sitemap/0.xml": "<urlset><url><loc>https://waxcompare.app</loc></url><url><loc>https://waxcompare.app/au</loc></url></urlset>",
-    "https://waxcompare.app/sitemap/1.xml":
-      "<urlset><url><loc>https://waxcompare.app/au/p/delta-reign-booster-box</loc></url><url><loc>https://waxcompare.app/au?a=1&amp;b=2</loc></url><url><loc>https://waxcompare.app/au</loc></url></urlset>",
+    "https://sportscardcompare.com/sitemap.xml":
+      '<sitemapindex><sitemap><loc>https://sportscardcompare.com/sitemap/0.xml</loc></sitemap><sitemap><loc>https://sportscardcompare.com/sitemap/1.xml</loc></sitemap></sitemapindex>',
+    "https://sportscardcompare.com/sitemap/0.xml": "<urlset><url><loc>https://sportscardcompare.com</loc></url><url><loc>https://sportscardcompare.com/au</loc></url></urlset>",
+    "https://sportscardcompare.com/sitemap/1.xml":
+      "<urlset><url><loc>https://sportscardcompare.com/au/p/delta-reign-booster-box</loc></url><url><loc>https://sportscardcompare.com/au?a=1&amp;b=2</loc></url><url><loc>https://sportscardcompare.com/au</loc></url></urlset>",
   };
-  const urls = await sitemapUrls("https://waxcompare.app/sitemap.xml", async (u) => fx[u] ?? "", 0);
-  assert.deepEqual(urls, ["https://waxcompare.app", "https://waxcompare.app/au", "https://waxcompare.app/au/p/delta-reign-booster-box", "https://waxcompare.app/au?a=1&b=2"]);
+  const urls = await sitemapUrls("https://sportscardcompare.com/sitemap.xml", async (u) => fx[u] ?? "", 0);
+  assert.deepEqual(urls, ["https://sportscardcompare.com", "https://sportscardcompare.com/au", "https://sportscardcompare.com/au/p/delta-reign-booster-box", "https://sportscardcompare.com/au?a=1&b=2"]);
   assert.ok(!urls.some((u) => u.endsWith(".xml")));
   assert.deepEqual(await sitemapUrls("https://x.test/s.xml", async () => "<urlset><url><loc>https://x.test/a</loc></url></urlset>", 0), ["https://x.test/a"], "a plain urlset");
 });
 
 test("the request names the host of the sitemap's own URLs (the apex), and leaves any other host out", () => {
-  const plan = submissionPlan(["https://waxcompare.app", "https://waxcompare.app/au/sealed", "https://www.waxcompare.app/old"]);
+  const plan = submissionPlan(["https://sportscardcompare.com", "https://sportscardcompare.com/au/sealed", "https://www.sportscardcompare.com/old"]);
   assert.ok(plan);
-  assert.equal(plan.host, "waxcompare.app");
-  assert.equal(plan.keyLocation, "https://waxcompare.app/indexnow.txt");
-  assert.deepEqual(plan.urls, ["https://waxcompare.app", "https://waxcompare.app/au/sealed"]);
+  assert.equal(plan.host, "sportscardcompare.com");
+  assert.equal(plan.keyLocation, "https://sportscardcompare.com/indexnow.txt");
+  assert.deepEqual(plan.urls, ["https://sportscardcompare.com", "https://sportscardcompare.com/au/sealed"]);
   assert.equal(plan.dropped, 1, "a URL on another host would make IndexNow refuse the batch (422): it is left out");
   assert.equal(submissionPlan([]), null);
 });

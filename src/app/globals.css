@@ -10,7 +10,7 @@
   --ink: 21 23 28;
   --muted: 92 96 108;
   --faint: 100 104 115; /* 5.2:1 on --bg, 5.6:1 on --surface (WCAG AA for small text) */
-  --brand: 184 22 46; /* WaxCompare seal red; white on it is 6.6:1, and it reads at 6.3:1 on --bg */
+  --brand: 184 22 46; /* SportsCardCompare seal red; white on it is 6.6:1, and it reads at 6.3:1 on --bg */
   --brand-ink: 255 255 255;
   --brand-soft: 252 233 236;
   --brand-strong: 146 14 34; /* brand as TEXT on --brand-soft and on --surface: chips and .btn-soft */
@@ -713,7 +713,7 @@ body:has([data-ebay-no-prefooter]) [data-ebay-prefooter] {
 }
 /* xmas-common:end */
 
-/* xmas-site:start — WaxCompare's Christmas: the landing hero turns into a
+/* xmas-site:start — SportsCardCompare's Christmas: the landing hero turns into a
    snowy winter night (dark) or a frosted morning (light), with snow, lights,
    trees and a candy cane (ChristmasDecor), a gifts line to the sealed list
    (ChristmasGifts) and Santa's hat on the five-orb mark. Brand, buy and stock
@@ -741,7 +741,7 @@ body:has([data-ebay-no-prefooter]) [data-ebay-prefooter] {
   --xmas-pill-soft: #1e3a5f;
   --xmas-pill-border: rgb(185 28 28 / 0.4);
 }
-/* WaxCompare keeps Christmas very light (owner, 2026-11-08: "some of the christmas themes … are a bit too much … the theme must
+/* SportsCardCompare keeps Christmas very light (owner, 2026-11-08: "some of the christmas themes … are a bit too much … the theme must
    match the domain"): no hat on the mark and no snow or trees in the hero (ChristmasDecor is no longer mounted); the gifts line stays. */
 :root[data-season="christmas"] .xmas-logo-hat {
   display: none;

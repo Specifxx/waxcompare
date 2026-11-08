@@ -1,5 +1,5 @@
 /**
- * What WaxCompare lists: the more popular products only (owner, 2026-11-08: "cull it a bit so it only features the more popular
+ * What SportsCardCompare lists: the more popular products only (owner, 2026-11-08: "cull it a bit so it only features the more popular
  * products"; MTG Compare's low-traction cull, mtgcompare #96, is the pattern). DECISIONS.md, 2026-11-08.
  *
  * PURE, so the exporter (scripts/export-public-data.ts), which decides what reaches data/public/, and tests/focus.test.ts read the

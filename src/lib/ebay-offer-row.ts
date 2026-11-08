@@ -1,7 +1,7 @@
 // The eBay row of a product's price table (components/OfferTable.tsx, EbayStrip.tsx OfferRowsWithEbay): which listing it shows, and the
 // note under the table. Pure, shared by the server table and the browser.
 //
-// The owner's calls (2026-10-11): WaxCompare compares WEBSITES, and eBay is one of them, so the product's cheapest eBay listing is a row of
+// The owner's calls (2026-10-11): SportsCardCompare compares WEBSITES, and eBay is one of them, so the product's cheapest eBay listing is a row of
 // the store table with eBay's blue button, labelled "Ad" (since 2026-10-26 pinned FIRST, TCGplayer second, then the stores cheapest
 // first, each row in the store rows' layout: the owner's call, EbayStrip.tsx OfferRowsWithEbay); and when
 // it is a new listing cheaper than every one of those stores (and the product is not a pre-order) it COUNTS AS THE CHEAPEST PRICE: the "Best price" badge in the table, and the product

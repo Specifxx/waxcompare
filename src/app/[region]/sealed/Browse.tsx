@@ -27,7 +27,7 @@ export function pageNumber(n: string): number {
   return Number(n);
 }
 
-const SUFFIX = " | WaxCompare"; // the root layout's title template
+const SUFFIX = " | SportsCardCompare"; // the root layout's title template
 
 export function browseTitle(r: RegionInfo, page: number): string {
   const suffix = page > 1 ? ` — page ${page}` : "";

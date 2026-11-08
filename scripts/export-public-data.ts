@@ -1,4 +1,4 @@
-// Writes every public table to data/public/ (src/lib/public-data/format.ts), the files the site reads (WaxCompare has no hosted database).
+// Writes every public table to data/public/ (src/lib/public-data/format.ts), the files the site reads (SportsCardCompare has no hosted database).
 // Run by .github/workflows/sealed-import.yml after each import, which commits the result to main: that commit is the
 // release that puts the new prices live (a data commit changes the repository, so Vercel builds it).
 //

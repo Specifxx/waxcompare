@@ -7,7 +7,7 @@ import { featureOrder } from "./release";
 // unreleased set does nothing until it is out (the importer refuses pre-sale listings).
 
 /** The hot sets, the owner's list (pages feature them in hotSetsByFeature order: the newest released set first, never a pre-order). */
-// None yet (2026-11-07): WaxCompare picks its hot releases from what visitors open and eBay sells, once there is a week of it.
+// None yet (2026-11-07): SportsCardCompare picks its hot releases from what visitors open and eBay sells, once there is a week of it.
 // Codes are release codes ("2026|chrome|baseball", sets.ts). Every other released set still gets its own set-sealed button.
 export const HOT_SETS: readonly string[] = [];
 

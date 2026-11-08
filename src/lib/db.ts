@@ -4,7 +4,7 @@ import { routeQuery } from "./public-data/route";
 // ─── WHERE THE DATA LIVES ─────────────────────────────────────────────────────────
 // Every public table is exported to data/public/ after each import and committed to main (scripts/export-public-data.ts), and
 // the site reads THOSE FILES (src/lib/public-data/, PUBLIC_DATA_MODE "files", the default): no page, route or build touches a
-// database. WaxCompare has no hosted database (DECISIONS.md 2026-11-07): the importers (scripts set WAXCOMPARE_SCRIPT=1) run on a
+// database. SportsCardCompare has no hosted database (DECISIONS.md 2026-11-07): the importers (scripts set WAXCOMPARE_SCRIPT=1) run on a
 // throwaway Postgres inside the GitHub runner, seeded from the committed files. A read the file engine cannot answer exactly falls
 // through to the database and logs [public-data:unsupported] once, which tests/public-data.test.ts keeps at zero for the loaders.
 //

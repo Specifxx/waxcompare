@@ -72,7 +72,7 @@ test("singles note: says the site is sealed only and links the sealed guides of 
 
 test("landing page metadata: the sealed queries first, title under 60 and description under 155 characters", () => {
   const page = readFileSync(new URL("../src/app/(site)/page.tsx", import.meta.url), "utf8");
-  const title = /const TITLE = `([^`]+)`/.exec(page)![1].replace("${SITE_NAME}", "WaxCompare");
+  const title = /const TITLE = `([^`]+)`/.exec(page)![1].replace("${SITE_NAME}", "SportsCardCompare");
   const desc = /const DESCRIPTION = `([^`]+)`/.exec(page)![1].replace("${STORES.length}", "383");
   assert.ok(title.length < 60, title);
   assert.ok(desc.length < 155, `${desc.length}: ${desc}`);

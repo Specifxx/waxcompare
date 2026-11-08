@@ -55,5 +55,5 @@ test("articleJsonLd: headline, dates, mainEntityOfPage, and MTG Compare (an Orga
     assert.equal(who.url, SITE_URL);
   }
   assert.equal(a.publisher.logo.url, `${SITE_URL}/logo.svg`);
-  assert.equal(articleJsonLd({ title: "t", description: "d", path: "/us/guides/x", published: "2026-01-01", updated: "2026-01-01", image: "https://waxcompare.app/x.png" }).image, "https://waxcompare.app/x.png");
+  assert.equal(articleJsonLd({ title: "t", description: "d", path: "/us/guides/x", published: "2026-01-01", updated: "2026-01-01", image: "https://sportscardcompare.com/x.png" }).image, "https://sportscardcompare.com/x.png");
 });

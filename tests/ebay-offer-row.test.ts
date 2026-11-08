@@ -42,7 +42,7 @@ test("the listing shown: the lowest-priced of the product's own feed, never one 
   assert.equal(listingCents("x"), null);
 });
 
-test("a listing stating another pack count than the product's is not the product; WaxCompare knows no pack count, so the check stays off", () => {
+test("a listing stating another pack count than the product's is not the product; SportsCardCompare knows no pack count, so the check stays off", () => {
   assert.deepEqual(statedPacks("2025 Topps Chrome Baseball Hobby Box 12 Packs Factory Sealed"), [12]);
   assert.equal(wrongPackCount("2025 Topps Chrome Baseball Hobby Box 12 Packs", 20), true);
   assert.equal(wrongPackCount("2025 Topps Chrome Baseball Hobby Box (20 Packs)", 20), false, "any stated count that is the product's will do");
@@ -59,7 +59,7 @@ test("a listing stating another pack count than the product's is not the product
     { title: "2025 Topps Chrome Baseball Hobby Box Factory Sealed", price: { value: "320.00", currency: "USD" } },
   ];
   assert.equal(pickListing(feed, null, 20)?.price.value, "320.00");
-  assert.equal(pickListing(feed, null)?.price.value, "180.00", "without a pack count (every WaxCompare product today) the check does nothing");
+  assert.equal(pickListing(feed, null)?.price.value, "180.00", "without a pack count (every SportsCardCompare product today) the check does nothing");
 });
 
 const NOW = Date.now();
@@ -108,7 +108,7 @@ test("the server table: the eBay row FIRST as a search (labelled Ad, sponsored, 
   assert.ok(!(PLACEMENTS as readonly string[]).includes("listings-price-rows"), "the old block above the table is gone");
 });
 
-test("pinned rows: eBay first, Amazon second (owner, 2026-11-06), then the stores; no TCGplayer search row on WaxCompare (its catalogue is card games)", () => {
+test("pinned rows: eBay first, Amazon second (owner, 2026-11-06), then the stores; no TCGplayer search row on SportsCardCompare (its catalogue is card games)", () => {
   const offers = [offer("alpha", 5000), offer("beta", 6000)];
   const us = render(React.createElement(OfferTable, { offers, region: "us", preorder: false, ebay: { slug: "x", query: "X", floor: null, packs: null }, pinned: { productName: "X", tcgplayer: null } }));
   const rows = [...us.matchAll(/<li data-offer-row=""([^>]*)>/g)].map((m) => m[1]);

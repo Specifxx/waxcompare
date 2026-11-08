@@ -20,7 +20,7 @@ import { OFFER_STALE_MS } from "./sealed-offers";
 import { SITE_NAME } from "./site";
 
 // ─── Titles ────────────────────────────────────────────────────────────────────
-// The root layout's template adds " | WaxCompare". A title that would run past 65 characters with it goes out as
+// The root layout's template adds " | SportsCardCompare". A title that would run past 65 characters with it goes out as
 // title.absolute (no suffix), so the words that rank (the set, the region, the date) are the ones a results page keeps.
 
 export const TITLE_SUFFIX = ` | ${SITE_NAME}`;
@@ -62,7 +62,7 @@ export function isoDay(now: Date = new Date()): string {
 }
 
 /**
- * The first day the import read any store (2026-11-07). A release first seen on or before it was already in stores when WaxCompare
+ * The first day the import read any store (2026-11-07). A release first seen on or before it was already in stores when SportsCardCompare
  * started, so its first-seen day says nothing about when it came out: no "In stores since" for it.
  */
 export const FIRST_IMPORT_DAY = "2026-11-07";
@@ -376,7 +376,7 @@ export function storeIntro(o: {
   const cheapest = o.rows.reduce((n, x) => n + x.cheapest, 0);
   const out: string[] = [];
   out.push(
-    `${o.name} (${o.host}) is one of the ${plural(o.storesInRegion, `${o.r.adjective} online store`)} WaxCompare reads about twice a day for sealed sports cards. ` +
+    `${o.name} (${o.host}) is one of the ${plural(o.storesInRegion, `${o.r.adjective} online store`)} SportsCardCompare reads about twice a day for sealed sports cards. ` +
       (listed
         ? `Right now it lists ${plural(listed, "sealed product")}, ${inStock} of them in stock, every price in ${o.r.currency} as the store shows it.`
         : `We haven’t found any sealed sports cards on its site yet.`),

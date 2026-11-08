@@ -62,7 +62,7 @@ export const historyDays = (h: PriceHistory | null): number => (h ? h.through - 
 
 /**
  * The market's products open in the last snapshot that, within the last `days`, went from a snapshot with nothing open to one with
- * it open. A product's FIRST snapshot is never a "came back" (it may only be new to WaxCompare: that is "Newly listed"). Most recent
+ * it open. A product's FIRST snapshot is never a "came back" (it may only be new to SportsCardCompare: that is "Newly listed"). Most recent
  * return first, then the most stores. Empty under MIN_DAYS_BACK days of snapshots.
  */
 export function backInStock(h: PriceHistory | null, market: string, { days = BACK_DAYS } = {}): BackInStock[] {

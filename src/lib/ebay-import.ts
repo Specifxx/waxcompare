@@ -235,7 +235,7 @@ export const MARKETPLACE_ORDER: readonly MarketplaceId[] = [
   ...MARKETPLACE_IDS.filter((m) => !(PRIORITY_MARKETPLACES as readonly string[]).includes(m)).sort((a, b) => MARKET_WEIGHT[b] - MARKET_WEIGHT[a] || a.localeCompare(b)),
 ];
 
-/** The "chase" feed: HIGH-END SEALED (WaxCompare's store rows are sealed only), 8 queries, taken round-robin (normaliseChase keeps HIGH_END_TYPES). */
+/** The "chase" feed: HIGH-END SEALED (SportsCardCompare's store rows are sealed only), 8 queries, taken round-robin (normaliseChase keeps HIGH_END_TYPES). */
 export const CHASE_QUERIES = [
   "topps chrome hobby box sealed",
   "bowman chrome hobby box sealed",

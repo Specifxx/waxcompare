@@ -10,7 +10,7 @@ import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site";
 // /creators: the sports card creators we feature (owner, 2026-10-30), modelled on RiftCompare's /creators. The list is static
 // (lib/creators.ts) and the page reads no data, so it is prerendered at build like /about: a visit is a static file. Every word and
 // link is in the server HTML (the crawlability rule). Creators' links are followed and keep the referrer (rel="noopener", no
-// "noreferrer"): their analytics should see waxcompare.app, which is the point of the listing.
+// "noreferrer"): their analytics should see sportscardcompare.com, which is the point of the listing.
 
 export const metadata: Metadata = pageMeta({
   title: "Sports Card Creators We Feature: Breaks, Rips & More",
@@ -40,7 +40,7 @@ const FAQS = [
     a: "Anyone who makes sports card content regularly: box openings, collection tours, hobby news, grading, on Instagram, YouTube, TikTok, Twitch or a blog. Good content matters more than audience size.",
   },
   {
-    q: "Does WaxCompare earn from these links?",
+    q: "Does SportsCardCompare earn from these links?",
     a: "No. Links to creators are plain links to their own profiles. Nobody pays to be listed here, and a listing never changes how stores are ranked.",
   },
 ];
@@ -202,7 +202,7 @@ export default function CreatorsPage() {
           here and on our homepage. Mention {SITE_NAME} in your content now and then, and we send collectors your way.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <a href={`mailto:${CONTACT_EMAIL}?subject=WaxCompare%20creator%20feature`} className="btn-primary min-h-11 px-5">
+          <a href={`mailto:${CONTACT_EMAIL}?subject=SportsCardCompare%20creator%20feature`} className="btn-primary min-h-11 px-5">
             Email us to get featured
           </a>
           <Link href="/contact" className="btn-ghost min-h-11 px-5">
