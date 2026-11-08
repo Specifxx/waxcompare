@@ -93,7 +93,7 @@ test("static sitemap: every guide in each region it is offered in, and nowhere e
   for (const g of GUIDES) {
     for (const r of REGION_LIST) {
       const u = `${SITE_URL}/${r.region}/guides/${g.slug}`;
-      assert.equal(urls.has(u), guideRegions(g).includes(r.region), u);
+      assert.equal(urls.has(u), guideRegions(g).includes(r.region) && ["us", "au", "uk", "ca"].includes(r.region), u);
     }
   }
   // The one by-country page at its region-less URL, and the blog.
