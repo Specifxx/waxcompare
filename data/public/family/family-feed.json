@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-08T00:33:57.466Z",
+ "generatedAt": "2026-11-08T02:21:32.022Z",
  "links": {
   "AU": {
    "deals": "https://waxcompare.app/au/deals"
@@ -58,6 +58,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "AU",
+   "title": "2024-25 Panini Adrenalyn XL Premier League Starter Pack",
+   "url": "https://waxcompare.app/au/p/2024-25-panini-adrenalyn-xl-premier-league-starter-pack",
+   "cents": 1245,
+   "currency": "AUD",
+   "store": "Gameology",
+   "image": "https://cdn.shopify.com/s/files/1/0598/2244/0600/files/Premier-League-Adrenalyn-XL-2025-PLUS-Starter-Pack-R-1024x1024.png?v=1748148194",
+   "refCents": 2000,
+   "refLabel": "median store price",
+   "savingPct": 38
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "AU",
    "title": "2026 Topps Heritage Baseball Value Box",
    "url": "https://waxcompare.app/au/p/2026-topps-heritage-baseball-value-pack",
    "cents": 4000,
@@ -95,20 +109,6 @@
    "refCents": 6999,
    "refLabel": "median store price",
    "savingPct": 36
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "AU",
-   "title": "2024-25 Panini Adrenalyn XL Premier League Pack",
-   "url": "https://waxcompare.app/au/p/2024-25-panini-adrenalyn-xl-premier-league-pack",
-   "cents": 300,
-   "currency": "AUD",
-   "store": "One Stop Poke Shop",
-   "image": "https://cdn.shopify.com/s/files/1/0598/2244/0600/files/Premier-League-Adrenalyn-XL-2025-PLUS-Booster-1-1024x1024.jpg?v=1747886161",
-   "refCents": 450,
-   "refLabel": "median store price",
-   "savingPct": 33
   },
   {
    "kind": "deal",
@@ -324,15 +324,15 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
-   "title": "2021-22 Upper Deck Series 1 Hockey Display Box",
-   "url": "https://waxcompare.app/ca/p/2021-22-upper-deck-series-1-hockey-display-box",
-   "cents": 4995,
+   "title": "2026 Panini Prizm World Cup Mega Box",
+   "url": "https://waxcompare.app/ca/p/2026-panini-prizm-world-cup-mega-box",
+   "cents": 5995,
    "currency": "CAD",
-   "store": "Rémi Card Trader",
-   "image": "https://cdn.shopify.com/s/files/1/0469/6417/9110/products/2021-22UpperDeckSeries1Hockeyretail.jpg?v=1637693725",
-   "refCents": 8999,
+   "store": "Mystic Dragon",
+   "image": "https://cdn.shopify.com/s/files/1/0022/6158/1926/files/2-20262-20.webp?v=1789955501",
+   "refCents": 9995,
    "refLabel": "median store price",
-   "savingPct": 44
+   "savingPct": 40
   },
   {
    "kind": "deal",
@@ -352,15 +352,15 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
-   "title": "2025 Panini Score Football Blaster Box",
-   "url": "https://waxcompare.app/ca/p/2025-panini-score-football-blaster-box",
-   "cents": 3495,
+   "title": "2021-22 Upper Deck Series 1 Hockey Display Box",
+   "url": "https://waxcompare.app/ca/p/2021-22-upper-deck-series-1-hockey-display-box",
+   "cents": 4995,
    "currency": "CAD",
-   "store": "Morrison Trading Post",
-   "image": "https://cdn.shopify.com/s/files/1/0414/6957/files/panini.fw_62103e92-49a0-4192-80ab-c27ce5f2a61c.png?v=1762314990",
-   "refCents": 5497,
+   "store": "Rémi Card Trader",
+   "image": "https://cdn.shopify.com/s/files/1/0469/6417/9110/products/2021-22UpperDeckSeries1Hockeyretail.jpg?v=1637693725",
+   "refCents": 7999,
    "refLabel": "median store price",
-   "savingPct": 36
+   "savingPct": 38
   },
   {
    "kind": "deal",
