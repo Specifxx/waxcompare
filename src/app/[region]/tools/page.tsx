@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export function generateMetadata({ params }: { params: { region: string } }): Metadata {
   const r = regionOrNotFound(params.region);
   return pageMeta({
-    title: "Sports card tools: sealed value checker and eBay fee calculator",
+    title: "Sports card tools: good price checker, value checker, eBay fees",
     description: `Free sports card tools for ${r.inName}: a sealed value checker and an eBay selling-fee calculator.`,
     path: `/${r.region}/tools`,
     alternates: regionAlternates(r.region, "/tools"),
