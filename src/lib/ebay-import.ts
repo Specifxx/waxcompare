@@ -62,18 +62,19 @@ import { SET_BY_CODE, SETS, type MtgSet } from "./sets";
 
 // ─── Tunables ──────────────────────────────────────────────────────────────────
 
-export const DEFAULT_RUN_CAP = 2500;
-export const DEFAULT_DAILY_CAP = 2500;
+export const DEFAULT_RUN_CAP = 1400;
+export const DEFAULT_DAILY_CAP = 1400;
 /** Calls the catalogue sweep may spend (of what the fixed feeds leave); the per-product searches get the rest. EBAY_SWEEP_CALLS overrides. */
 /**
  * Measured on the first full run (2026-10-11): the sweep wrote 4,673 item feeds with 1,800 calls (2.6 a call); the 408 per-product
  * searches after it found listings for 150 products (0.37 a call). So the sweep gets most of the day.
  */
-export const DEFAULT_SWEEP_CALLS = 2100;
+export const DEFAULT_SWEEP_CALLS = 950;
 /** Feeds the sweep writes per database transaction. */
 export const SWEEP_WRITE_BATCH = 100;
-/** The hard ceiling for the daily cap setting: eBay's default limit is 5,000 a day for the whole application, shared with the owner's other site. */
-export const MAX_DAILY_CAP = 2500;
+/** The hard ceiling for the daily cap setting: Compare Empire's keyset (5,000 a day) is shared with Compare Empire (2,900) and
+ * MotorCompare (600) since 2026-11-08 (owner); 1,400 is this site's share. */
+export const MAX_DAILY_CAP = 1400;
 export const CONCURRENCY = 3;
 /**
  * Circuit breaker: this many searches in a row that FAILED (a 400/5xx after its retry, malformed JSON, or HTTP 200 with no listings and
@@ -505,12 +506,12 @@ export interface CapEnv {
   EBAY_LISTING_MAX_AGE_HOURS?: string;
 }
 
-/** The daily cap (default 2500, clamped to 0..2500) and the per-run cap (default 2500). */
+/** The daily cap (default 1400, clamped to 0..1400) and the per-run cap (default 1400). */
 export function capsFromEnv(env: CapEnv): { daily: number; run: number } {
   return { daily: clampInt(env.EBAY_DAILY_CAP, DEFAULT_DAILY_CAP, 0, MAX_DAILY_CAP), run: clampInt(env.EBAY_RUN_CAP, DEFAULT_RUN_CAP, 0, MAX_DAILY_CAP) };
 }
 
-/** The catalogue sweep's call allowance (default 2,100, clamped to 0..2500). */
+/** The catalogue sweep's call allowance (default 950, clamped to 0..1400). */
 export const sweepCallsFromEnv = (env: CapEnv) => clampInt(env.EBAY_SWEEP_CALLS, DEFAULT_SWEEP_CALLS, 0, MAX_DAILY_CAP);
 
 /** What this run may spend: min(run cap, what is left of today's daily cap, --max-calls). */

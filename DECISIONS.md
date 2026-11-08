@@ -1424,3 +1424,18 @@ collection worth"; Scryfall grew on free data credited with a link; price sites 
   worth today, the change since the items were added, the change since the last look (one total per market and day in
   `ce_vault_days_v1`), and a share line with the real totals (`utm_medium=collection`). Values are the price to buy it again
   at a store, and the page says so. Linked from the footer.
+
+## 2026-11-08: eBay rides Compare Empire's keyset, 1,400 calls a day (owner)
+
+The owner asked to split Compare Empire's eBay keyset (the "compareempire" app, 5,000 Browse calls a day) with the two new sites
+that had no keys, for the most affiliate earnings, and left the split to us: Compare Empire 2,900 (most traffic, ~30,700 products,
+first eBay earnings), SportsCardCompare 1,400, MotorCompare 600, 100 spare for a manual run. This replaces "a new site never shares
+a sister's keys" (2026-11-06) for this site, at the owner's word.
+
+Why 1,400 here: eBay is where sealed sports cards are bought, the boxes are US$50 to US$1,000+, and the catalogue sweep finds about
+2.6 listings a call against 0.37 for a per-product search (first full run, 2026-10-11). So the sweep keeps most of the day:
+`EBAY_SWEEP_CALLS` 950 of 1,400 (was 2,100 of 2,500); the ~255 fixed feeds (chase, sealed, types, sets) come first and the
+per-product searches get the last ~195, popular releases first.
+`MAX_DAILY_CAP` is 1,400, so a variable can never push the three sites past eBay's 5,000. The secrets are Compare Empire's
+`EBAY_CLIENT_ID` / `EBAY_CLIENT_SECRET`; the keyset's deletion endpoint stays compareempire.com's, and this site's route stays deployed.
+Rebalance after two weeks of EPN earnings per call by customid (`ce-`, `wax-`, `mc-`).

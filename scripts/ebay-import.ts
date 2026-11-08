@@ -28,8 +28,8 @@
 // --dry-run prints the plan and the expected calls: no network and no database writes (it does read the product tables); the
 // sweep's coverage shows only in a real run (the summary's Sweep table).
 // Env: DATABASE_URL; EBAY_CLIENT_ID / EBAY_CLIENT_SECRET (WAXCOMPARE_EBAY_CLIENT_ID / _SECRET win when set);
-// optional EBAY_DAILY_CAP (2500, max 2500: SportsCardCompare's own keyset, 2,500 a day; never raised without the owner;
-// EBAY_RUN_CAP (2500), EBAY_SWEEP_CALLS (2100), EBAY_LISTING_MAX_AGE_HOURS (26).
+// optional EBAY_DAILY_CAP (1400, max 1400: this site's share of Compare Empire's keyset, owner 2026-11-08; never raised without the owner;
+// EBAY_RUN_CAP (1400), EBAY_SWEEP_CALLS (950), EBAY_LISTING_MAX_AGE_HOURS (26).
 // Exit 1: token failure (only eBay's OAuth error category is printed), a search refusal or the circuit breaker, or fewer than
 // half of the planned feeds finished (the fixed feeds and the per-product searches; a per-product search that completed with no
 // listing counts as finished, an empty fixed feed does not; the sweep is reported on its own; feedsShortfall).
