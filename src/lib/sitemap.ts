@@ -13,6 +13,8 @@ import { POSTS, postPath } from "./blog";
 import { openPreorderGuides } from "./preorder-guides";
 import { REGION_LIST, regionOfMarket, type Region, type RegionInfo } from "./regions";
 import { PRODUCT_TYPES } from "./sealed-title";
+import { BRAND_BY_SLUG } from "./facets";
+import { SPORT_BY_KEY, type Sport } from "./lines";
 import { SETS } from "./sets";
 import { SITE_URL } from "./site";
 import { STORES } from "./stores";
@@ -72,6 +74,8 @@ export function staticSitemap(
     out.push(url(`/${r.region}/sealed`, m, "daily", 0.8));
     out.push(url(`/${r.region}/releases`, m, "weekly", 0.6));
     out.push(url(`/${r.region}/sets`, m, "weekly", 0.6));
+    out.push(url(`/${r.region}/sport`, m, "weekly", 0.7));
+    out.push(url(`/${r.region}/brand`, m, "weekly", 0.7));
     out.push(url(`/${r.region}/stores`, m, "weekly", 0.5));
     // The pages built from each import's current state (deals, price per pack, the week's digest) change with it. The guides index
     // changes only when a guide is added or edited, so the import time would be a false lastmod there: it has none.
@@ -125,6 +129,8 @@ export interface RegionSitemapData {
   /** Slugs of the market's comparable products (data.ts COMPARABLE). */
   productSlugs: Iterable<string>;
   lastmod: Date | null;
+  /** The sport, brand and sport-and-brand pages with enough comparable products (lib/facet-data.ts facetSitemapKeys; sports are Sport keys). */
+  facets?: { sports: Iterable<string>; brands: Iterable<string>; combos: Iterable<string> };
 }
 
 /** One region's type, set and product pages. Unknown labels and codes are skipped, never guessed. */
@@ -132,8 +138,19 @@ export function regionSitemap(r: RegionInfo, d: RegionSitemapData): MetadataRout
   const out: MetadataRoute.Sitemap = [];
   const labels = new Set(d.typeLabels);
   for (const t of PRODUCT_TYPES) if (labels.has(t.label)) out.push(url(`/${r.region}/type/${t.slug}`, d.lastmod, "daily", 0.7));
+  // Sports, brands and pairs (owner, 2026-11-09): the navigation's pages, listed only with MIN_HUB_PRODUCTS comparable products.
+  if (d.facets) {
+    for (const k of d.facets.sports) out.push(url(`/${r.region}/sport/${sportSlugOf(k)}`, d.lastmod, "daily", 0.7));
+    for (const b of d.facets.brands) if (BRAND_BY_SLUG.has(b)) out.push(url(`/${r.region}/brand/${b}`, d.lastmod, "daily", 0.7));
+    for (const c of d.facets.combos) {
+      const [sport, brand] = c.split("/");
+      if (BRAND_BY_SLUG.has(brand)) out.push(url(`/${r.region}/sport/${sportSlugOf(sport)}/${brand}`, d.lastmod, "daily", 0.6));
+    }
+  }
   const codes = new Set(d.setCodes);
   for (const s of SETS) if (codes.has(s.code)) out.push(url(`/${r.region}/sets/${s.slug}`, d.lastmod, "daily", 0.6));
   for (const slug of d.productSlugs) out.push(url(`/${r.region}/p/${slug}`, d.lastmod, "daily", 0.7));
   return out;
 }
+
+const sportSlugOf = (key: string): string => SPORT_BY_KEY.get(key as Sport)?.slug ?? key;

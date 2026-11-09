@@ -1,11 +1,13 @@
 import { inSeason } from "./black-friday";
+import { availableFrom, brandHref, brandsAvailable, brandsOfSport, comboHref, sportHref, sportNavLabel, sportsAvailable } from "./facets";
 import { openPreorderGuides } from "./preorder-guides";
 import { menuSets } from "./release";
 import { isRegion, type Region } from "./regions";
 import { SET_BY_CODE } from "./sets";
 import { sectionHref, type SectionKey } from "./site";
 
-export type NavItem = { href: string; label: string };
+/** `children`: the sidebar opens them under the page the visitor is on (a sport's brands); the phone menu lists the top level only. */
+export type NavItem = { href: string; label: string; children?: NavItem[] };
 export type NavGroup = { title: string; links: NavItem[] };
 
 /**
@@ -20,7 +22,17 @@ export function navGroups(region: Region, today: string = new Date().toISOString
   const sets = menuSets(8, today, listed)
     .map((c) => SET_BY_CODE.get(c)!)
     .map((set) => ({ href: `/${region}/sets/${set.slug}`, label: set.dateKnown && set.releaseDate > today ? `${set.name} (pre-order)` : set.name }));
+  // Owner, 2026-11-09: collectors look for their sport and their brand first. Only what is listed in the market is linked.
+  const avail = availableFrom(listed);
+  const sports: NavItem[] = sportsAvailable(avail).map((x) => ({
+    href: sportHref(region, x.key),
+    label: x.nav,
+    children: brandsOfSport(avail, x.key).map((b) => ({ href: comboHref(region, x.key, b), label: `${b.label} ${sportNavLabel(x.key).replace(/ \(.*\)$/, "")}` })),
+  }));
+  const brands: NavItem[] = brandsAvailable(avail).map((b) => ({ href: brandHref(region, b), label: b.label }));
   return [
+    { title: "Shop by sport", links: sports },
+    { title: "Shop by brand", links: brands },
     {
       title: "Shop by product",
       links: [
@@ -62,5 +74,6 @@ export function retargetHref(href: string, to: Region): string {
 
 /** navGroups built for one region, moved to another (the pages with no region of their own follow the visitor's in the browser). */
 export function retargetGroups(groups: NavGroup[], to: Region): NavGroup[] {
-  return groups.map((g) => ({ ...g, links: g.links.map((l) => ({ ...l, href: retargetHref(l.href, to) })) }));
+  const move = (l: NavItem): NavItem => ({ ...l, href: retargetHref(l.href, to), ...(l.children ? { children: l.children.map(move) } : {}) });
+  return groups.map((g) => ({ ...g, links: g.links.map(move) }));
 }

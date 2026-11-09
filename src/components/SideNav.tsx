@@ -28,16 +28,37 @@ export function SideNav({ region, groups }: { region: Region; groups: NavGroup[]
             <ul>
               {g.links.map((l) => {
                 const active = isActivePath(pathname, l.href);
+                // A sport's brands open under it while the visitor is on that sport (or one of its brand pages).
+                const open = !!l.children?.length && (pathname === l.href || pathname.startsWith(`${l.href}/`));
                 return (
                   <li key={l.href}>
                     <Link
                       href={l.href}
                       prefetch={false}
-                      aria-current={active ? "page" : undefined}
+                      aria-current={active && !open ? "page" : undefined}
                       className={`block rounded-lg px-2 py-1.5 text-sm leading-5 transition-colors ${active ? "bg-raised font-semibold text-ink ring-1 ring-inset ring-line" : "text-muted hover:bg-raised hover:text-ink"}`}
                     >
                       {l.label}
                     </Link>
+                    {open && (
+                      <ul className="ml-3 mt-0.5 mb-1 border-l border-line pl-2">
+                        {l.children!.map((c) => {
+                          const on = pathname === c.href;
+                          return (
+                            <li key={c.href}>
+                              <Link
+                                href={c.href}
+                                prefetch={false}
+                                aria-current={on ? "page" : undefined}
+                                className={`block rounded-lg px-2 py-1 text-[13px] leading-5 transition-colors ${on ? "bg-raised font-semibold text-ink" : "text-muted hover:bg-raised hover:text-ink"}`}
+                              >
+                                {c.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}

@@ -7,6 +7,7 @@ import { cardOpen, expandCard, type CompactCard } from "@/lib/compact";
 import { pctOf } from "@/lib/format";
 import { loadIndex, peekIndex } from "@/lib/index-client";
 import { packsForLabel, perPackCents } from "@/lib/packs";
+import { BRAND_BY_SLUG, BRANDS, facetOf, SPORT_ORDER, sportOfSlug, sportSlug } from "@/lib/facets";
 import type { Region } from "@/lib/regions";
 import { BROWSE_QUERY_EVENT, queryWords, relevanceCompare, searchCards } from "@/lib/search-index";
 import { PRODUCT_TYPES, TYPE_BY_SLUG, typeRank } from "@/lib/sealed-title";
@@ -103,6 +104,8 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
   const [q, setQ] = useState("");
   const [type, setType] = useState("");
   const [set, setSet] = useState("");
+  const [sport, setSport] = useState("");
+  const [brand, setBrand] = useState("");
   const [inStock, setInStock] = useState(false);
   const [sort, setSort] = useState<Sort>("relevance");
   const [limit, setLimit] = useState(PAGE);
@@ -116,8 +119,8 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
   const ids = useId();
 
   const qOn = queryWords(q).length > 0;
-  const any = !!(qOn || type || set || inStock || sort !== "relevance");
-  const activeFilters = Number(!!type) + Number(!!set) + Number(inStock) + Number(sort !== "relevance");
+  const any = !!(qOn || type || set || sport || brand || inStock || sort !== "relevance");
+  const activeFilters = Number(!!type) + Number(!!set) + Number(!!sport) + Number(!!brand) + Number(inStock) + Number(sort !== "relevance");
 
   const ensureIndex = useCallback(() => {
     if (loading.current) return;
@@ -159,6 +162,10 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
     if (t && TYPE_BY_SLUG.has(t)) setType(t);
     const s = p.get("set");
     if (s && SET_BY_SLUG.has(s)) setSet(s);
+    const sp = p.get("sport");
+    if (sp && sportOfSlug(sp)) setSport(sp);
+    const br = p.get("brand");
+    if (br && BRAND_BY_SLUG.has(br)) setBrand(br);
     setInStock(p.get("stock") === "in");
     const so = p.get("sort");
     if (isSort(so)) setSort(so);
@@ -180,6 +187,8 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
     if (q.trim()) p.set("q", q.trim());
     if (type) p.set("type", type);
     if (set) p.set("set", set);
+    if (sport) p.set("sport", sport);
+    if (brand) p.set("brand", brand);
     if (inStock) p.set("stock", "in");
     if (sort !== "relevance") p.set("sort", sort);
     const qs = p.toString();
@@ -187,7 +196,7 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
     const next = qs ? `${base}?${qs}` : pageHref(base, page);
     if (`${window.location.pathname}${window.location.search}` !== next) window.history.replaceState(window.history.state, "", next);
     setLimit(PAGE);
-  }, [q, type, set, inStock, sort, base, page, touched]);
+  }, [q, type, set, sport, brand, inStock, sort, base, page, touched]);
 
   useEffect(() => {
     if (any) ensureIndex();
@@ -201,12 +210,19 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
   const filtered = useMemo(() => {
     if (!any) return pageCards;
     let list = qOn ? searchCards(pool, q) : [...pool];
-    list = list.filter((p) => (!typeLabel || p.productType === typeLabel) && (!setInfo || p.setCode === setInfo.code) && (!inStock || cardOpen(p)));
+    const sportKey = sportOfSlug(sport);
+    list = list.filter((p) => {
+      if (sportKey || brand) {
+        const f = facetOf(p.setCode);
+        if (!f || (sportKey && f.sport !== sportKey) || (brand && f.brand.slug !== brand)) return false;
+      }
+      return (!typeLabel || p.productType === typeLabel) && (!setInfo || p.setCode === setInfo.code) && (!inStock || cardOpen(p));
+    });
     // "Recommended" with a search keeps the search's own order (lib/search-index.ts searchCards); without one, the browse order.
     if (sort !== "relevance") list.sort(sorter(sort));
     else if (!qOn) list.sort(relevanceCompare);
     return list;
-  }, [any, pageCards, pool, q, qOn, typeLabel, setInfo, inStock, sort]);
+  }, [any, pageCards, pool, q, qOn, typeLabel, setInfo, sport, brand, inStock, sort]);
 
   // The sets and types the region has, once the index says so; until then every set (no option list ever shrinks under a
   // visitor who has it open) and every type (a type the region lacks is shown disabled, not removed, so the chips never move).
@@ -233,6 +249,8 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
     setQ("");
     setType("");
     setSet("");
+    setSport("");
+    setBrand("");
     setInStock(false);
     setSort("relevance");
     reveal();
@@ -296,6 +314,29 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
       ))}
     </select>
   );
+  // Sport and brand (owner, 2026-11-09): the two ways a collector narrows the list first. Present ones only, once the index says so.
+  const sportsPresent = useMemo(() => (ready ? new Set(ready.map((p) => facetOf(p.setCode)?.sport)) : null), [ready]);
+  const brandsPresent = useMemo(() => (ready ? new Set(ready.map((p) => facetOf(p.setCode)?.brand.slug)) : null), [ready]);
+  const sportSelect = (id: string, className: string, label?: string) => (
+    <select id={id} value={sport} onChange={(e) => change(setSport)(e.target.value)} aria-label={label} className={className}>
+      <option value="">All sports</option>
+      {SPORT_ORDER.filter((x) => !sportsPresent || sportsPresent.has(x.key) || sportSlug(x.key) === sport).map((x) => (
+        <option key={x.key} value={sportSlug(x.key)}>
+          {x.nav}
+        </option>
+      ))}
+    </select>
+  );
+  const brandSelect = (id: string, className: string, label?: string) => (
+    <select id={id} value={brand} onChange={(e) => change(setBrand)(e.target.value)} aria-label={label} className={className}>
+      <option value="">All brands</option>
+      {BRANDS.filter((b) => !brandsPresent || brandsPresent.has(b.slug) || b.slug === brand).map((b) => (
+        <option key={b.slug} value={b.slug}>
+          {b.label}
+        </option>
+      ))}
+    </select>
+  );
   const sortSelect = (id: string, className: string, label?: string) => (
     <select id={id} value={sort} onChange={(e) => change(setSort)(e.target.value as Sort)} aria-label={label} className={className}>
       {SORTS.map((s) => (
@@ -355,7 +396,9 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
             {sortSelect(`${ids}-sort-d`, `${selectClass} md:w-56`, "Sort")}
           </div>
         </div>
-        <div className="scroller hidden gap-2 md:flex" role="group" aria-label="Product type and stock">
+        <div className="scroller hidden gap-2 md:flex" role="group" aria-label="Sport, brand, product type and stock">
+          {sportSelect(`${ids}-sport-d`, `${selectClass} w-44 shrink-0`, "Sport")}
+          {brandSelect(`${ids}-brand-d`, `${selectClass} w-36 shrink-0`, "Brand")}
           {stockToggle}
           {typeChips()}
         </div>
@@ -384,6 +427,14 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
             </div>
             <div className="flex flex-col gap-5 overflow-y-auto overscroll-contain px-5 py-5">
               <div className="grid gap-4 min-[360px]:grid-cols-2">
+                <label className="flex flex-col gap-1.5 text-sm font-semibold" htmlFor={`${ids}-sport-m`}>
+                  Sport
+                  {sportSelect(`${ids}-sport-m`, `${selectClass} w-full font-normal`)}
+                </label>
+                <label className="flex flex-col gap-1.5 text-sm font-semibold" htmlFor={`${ids}-brand-m`}>
+                  Brand
+                  {brandSelect(`${ids}-brand-m`, `${selectClass} w-full font-normal`)}
+                </label>
                 <label className="flex flex-col gap-1.5 text-sm font-semibold" htmlFor={`${ids}-set-m`}>
                   Set
                   {setSelect(`${ids}-set-m`, `${selectClass} w-full font-normal`)}

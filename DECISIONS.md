@@ -1457,3 +1457,21 @@ price against the median store price. Only products with three or more in-stock 
 likely a bad match than a bargain, and fewer than three charted products falls back to the plain card. Real prices from the public data
 files, in the region's currency, never eBay or TCGplayer; no photos, so each PNG is 60–100 KB. The root and region cards are static at build,
 the type, set and product cards drawn on first share and held by the CDN for a day (never ISR).
+
+## 2026-11-09 — Browse by sport and by brand
+
+Owner, 2026-11-09, before the Reddit launch: the navigation was by product type and set only, and a sports card collector looks for their
+sport and their brand first. Three page types, all under the region: `/sport/<sport>` (`/us/sport/basketball`), `/brand/<brand>`
+(`/us/brand/panini`) and the pair `/sport/<sport>/<brand>` (`/us/sport/basketball/panini`), plus the two indexes `/sport` and `/brand`.
+Nothing new is stored: a product's sport and maker are read from its set code through the same line table the release pages use
+(`lib/facets.ts`; the maker is the line's `maker`: Topps including Bowman, Panini, Upper Deck, Leaf, Select, Futera). The header
+row is Deals · Sports · Brands · All sealed · Stores, each of the first three a dropdown (Sports: major leagues, the rest of the world and
+the popular pairs; Brands: Topps and Panini by sport, then the smaller makers); Sets, Releases and Guides left the header row (no room) and
+stay in the "All sealed" dropdown, the sidebar, the phone menu and the footer. The sidebar and phone menu lead with "Shop by sport" and "Shop by
+brand"; the sidebar opens a sport's brands under it while the visitor is on that sport. A sport, brand or pair with nothing listed in
+the market is not linked and its URL is a 404 (menus read the market's listed set codes, as the set menus do). A hub page shows the cheapest
+in-stock products per product type (8, at most 64), a filter bar of plain links (other sports, brands, types by in-page anchor), the
+releases, and the sold-out names at the foot; "Search, sort and filter all" opens the sealed browse page, which gained Sport and Brand
+selects (`?sport=&brand=`, also in the phone filter sheet). Indexing is the set and type rule: noindex with fewer than `MIN_HUB_PRODUCTS`
+comparable products, and the sitemap lists only the indexable ones (`lib/facet-rules.ts` is the one rule for both). hreflang names only the
+regions that have the page.
