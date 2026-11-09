@@ -4,11 +4,12 @@ import { money } from "@/lib/format";
 import { isRegion, REGIONS } from "@/lib/regions";
 import { offerStock } from "@/lib/sealed-offers";
 import { priceGap } from "@/lib/share-link";
+import { statsCard, STATS_MIN_STORES } from "@/lib/og-chart";
 
 // /og/p/<region>/<slug>: a product's share card (2026-11-02, word of mouth), its og:image when the region shows a real
 // price gap: the cheapest and dearest in-stock store price and how much less (lib/share-link.ts). Drawn per request from
 // the public data files and kept by Vercel's CDN for a day, like the product page; never ISR, nothing prerendered. Only
-// links someone shares are ever fetched. An unknown product or no gap draws the site's plain card, never invented prices.
+// links someone shares are ever fetched. Six or more in-stock stores draw the stats chart (lib/og-chart.tsx), fewer the text card. An unknown product or no gap draws the site's plain card, never invented prices.
 export const dynamic = "force-dynamic";
 
 const CDN = "public, s-maxage=86400, stale-while-revalidate=86400";
@@ -20,7 +21,9 @@ export async function GET(_req: Request, { params }: { params: { region: string;
   const gap = priceGap(open.map((o) => ({ priceCents: o.priceCents, storeName: o.storeName })));
   const name = p && p.name.length > 60 ? `${p.name.slice(0, 58)}…` : p?.name;
   const res =
-    r && p && gap
+    r && p && gap && open.length >= STATS_MIN_STORES
+      ? statsCard({ tag: r.name, name: p.name, prices: open.map((o) => o.priceCents), fmt: (c) => money(c, r.market), sub: "In stock, checked daily" })
+      : r && p && gap
       ? ogCard({
           tag: r.name,
           lines: [

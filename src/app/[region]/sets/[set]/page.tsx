@@ -25,7 +25,7 @@ import { isPreorderSet } from "@/lib/release";
 import { preorderPath } from "@/lib/preorder-guides";
 import { regionOfMarket, regionOrNotFound, type Market, type RegionInfo } from "@/lib/regions";
 import { RRP_NOTE } from "@/lib/rrp";
-import { itemListJsonLd, jsonLd, pageMeta, regionAlternates, withMtg } from "@/lib/seo";
+import { itemListJsonLd, jsonLd, ogCardImage, pageMeta, regionAlternates, withMtg } from "@/lib/seo";
 import { fitDescription, seoCopy, seoTitleText } from "@/lib/seo-titles";
 import { ShareButton } from "@/components/ShareButton";
 import { PRODUCT_TYPES } from "@/lib/sealed-title";
@@ -54,15 +54,18 @@ export async function generateMetadata({ params }: { params: { region: string; s
   if (!products.length) notFound();
   const regions = (await marketsWithSet(s.code)).map(regionOfMarket).filter((x): x is RegionInfo => !!x);
   // The title follows the release state (pre-order wording and the date until the set is out; never "booster box" for a set sold
-  // without one), and the description is built from the products loaded above. No image: the site's share card (pageMeta's default).
+  // without one), and the description is built from the products loaded above. Its own share card, a chart (og:image).
   const title = seoCopy.setTitle(s, r, { preorder: isPreorderSet(s.code), withoutBox: soldWithoutBox(s), date: shortDate(s.releaseDate) });
+  const meta = pageMeta({
+    title: titleText(title),
+    description: fitDescription(setDescription(s, r, products), setDescription(s, r, products).replace(/; cheapest per pack: [^;]+/, "")),
+    path: `/${r.region}/sets/${s.slug}`,
+    alternates: regionAlternates(r.region, `/sets/${s.slug}`, regions),
+  });
+  // The set's own share card (app/og/sets): the chart of its products' real savings.
   return {
-    ...pageMeta({
-      title: titleText(title),
-      description: fitDescription(setDescription(s, r, products), setDescription(s, r, products).replace(/; cheapest per pack: [^;]+/, "")),
-      path: `/${r.region}/sets/${s.slug}`,
-      alternates: regionAlternates(r.region, `/sets/${s.slug}`, regions),
-    }),
+    ...meta,
+    openGraph: { ...meta.openGraph, images: [ogCardImage(`/og/sets/${r.region}/${s.slug}`, `${s.name} prices compared across ${r.adjective} card shops`)] },
     title,
   };
 }
