@@ -15,7 +15,7 @@ import { STORES } from "@/lib/stores";
 import { SoftHeroCards } from "@/components/home/SoftHeroCards";
 import { ChristmasGifts } from "@/components/home/ChristmasGifts";
 import { LandingAds } from "@/components/home/LandingAds";
-import { landingRailTiles, landingTcgTiles } from "@/lib/landing-ads";
+import { landingTcgTiles } from "@/lib/landing-ads";
 
 // Rendered per request and kept by Vercel's CDN for a day (next.config.js CDN_PAGES, "/"), like the region pages, never ISR and never
 // prerendered at build (a build reads no data: tests/vercel-ignore-build.test.ts). The region block's default (US) picks come from the
@@ -53,8 +53,6 @@ const HERO_LINKS = [
 ];
 
 export default async function Landing() {
-  // The side rails' tiles, as on the region pages (this page is force-dynamic: read per request, never at build).
-  const railTiles = await landingRailTiles().catch(() => []);
   // The default region's five, from the public data files: the server HTML is already filled.
   const today = new Date().toISOString().slice(0, 10);
   // The next set's block, every region's (seven small lists): the server HTML has the default region's, the browser the visitor's.
@@ -160,7 +158,7 @@ export default async function Landing() {
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd([{ href: "/", label: SITE_NAME }])) }} />
       {/* The side rails from 1280px, browser-only, in the visitor's region (components/SideAds.tsx; owner 2026-11-06: "the home page must have this as well"). */}
-      <SoftSideAds tiles={railTiles} />
+      <SoftSideAds />
     </div>
   );
 }

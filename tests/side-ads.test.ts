@@ -1,5 +1,5 @@
-// The side rails (components/SideAds.tsx, ported from DexCompare 2026-11-06: eBay down the far left, TCGplayer down the far right).
-// Pinned: browser-only from 1280px (nothing in the server HTML, no layout shift), ten tiles that scroll, the placements, no Amazon.
+// The side rails (components/SideAds.tsx, ported from DexCompare 2026-11-06: eBay down the far left; Amazon down the far right since 2026-11-09, TCGplayer sells no sealed sports cards).
+// Pinned: browser-only from 1280px (nothing in the server HTML, no layout shift), ten tiles that scroll, the placements, Amazon with no price and never in the dock.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -18,11 +18,13 @@ test("side rails: wide screens only, the same width in the hook and the class, d
   assert.match(s, /window\.matchMedia\(`\(min-width: \$\{MIN_WIDTH\}px\)`\)/, "mounted only when the viewport fits");
   assert.match(s, /const \[fit, setFit\] = useState\(false\);[\s\S]*if \(!fit\) return null;/, "nothing is rendered before the check or when nothing fits (no SSR markup)");
   assert.match(s, /"fixed z-30 hidden flex-col/, "fixed beside the shell: takes no space, below the header (z-40) and the quick view (z-50)");
-  for (const p of ["listings-side", "tcgplayer-strip-side"]) assert.ok((PLACEMENTS as readonly string[]).includes(p), `${p} is a placement`);
+  for (const p of ["listings-side", "amazon-side"]) assert.ok((PLACEMENTS as readonly string[]).includes(p), `${p} is a placement`);
   assert.match(s, /useListings\(\{ region, context: "sealed", placement, min: 1, eager: true \}\)/, "the eBay rail shares the home strip's sealed request");
   assert.match(s, />Ad<\/span>/, "labelled Ad");
   assert.match(s, /rel=\{REL_SPONSORED\}/, "sponsored links");
-  assert.doesNotMatch(s, /amazon/i, "no Amazon in a rail");
+  assert.match(s, /rel=\{REL_AMAZON\}/, "Amazon links carry Amazon's own rel");
+  assert.match(s, /AMAZON_DISCLOSURE/, "the Associates disclosure sits under the rail");
+  assert.match(s, /fetch\(`\/api\/rails\/amazon\/\$\{region\}`\)/, "the Amazon rail asks for its tiles in the browser");
 });
 
 test("side rails: up to ten tiles that scroll inside the rail, popular sealed first, no listing twice", () => {
@@ -39,15 +41,14 @@ test("side rails: up to ten tiles that scroll inside the rail, popular sealed fi
 
 test("the region layout mounts the rails once, after the footer; the server HTML of a page never holds them", () => {
   const layout = src("app/[region]/layout.tsx");
-  assert.match(layout, /<Footer region=\{r\.region\}( listed=\{listed\})? \/>\s*\{\/\*[\s\S]*?\*\/\}\s*<SideAds region=\{r\.region\} tiles=\{tcg\} \/>/, "after the footer, the pre-footer strip's tiles");
+  assert.match(layout, /<Footer region=\{r\.region\}( listed=\{listed\})? \/>\s*\{\/\*[\s\S]*?\*\/\}\s*<SideAds region=\{r\.region\} \/>/, "after the footer");
   assert.equal(layout.match(/<SideAds /g)?.length, 1);
 });
 
 test("the home page gets the same rails, in the visitor's region, read per request (never at build)", () => {
   const home = src("app/(site)/page.tsx");
   assert.match(home, /^export const dynamic = "force-dynamic"/m);
-  assert.match(home, /<SoftSideAds tiles=\{railTiles\} \/>/);
-  assert.match(home, /landingRailTiles\(\)\.catch\(/, "a failed read shows no TCGplayer rail, never an error page");
+  assert.match(home, /<SoftSideAds \/>/);
   assert.match(src("components/SideAds.tsx"), /export function SoftSideAds[\s\S]*?useSoftRegion\(\)/);
 });
 
@@ -71,7 +72,19 @@ test("the phone dock: narrow screens only, never on the first screen, never besi
   assert.match(d, /sessionStorage\.setItem\(DISMISS_KEY, "1"\)/, "✕ hides it for the visit");
   assert.match(d, />Ad<\/span>/, "labelled Ad");
   const s = src("components/SideAds.tsx");
-  for (const p of ["listings-dock", "tcgplayer-strip-dock"]) assert.ok((PLACEMENTS as readonly string[]).includes(p), `${p} is a placement`);
+  assert.ok((PLACEMENTS as readonly string[]).includes("listings-dock"), "listings-dock is a placement");
   assert.match(s, /placement="?\{?placement\}?[\s\S]*minWidth=\{MIN_WIDTH\}/);
-  assert.doesNotMatch(d + s, /amazon/i, "no Amazon in the dock");
+  assert.doesNotMatch(d, /amazon/i, "no Amazon in the dock");
+  const dock = s.slice(s.indexOf("function PhoneDock"));
+  assert.doesNotMatch(dock, /amazon/i, "no Amazon in the dock (an overlay: Associates rules)");
+});
+
+test("the Amazon rail: tagged links, never a price, its own placement, no AdSense", () => {
+  const rail = src("lib/amazon-rail.ts");
+  assert.match(rail, /placement: "amazon-side"/);
+  assert.doesNotMatch(rail, /priceCents|amazonLiveFor\([^)]*\)\??\.cents/, "no price in the rail's tiles");
+  const route = src("app/api/rails/amazon/[region]/route.ts");
+  assert.match(route, /export const dynamic = "force-dynamic"/);
+  assert.match(route, /s-maxage=86400/, "kept by the CDN for a day");
+  assert.doesNotMatch(src("components/SideAds.tsx"), /adsbygoogle|adsense/i);
 });

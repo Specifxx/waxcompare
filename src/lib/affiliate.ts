@@ -94,6 +94,7 @@ export const PLACEMENTS = [
   "amazon-set", // set page: the same line
   "amazon-deals", // /[region]/deals: the same line
   "amazon-guide", // a guide: a product row's "Check price on Amazon AU" link
+  "amazon-side", // every page from 1280px wide: the Amazon rail down the far right (components/SideAds.tsx, owner, 2026-11-09); never in the phone dock
 ] as const;
 export type Placement = (typeof PLACEMENTS)[number];
 

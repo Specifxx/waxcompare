@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { AFFILIATE_NOTE_SHORT, ebayRetailer, ebayRetailerForHref, ebaySearchUrl, REL_SPONSORED, TCGPLAYER_RETAILER, tcgplayerAffiliateUrl, tcgplayerSearchUrl, type Placement } from "@/lib/affiliate";
-import type { TcgplayerTile } from "@/lib/data";
+import { AFFILIATE_NOTE_SHORT, ebayRetailer, ebayRetailerForHref, ebaySearchUrl, REL_SPONSORED, type Placement } from "@/lib/affiliate";
+import { AMAZON_DISCLOSURE, amazonRetailer, amazonUrl, REL_AMAZON } from "@/lib/amazon";
+import type { AmazonRail as AmazonRailData } from "@/lib/amazon-rail";
 import { formatPrice } from "@/lib/ebay-context";
-import { money } from "@/lib/format";
-import { thumb } from "@/lib/images";
 import type { Region } from "@/lib/regions";
 import { useListings } from "./EbayStrip";
 import { useSoftRegion } from "./RegionSuggest";
@@ -13,6 +12,9 @@ import { EbayMark } from "./EbayMark";
 import { OutboundLink } from "./OutboundLink";
 import { AdDock, DockGate, DockTile, DOCK_LINK, type DockSide } from "./AdDock";
 
+// 2026-11-09 (owner: "the eBay ad banner and Amazon ad banner on the left and right side of the site"): the right rail is AMAZON's, not
+// TCGplayer's (TCGplayer sells no sealed sports cards, so that rail was always empty): tagged links to the region's popular sealed
+// products, NO price, asked from /api/rails/amazon/<region> in the browser. Amazon is never in the phone dock (an overlay).
 // The two side rails (ported from DexCompare 2026-11-06, owner: "I really want those ads to be on SportsCardCompare"; DexCompare's brief, 2026-11-03: "a lot of space on the very, very left … and the very, very right … the left side could be
 // eBay and the right side TCGplayer … only if you can fit it. If you can't fit it, then don't use the ads"): real sealed eBay listings
 // stacked down the far left of a wide screen, the newest sets' TCGplayer products down the far right, both OUTSIDE the page shell
@@ -50,7 +52,7 @@ export function railFits(innerHeight: number): boolean {
   return innerHeight - TOP - HEAD - NOTE - PAD >= TILE_H;
 }
 
-export function SideAds({ region, tiles }: { region: Region; tiles: TcgplayerTile[] }) {
+export function SideAds({ region }: { region: Region }) {
   const [fit, setFit] = useState(false);
   const [narrow, setNarrow] = useState(false);
   useEffect(() => {
@@ -68,12 +70,12 @@ export function SideAds({ region, tiles }: { region: Region; tiles: TcgplayerTil
     };
   }, []);
   // Too narrow for the rails (phones, tablets, a small window): the same tiles in the phone dock (AdDock.tsx).
-  if (narrow) return <PhoneDock region={region} tiles={tiles} />;
+  if (narrow) return <PhoneDock region={region} />;
   if (!fit) return null;
   return (
     <>
       <EbayRail region={region} />
-      {tiles.length >= 2 && <TcgRail region={region} tiles={tiles} />}
+      <AmazonRail region={region} />
     </>
   );
 }
@@ -82,8 +84,8 @@ export function SideAds({ region, tiles }: { region: Region; tiles: TcgplayerTil
  * The same rails on the pages with no region of their own (the home page, the blog, About…; owner 2026-11-06: "the home page must
  * have this as well"), in the visitor's suggested or picked region (RegionSuggest.tsx), like their header and sidebar.
  */
-export function SoftSideAds({ tiles }: { tiles: TcgplayerTile[] }) {
-  return <SideAds region={useSoftRegion()} tiles={tiles} />;
+export function SoftSideAds() {
+  return <SideAds region={useSoftRegion()} />;
 }
 
 const LIST = "rail-scroll grid min-h-0 flex-1 content-start overflow-y-auto overscroll-contain border-t border-line";
@@ -145,37 +147,59 @@ export function mergeListings(states: ListingsState[]): Listing[] {
   return out;
 }
 
-function TcgRail({ region, tiles }: { region: Region; tiles: TcgplayerTile[] }) {
-  const placement: Placement = "tcgplayer-strip-side";
-  const us = region === "us";
-  const price = (cents: number) => (us ? money(cents, "US") : `US${money(cents, "US")}`);
+function AmazonRail({ region }: { region: Region }) {
+  const placement: Placement = "amazon-side";
+  const rail = useAmazonRail(region);
+  if (!rail) return null;
+  const retailer = amazonRetailer(region);
   return (
-    <div role="group" data-ad={placement} aria-label="Sponsored: sealed on TCGplayer" className={RAIL} style={railStyle("right")}>
+    <div role="group" data-ad={placement} aria-label="Sponsored: sealed sports cards on Amazon" className={RAIL} style={railStyle("right")}>
       <Head
         brand={
-          <span className="text-[15px] font-black tracking-tight" aria-label="TCGplayer">
-            TCG<span className="text-[#1f6fe5]">player</span>
+          <span className="text-[15px] font-black tracking-tight" aria-label="Amazon">
+            amazon
           </span>
         }
       />
       <ul role="list" className={LIST}>
-        {tiles.slice(0).map((t) => (
-          <li key={t.slug}>
-            <OutboundLink href={tcgplayerAffiliateUrl(t.url, region, placement)} rel={REL_SPONSORED} retailer={TCGPLAYER_RETAILER} placement={placement} className={TILE} title={`${t.name} · ${price(t.priceCents)}`}>
+        {rail.tiles.map((t) => (
+          <li key={t.id}>
+            <OutboundLink href={t.href} rel={REL_AMAZON} retailer={retailer} placement={placement} className={TILE} title={t.name}>
               <span className="plate relative block aspect-square w-full overflow-hidden rounded-md">
-                <img src={thumb(t.imageUrl, 200) ?? t.imageUrl} alt={t.name} width={128} height={128} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-contain p-1 mix-blend-multiply" />
+                <img src={t.img} alt={t.name} width={128} height={128} loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-contain p-1 mix-blend-multiply" />
               </span>
-              <span className="mt-1.5 line-clamp-2 h-9 text-xs font-semibold leading-[18px] group-hover:text-[#1f6fe5]">{t.name}</span>
-              <span className="tabular block h-5 truncate text-[15px] font-bold leading-5">{price(t.priceCents)}</span>
-              <span className="sr-only">, on TCGplayer</span>
+              <span className="mt-1.5 line-clamp-2 h-9 text-xs font-semibold leading-[18px] group-hover:text-brand">{t.name}</span>
+              <span className="tabular block h-5 truncate text-[13px] font-bold leading-5 text-brand">Check price →</span>
+              <span className="sr-only">, on Amazon</span>
             </OutboundLink>
           </li>
         ))}
       </ul>
-      <Note href={tcgplayerSearchUrl("", region, placement)} retailer={TCGPLAYER_RETAILER} placement={placement} label="All on TCGplayer →" usd={!us} />
+      <Note href={amazonUrl("", { region, placement })} retailer={retailer} placement={placement} label={`All on ${rail.label} →`} rel={REL_AMAZON} text={AMAZON_DISCLOSURE} />
     </div>
   );
 }
+
+/** The region's Amazon tiles, asked for once the rail is mounted (browser only; CDN-cached a day, no price in it). */
+function useAmazonRail(region: Region): AmazonRailData | null {
+  const [rail, setRail] = useState<AmazonRailData | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setRail(null);
+    fetch(`/api/rails/amazon/${region}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { rail: AmazonRailData | null } | null) => {
+        if (!cancelled) setRail(j?.rail && j.rail.tiles.length > 0 ? j.rail : null);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [region]);
+  return rail;
+}
+
+const AFFILIATE_NOTE_SHORT_LINE = "Affiliate links · we may earn";
 
 function Head({ brand }: { brand: ReactNode }) {
   return (
@@ -186,46 +210,38 @@ function Head({ brand }: { brand: ReactNode }) {
   );
 }
 
-function Note({ href, retailer, placement, label, usd = false }: { href: string; retailer: string; placement: Placement; label: string; usd?: boolean }) {
+function Note({ href, retailer, placement, label, rel = REL_SPONSORED, text = AFFILIATE_NOTE_SHORT_LINE }: { href: string; retailer: string; placement: Placement; label: string; rel?: string; text?: string }) {
   return (
     <p className="flex h-[34px] shrink-0 flex-col justify-center px-2 text-[10px] leading-[13px] text-muted">
-      <OutboundLink href={href} rel={REL_SPONSORED} retailer={retailer} placement={placement} className="truncate font-bold text-brand">
+      <OutboundLink href={href} rel={rel} retailer={retailer} placement={placement} className="truncate font-bold text-brand">
         {label}
       </OutboundLink>
-      <span className="truncate" title={AFFILIATE_NOTE_SHORT}>
-        {usd ? "Affiliate links · in US$" : "Affiliate links · we may earn"}
+      <span className="truncate" title={text === AFFILIATE_NOTE_SHORT_LINE ? AFFILIATE_NOTE_SHORT : text}>
+        {text}
       </span>
     </p>
   );
 }
 
-/** The phone dock: the rails' first tiles, eBay's on the left and TCGplayer's on the right (AdDock.tsx has the rules). */
-function PhoneDock({ region, tiles }: { region: Region; tiles: TcgplayerTile[] }) {
+/** The phone dock: the eBay rail's first tiles (AdDock.tsx has the rules). Amazon is never in it: an overlay (Associates rules). */
+function PhoneDock({ region }: { region: Region }) {
   return (
     <DockGate minWidth={MIN_WIDTH}>
-      <DockAds region={region} tiles={tiles} />
+      <DockAds region={region} />
     </DockGate>
   );
 }
 
-function DockAds({ region, tiles }: { region: Region; tiles: TcgplayerTile[] }) {
+function DockAds({ region }: { region: Region }) {
   const placement: Placement = "listings-dock";
-  const tcgPlacement: Placement = "tcgplayer-strip-dock";
   // The eBay rail's three feeds, the same requests (CDN-cached, shared with the strips).
   const { state } = useListings({ region, context: "sealed", placement, min: 1, eager: true });
   const boxes = useListings({ region, context: "type:hobby-boxes", placement, min: 1, eager: true }).state;
   const collectors = useListings({ region, context: "type:blaster-boxes", placement, min: 1, eager: true }).state;
   const items = state.status === "ready" ? mergeListings([state, boxes, collectors]) : [];
-  const us = region === "us";
-  const price = (cents: number) => (us ? money(cents, "US") : `US${money(cents, "US")}`);
-  const tcgBrand = (
-    <span className="font-black tracking-tight text-ink" aria-label="TCGplayer">
-      TCG<span className="text-[#1f6fe5]">player</span>
-    </span>
-  );
-  const sides: DockSide[] = [];
-  if (items.length > 0)
-    sides.push({
+  if (items.length === 0) return null;
+  const sides: DockSide[] = [
+    {
       key: "ebay",
       items: items.map((i) => (
         <OutboundLink key={i.id} href={i.href} rel={REL_SPONSORED} retailer={ebayRetailerForHref(i.href, region)} placement={placement} className={DOCK_LINK} title={`${i.title} · ${formatPrice(i.price)}`}>
@@ -233,17 +249,7 @@ function DockAds({ region, tiles }: { region: Region; tiles: TcgplayerTile[] }) 
           <span className="sr-only">, on eBay</span>
         </OutboundLink>
       )),
-    });
-  if (tiles.length >= 2)
-    sides.push({
-      key: "tcgplayer",
-      items: tiles.slice(0, MAX_TILES).map((t) => (
-        <OutboundLink key={t.slug} href={tcgplayerAffiliateUrl(t.url, region, tcgPlacement)} rel={REL_SPONSORED} retailer={TCGPLAYER_RETAILER} placement={tcgPlacement} className={DOCK_LINK} title={`${t.name} · ${price(t.priceCents)}`}>
-          <DockTile img={thumb(t.imageUrl, 100) ?? t.imageUrl} alt={t.name} brand={tcgBrand} title={t.name} price={price(t.priceCents)} cta="View" plate />
-          <span className="sr-only">, on TCGplayer</span>
-        </OutboundLink>
-      )),
-    });
-  if (sides.length === 0) return null;
+    },
+  ];
   return <AdDock label="Sponsored: sealed sports cards on eBay" sides={sides} placement={placement} minWidth={MIN_WIDTH} />;
 }
