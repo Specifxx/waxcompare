@@ -1439,3 +1439,9 @@ per-product searches get the last ~195, popular releases first.
 `MAX_DAILY_CAP` is 1,400, so a variable can never push the three sites past eBay's 5,000. The secrets are Compare Empire's
 `EBAY_CLIENT_ID` / `EBAY_CLIENT_SECRET`; the keyset's deletion endpoint stays compareempire.com's, and this site's route stays deployed.
 Rebalance after two weeks of EPN earnings per call by customid (`ce-`, `wax-`, `mc-`).
+
+## 2026-11-09: launch on sportscardcompare.com
+
+Owner bought sportscardcompare.com (Vercel registrar, Vercel nameservers). Added to the `waxcompare` project as the apex, with `www` a 308 redirect to the apex (apex was valid before www was added; never apex to www). Canonicals already follow `SITE_URL`'s default `https://sportscardcompare.com` (`NEXT_PUBLIC_SITE_URL` is unset in Vercel, so the build takes Vercel's production domain, which is this one). The new domain serves the existing build until the next release (the 12-hour gate; no `[deploy]` on this commit).
+
+Search Console: a Domain property verified by a DNS TXT record in Vercel DNS, sitemap `https://sportscardcompare.com/sitemap.xml` submitted. Bing Webmaster: site added by hand (not imported from Search Console, which would give Bing read access to every property); ownership by the `msvalidate.01` meta tag in the root layout (`BING_SITE_VERIFICATION` overrides it). Two guides added for real searches (hobby box vs jumbo box, hobby case vs single boxes), same rules as the others: no pull rates, values or pack counts.

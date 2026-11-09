@@ -16,7 +16,7 @@
 import type { Region } from "../../lib/regions";
 import { REGION_LIST } from "../../lib/regions";
 
-export type GuideSlug = "hobby-vs-blaster-vs-mega-box" | "where-to-buy-sealed-sports-cards-online" | "how-to-avoid-resealed-sports-card-boxes" | "sports-cards-black-friday-2026";
+export type GuideSlug = "hobby-vs-blaster-vs-mega-box" | "where-to-buy-sealed-sports-cards-online" | "how-to-avoid-resealed-sports-card-boxes" | "sports-cards-black-friday-2026" | "hobby-box-vs-jumbo-box" | "hobby-case-vs-single-box";
 
 export interface Guide {
   slug: GuideSlug;
@@ -89,6 +89,28 @@ export const GUIDES: readonly Guide[] = [
     regions: "all",
     topic: { types: ["hobby-box", "blaster-box"] },
     ebay: { heading: "Sealed hobby boxes on eBay", query: "hobby box factory sealed" },
+  },
+  {
+    slug: "hobby-box-vs-jumbo-box",
+    title: "Hobby box vs jumbo box: what is the difference",
+    description: "What a sports card jumbo (HTA) box is, how it differs from a standard hobby box, and what each costs in your region today.",
+    kicker: "Box types",
+    published: "2026-11-09",
+    updated: "2026-11-09",
+    regions: "all",
+    topic: { types: ["hobby-box", "jumbo-box"] },
+    ebay: { heading: "Sealed jumbo boxes on eBay", query: "jumbo box sealed" },
+  },
+  {
+    slug: "hobby-case-vs-single-box",
+    title: "Sports card hobby case vs single boxes: what to check",
+    description: "Buying a sealed sports card hobby case or single boxes: today's cheapest cases and boxes in your region, and four checks before you order.",
+    kicker: "Buying",
+    published: "2026-11-09",
+    updated: "2026-11-09",
+    regions: "all",
+    topic: { types: ["hobby-case", "hobby-box"] },
+    ebay: { heading: "Sealed hobby cases on eBay", query: "hobby case sealed" },
   },
 ];
 
