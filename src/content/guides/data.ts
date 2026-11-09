@@ -66,6 +66,8 @@ const READS: Record<GuideSlug, readonly [FamilyKey, number][]> = {
   "where-to-buy-sealed-sports-cards-online": [],
   "how-to-avoid-resealed-sports-card-boxes": [["hobby-box", 3], ["blaster-box", 3]],
   "sports-cards-black-friday-2026": [["hobby-box", 4], ["mega-box", 3], ["blaster-box", 3]],
+  "hobby-box-vs-jumbo-box": [["hobby-box", 3], ["jumbo-box", 3]],
+  "hobby-case-vs-single-box": [["hobby-case", 3], ["hobby-box", 3]],
 };
 
 /** Load what a guide's live blocks show, for one region. */

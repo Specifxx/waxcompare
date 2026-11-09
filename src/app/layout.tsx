@@ -34,7 +34,11 @@ export const metadata: Metadata = {
   // A page that sets its own `robots` (noindex) replaces this whole object.
   robots: { googleBot: { "max-image-preview": "large", "max-snippet": -1 } },
   // Search Console ownership of sportscardcompare.com (owner, 2026-10-16); GOOGLE_SITE_VERIFICATION replaces it.
-  verification: { google: process.env.GOOGLE_SITE_VERIFICATION || "N0wgTl_HUriBqcifrYzMsLDL2KYnnzOY7q8AG0XUS_U" },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || "N0wgTl_HUriBqcifrYzMsLDL2KYnnzOY7q8AG0XUS_U",
+    // Bing Webmaster Tools ownership of sportscardcompare.com (2026-11-09).
+    other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION || "00CF7EB081441B32E0ED54138A9356D0" },
+  },
 };
 
 export const viewport: Viewport = {
