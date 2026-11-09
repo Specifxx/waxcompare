@@ -1445,3 +1445,15 @@ Rebalance after two weeks of EPN earnings per call by customid (`ce-`, `wax-`, `
 Owner bought sportscardcompare.com (Vercel registrar, Vercel nameservers). Added to the `waxcompare` project as the apex, with `www` a 308 redirect to the apex (apex was valid before www was added; never apex to www). Canonicals already follow `SITE_URL`'s default `https://sportscardcompare.com` (`NEXT_PUBLIC_SITE_URL` is unset in Vercel, so the build takes Vercel's production domain, which is this one). The new domain serves the existing build until the next release (the 12-hour gate; no `[deploy]` on this commit).
 
 Search Console: a Domain property verified by a DNS TXT record in Vercel DNS, sitemap `https://sportscardcompare.com/sitemap.xml` submitted. Bing Webmaster: site added by hand (not imported from Search Console, which would give Bing read access to every property); ownership by the `msvalidate.01` meta tag in the root layout (`BING_SITE_VERIFICATION` overrides it). Two guides added for real searches (hobby box vs jumbo box, hobby case vs single boxes), same rules as the others: no pull rates, values or pack counts.
+
+## 2026-11-09 — Share cards draw real-price charts
+
+Owner, 2026-11-09: link previews should be graphical, with charts, like DexCompare's, ahead of the Reddit link posts. `lib/og-chart.tsx` draws a
+navy sports-card-look card (white stat tiles over a chart; original, no maker or league marks). A product's og:image (`/og/p/<region>/<slug>`)
+is the stats chart where six or more stores have it in stock: cheapest, median, dearest, dearest vs cheapest, one bar per store, median dashed.
+Each region home (`/og/<region>`), each product type (`/og/type/<region>/<type>`) and each set (`/og/sets/<region>/<set>`) draw
+a listing chart: tiles (products compared, stores or in stock, typical and best saving) over one row per product, its cheapest in-stock
+price against the median store price. Only products with three or more in-stock stores are charted, a gap over 60% is left out as more
+likely a bad match than a bargain, and fewer than three charted products falls back to the plain card. Real prices from the public data
+files, in the region's currency, never eBay or TCGplayer; no photos, so each PNG is 60–100 KB. The root and region cards are static at build,
+the type, set and product cards drawn on first share and held by the CDN for a day (never ISR).

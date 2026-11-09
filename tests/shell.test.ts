@@ -11,7 +11,7 @@ import { IMPACT_SITE_VERIFICATIONS } from "../src/lib/affiliate";
 import { REGION_LIST } from "../src/lib/regions";
 import { SETS } from "../src/lib/sets";
 import { OPERATOR, SITE_NAME, SITE_URL } from "../src/lib/site";
-import { DEFAULT_OG_IMAGE } from "../src/lib/seo";
+import { DEFAULT_OG_IMAGE, ogCardImage } from "../src/lib/seo";
 import { findBannedCopy } from "../src/lib/copy-rules";
 import { Breadcrumbs, parentCrumb } from "../src/components/Breadcrumbs";
 import { Footer, footerColumns } from "../src/components/Footer";
@@ -253,7 +253,8 @@ test("landing metadata: hreflang for every region home plus x-default '/', a sho
   const d = String(landingMetadata.description);
   assert.ok(d.length <= 155, `${d.length} characters`);
   assert.equal(findBannedCopy(d), null);
-  assert.deepEqual((landingMetadata.openGraph as { images: unknown[] }).images, [DEFAULT_OG_IMAGE]);
+  // The landing page's card is the US chart card (2026-11-09), not the plain site-wide one.
+  assert.deepEqual((landingMetadata.openGraph as { images: unknown[] }).images, [ogCardImage("/og/us", "SportsCardCompare: sealed sports card prices across card shops")]);
   assert.equal((landingMetadata.twitter as { card: string }).card, "summary_large_image");
   const title = (landingMetadata.title as { absolute: string }).absolute;
   assert.ok(title.length <= 65, title);

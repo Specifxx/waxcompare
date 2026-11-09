@@ -18,7 +18,7 @@ import { typeIndexRows, typePageData, typeLabelsInMarket } from "@/lib/hub-data"
 import { regionOfMarket, regionOrNotFound, type Market, type RegionInfo } from "@/lib/regions";
 import { RRP_NOTE } from "@/lib/rrp";
 import { PRODUCT_TYPES, TYPE_BY_SLUG } from "@/lib/sealed-title";
-import { itemListJsonLd, jsonLd, pageMeta, regionAlternates } from "@/lib/seo";
+import { itemListJsonLd, jsonLd, ogCardImage, pageMeta, regionAlternates } from "@/lib/seo";
 import { fitDescription, seoCopy, seoTitleText } from "@/lib/seo-titles";
 import { SET_BY_CODE } from "@/lib/sets";
 import { TYPE_ABOUT } from "@/lib/type-about";
@@ -46,13 +46,16 @@ export async function generateMetadata({ params }: { params: { region: string; t
   if (!total) notFound();
   const regions = (await marketsWithType(t.label)).map(regionOfMarket).filter((x): x is RegionInfo => !!x);
   const title = seoCopy.typeTitle(t, r, d.openCount, from);
+  const meta = pageMeta({
+    title: titleText(title),
+    description: seoCopy.typeDescription(t, r, { open: d.openCount, total }, from),
+    path: `/${r.region}/type/${t.slug}`,
+    alternates: regionAlternates(r.region, `/type/${t.slug}`, regions),
+  });
+  // The type's own share card (app/og/type): the chart of its products' real savings.
   return {
-    ...pageMeta({
-      title: titleText(title),
-      description: seoCopy.typeDescription(t, r, { open: d.openCount, total }, from),
-      path: `/${r.region}/type/${t.slug}`,
-      alternates: regionAlternates(r.region, `/type/${t.slug}`, regions),
-    }),
+    ...meta,
+    openGraph: { ...meta.openGraph, images: [ogCardImage(`/og/type/${r.region}/${t.slug}`, `${t.label} prices compared across ${r.adjective} card shops`)] },
     title,
   };
 }

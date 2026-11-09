@@ -9,7 +9,7 @@ import { regionPicks } from "@/lib/picks";
 import { ComingSoonSwitch } from "@/components/ComingSoonSwitch";
 import { loadFeaturedAll } from "@/lib/coming-soon-data";
 import { REGION_LIST, X_DEFAULT_REGION } from "@/lib/regions";
-import { DEFAULT_OG_IMAGE, breadcrumbJsonLd, jsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, jsonLd, ogCardImage } from "@/lib/seo";
 import { SITE_NAME, SITE_URL, sectionHref } from "@/lib/site";
 import { STORES } from "@/lib/stores";
 import { SoftHeroCards } from "@/components/home/SoftHeroCards";
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
     languages: { ...Object.fromEntries(REGION_LIST.map((r) => [r.hreflang, `${SITE_URL}/${r.region}`])), "x-default": `${SITE_URL}/` },
   },
-  openGraph: { url: SITE_URL, siteName: SITE_NAME, type: "website", title: TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { url: SITE_URL, siteName: SITE_NAME, type: "website", title: TITLE, description: DESCRIPTION, images: [ogCardImage("/og/us", "SportsCardCompare: sealed sports card prices across card shops")] },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
