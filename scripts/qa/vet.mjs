@@ -10,8 +10,17 @@ async function get(url, t = 15000) {
   } catch (e) { return { status: 0, error: String(e?.cause?.code || e?.name || e) }; }
 }
 const dom = (h) => { const p = h.replace(/^www\./, "").split("."); const l2 = p.slice(-2).join("."); return p.length > 2 && /^(com|co|net|org)\.[a-z]{2}$/.test(l2) ? p.slice(-3).join(".") : l2; };
+let BOOT = null;
+const lastHit = {};
 async function rdap(d) {
-  const r = await get(`https://rdap.org/domain/${d}`, 15000);
+  if (!BOOT) { const b = await get("https://data.iana.org/rdap/dns.json", 15000); try { BOOT = {}; for (const [tlds, urls] of JSON.parse(b.body).services) for (const t of tlds) BOOT[t] = urls[0]; } catch { BOOT = {}; } }
+  const tld = d.split(".").pop(); const base = BOOT[tld]; if (!base) return { age: null, note: "no rdap for ." + tld };
+  let r;
+  for (let a = 0; a < 4; a++) {
+    const wait = Math.max(0, (lastHit[base] || 0) + 700 - Date.now()); lastHit[base] = Date.now() + wait; if (wait) await new Promise((x) => setTimeout(x, wait));
+    r = await get(`${base.replace(/\/$/, "")}/domain/${d}`, 15000);
+    if (r.status !== 429) break; await new Promise((x) => setTimeout(x, 2500 * (a + 1)));
+  }
   if (r.status !== 200) return { age: null, note: `rdap ${r.status || r.error}` };
   try {
     const j = JSON.parse(r.body);
@@ -59,9 +68,10 @@ async function vet(s) {
   out.samples = [];
   for (const x of s.sample) {
     let u = x.url.split("?")[0].split("#")[0];
-    const r = await get(u + ".json", 12000);
+    const vid = (x.url.match(/variant=(\d+)/) || [])[1];
+    const r = await get(u + ".js", 12000);
     let rec = { url: x.url, ourPrice: x.price, status: r.status || r.error };
-    if (r.status === 200) { try { const p = JSON.parse(r.body).product; const v = p.variants?.[0]; rec.title = p.title; rec.livePrice = Math.round(parseFloat(v?.price) * 100); rec.available = p.variants?.some((v) => v.available) ?? null; rec.match = rec.livePrice === x.price; } catch { rec.status = "parse"; } }
+    if (r.status === 200) { try { const p = JSON.parse(r.body); const v = p.variants.find((v) => String(v.id) === vid) || p.variants[0]; rec.title = p.title; rec.livePrice = v.price; rec.available = v.available; rec.match = v.price === x.price; rec.vfound = String(v.id) === vid; } catch { rec.status = "parse"; } }
     out.samples.push(rec);
   }
   // catalogue size
@@ -70,7 +80,7 @@ async function vet(s) {
   return out;
 }
 const res = []; let i = 0;
-await Promise.all(Array.from({ length: 8 }, async () => { while (i < stores.length) { const s = stores[i++]; try { res.push(await vet(s)); } catch (e) { res.push({ key: s.key, base: s.base, error: String(e) }); } if (res.length % 20 === 0) console.log(res.length); } }));
+await Promise.all(Array.from({ length: 10 }, async () => { while (i < stores.length) { const s = stores[i++]; try { res.push(await vet(s)); } catch (e) { res.push({ key: s.key, base: s.base, error: String(e) }); } if (res.length % 20 === 0) console.log(res.length); } }));
 res.sort((a, b) => a.key.localeCompare(b.key));
 writeFileSync(process.argv[3] || "scripts/qa/vet-out.json", JSON.stringify(res, null, 1));
 console.log("done", res.length);
