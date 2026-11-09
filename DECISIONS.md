@@ -1479,3 +1479,14 @@ regions that have the page.
 ## 2026-11-09 — A damaged-box variant is never a store's price
 
 `priceOf` drops variants titled as damaged, dented or imperfect when the store lists others (all damaged: no listing), so a cheaper cosmetically damaged copy never becomes the product's price. Ported from DexCompare after a store asked for standard and damaged boxes to be kept apart.
+
+## 2026-11-09 — The right side rail is Amazon's, not TCGplayer's
+
+Owner: "the eBay ad banner and Amazon ad banner on the left and right side of the site". TCGplayer sells no sealed sports cards
+(2026-11-07), so the far-right rail had nothing to show. It is now Amazon's: ten of the region's most-listed in-stock sealed products
+(the ones whose ASIN the daily import found first), each a tagged link (`ascsubtag=wax-<region>-amazon-side`, the region's own
+Associates tag) to Amazon's own page of the product, else an exact-name search. NO price (Amazon's licence allows a price 24 hours
+and the CDN copy lives longer), labelled Ad with the Associates disclosure under it. The tiles come from `/api/rails/amazon/<region>`
+(`lib/amazon-rail.ts`), asked for in the browser from 1280px and CDN-cached a day: nothing in the server HTML. The left eBay rail,
+the flush layout (2026-11-07) and the 1280px gate are unchanged. Amazon is never in the phone dock (an overlay; the dock is eBay only),
+and no AdSense. `tcgplayer-strip-side` and `tcgplayer-strip-dock` are retired placements.

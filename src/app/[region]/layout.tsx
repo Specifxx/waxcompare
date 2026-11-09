@@ -43,9 +43,9 @@ export default async function RegionLayout({ children, params }: { children: Rea
       </div>
       <Footer region={r.region} listed={listed} />
       {/* From 1280px (every regular 16:9 and 16:10 screen; owner, 2026-11-06), drawn in the browser: an eBay rail down the far left and
-          a TCGplayer rail down the far right, fixed beside the shell, ten tiles that scroll (components/SideAds.tsx). Nothing in the
+          an Amazon rail down the far right, fixed beside the shell, ten tiles that scroll (components/SideAds.tsx). Nothing in the
           server HTML, nothing on smaller screens. */}
-      <SideAds region={r.region} tiles={tcg} />
+      <SideAds region={r.region} />
     </>
   );
 }
