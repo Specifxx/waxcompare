@@ -4,6 +4,8 @@ import { COMPARABLE } from "@/lib/data";
 import { prisma } from "@/lib/db";
 import { isComparable, statsInMarket } from "@/lib/public-data/joins";
 import { routeRaw } from "@/lib/public-data/route";
+import { taggedProducts } from "@/lib/facet-data";
+import { facetSitemapKeys } from "@/lib/facet-rules";
 import { activeStoreKeys } from "@/lib/hub-data";
 import { detailIndexed, MIN_HUB_PRODUCTS, productInSitemap } from "@/lib/index-tiers";
 import { regionOfSitemapId, SITEMAP_IDS, STATIC_SITEMAP_ID, regionSitemap, staticSitemap } from "@/lib/sitemap";
@@ -42,14 +44,15 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
     }
     const r = regionOfSitemapId(n);
     if (!r) return [];
-    const [typeLabels, setCodes, productSlugs, lastmod] = await Promise.all([
+    const [typeLabels, setCodes, productSlugs, lastmod, facets] = await Promise.all([
       typesInMarket(r.market),
       setsInMarket(r.market),
       // NZ, SG and EU product pages are noindex (INDEXED_DETAIL_REGIONS, 2026-11-08): none of them is listed.
       detailIndexed(r.region) ? strongSlugs(r.market) : Promise.resolve([] as string[]),
       lastImport(r.market),
+      taggedProducts(r.market).then(facetSitemapKeys),
     ]);
-    return regionSitemap(r, { typeLabels, setCodes, productSlugs, lastmod });
+    return regionSitemap(r, { typeLabels, setCodes, productSlugs, lastmod, facets });
   } catch (e) {
     if (process.env.NEXT_PHASE === "phase-production-build") {
       console.error(`sitemap/${n}: database unavailable at build (${(e as Error).message}); written without products until the first refresh.`);

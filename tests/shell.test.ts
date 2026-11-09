@@ -139,21 +139,18 @@ test("Header on a region page: search at every width (never in a hidden wrapper)
   assert.doesNotMatch(html, /aria-label="Sections"[^>]*class="page flex gap-1 overflow-x-auto/, "the second chip row is gone");
 });
 
-test("Header nav (lg and up): Deals · All sealed · Sets · Releases · Guides · Stores, each to its region path", () => {
+test("Header nav (lg and up): Deals · Sports · Brands · All sealed · Stores, each to its region path", () => {
   assert.deepEqual(
     HEADER_NAV.map((n) => n.label),
-    ["Deals", "All sealed", "Sets", "Releases", "Guides", "Stores"],
+    ["Deals", "Sports", "Brands", "All sealed", "Stores"],
   );
   const html = render(React.createElement(Header, { region: "uk" }));
   const nav = /<nav class="hidden items-center gap-0\.5 lg:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
-  // While a set is on pre-order, "Releases" is its pre-order hub.
-  const pre = openPreorderGuides()[0];
   for (const [href, label] of [
     ["/uk/deals", "Deals"],
+    ["/uk/sport", "Sports"],
+    ["/uk/brand", "Brands"],
     ["/uk/sealed", "All sealed"],
-    ["/uk/sets", "Sets"],
-    pre ? [`/uk/preorders/${pre.set.slug}`, `${pre.set.name} pre-orders`] : ["/uk/releases", "Releases"],
-    ["/uk/guides", "Guides"],
     ["/uk/stores", "Stores"],
   ])
     assert.match(nav, new RegExp(`href="${href}"[^>]*>${label}</a>`), label);
@@ -164,8 +161,7 @@ test("Header with no region: the whole header, built for the default region (the
   const html = render(React.createElement(Header, { region: null }));
   assert.match(html, /role="search"/, "search from the first page");
   const nav = /<nav class="hidden items-center gap-0\.5 lg:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
-  const pre = openPreorderGuides()[0];
-  for (const h of ["/us/deals", "/us/sealed", "/us/sets", pre ? `/us/preorders/${pre.set.slug}` : "/us/releases", "/us/guides", "/us/stores", "/blog"]) assert.match(nav, new RegExp(`href="${h}"`), h);
+  for (const h of ["/us/deals", "/us/sport", "/us/brand", "/us/sealed", "/us/stores", "/blog"]) assert.match(nav, new RegExp(`href="${h}"`), h);
   assert.doesNotMatch(nav, /data-ad="header"/, "eBay's link is a region page's only");
   assert.match(html, /aria-label="Menu"/);
   assert.match(html, /aria-label="Region: United States\. Change region"/);
@@ -174,13 +170,13 @@ test("Header with no region: the whole header, built for the default region (the
 
 test("the sidebar (xl): product types, sets, deals and the rest, under each layout, every link a real region path", () => {
   const groups = navGroups("au", "2026-10-28");
-  assert.deepEqual(groups.map((g) => g.title), ["Shop by product", "Releases", "Deals & stock", "More"]);
+  assert.deepEqual(groups.map((g) => g.title), ["Shop by sport", "Shop by brand", "Shop by product", "Releases", "Deals & stock", "More"]);
   for (const l of groups.flatMap((g) => g.links)) assert.match(l.href, /^\/au\/|^\/blog$|^\/creators$|^\/forum$/, l.href);
   assert.ok(!groups.flatMap((g) => g.links).some((l) => l.href.includes("/preorders/")), "no pre-order hubs on SportsCardCompare");
-  assert.deepEqual(groups[0].links.slice(0, 4).map((l) => l.href), ["/au/type/hobby-boxes", "/au/type/jumbo-boxes", "/au/type/mega-boxes", "/au/type/blaster-boxes"]);
-  assert.equal(groups[1].links.at(-1)!.href, "/au/sets");
-  assert.ok(navGroups("us", "2026-11-25")[2].links.some((l) => l.label === "Black Friday"), "Black Friday in season");
-  assert.ok(!groups[2].links.some((l) => l.label === "Black Friday"));
+  assert.deepEqual(groups[2].links.slice(0, 4).map((l) => l.href), ["/au/type/hobby-boxes", "/au/type/jumbo-boxes", "/au/type/mega-boxes", "/au/type/blaster-boxes"]);
+  assert.equal(groups[3].links.at(-1)!.href, "/au/sets");
+  assert.ok(navGroups("us", "2026-11-25")[4].links.some((l) => l.label === "Black Friday"), "Black Friday in season");
+  assert.ok(!groups[4].links.some((l) => l.label === "Black Friday"));
   const html = render(React.createElement(SideNav, { region: "au", groups }));
   assert.match(html, /^<aside class="hidden w-60 shrink-0 xl:block" data-sidenav="">/);
   assert.match(html, /href="\/au\/type\/hobby-boxes"/);
@@ -214,7 +210,7 @@ test("the phone menu: every group of the sidebar under the region, then the regi
   const groups = navGroups("ca", "2026-10-28");
   const sheet = render(React.createElement(MenuSheet, { region: "ca", groups, pathname: "/ca/stores", onClose() {} }));
   assert.match(sheet, /aria-current="page"[^>]*href="\/ca\/stores"|href="\/ca\/stores"[^>]*aria-current="page"/, "the current section is marked");
-  for (const t of ["Shop by product", "Releases", "Deals &amp; stock", "More"]) assert.match(sheet, new RegExp(`>${t}</h2>`), t);
+  for (const t of ["Shop by sport", "Shop by brand", "Shop by product", "Releases", "Deals &amp; stock", "More"]) assert.match(sheet, new RegExp(`>${t}</h2>`), t);
   for (const l of groups.flatMap((g) => g.links)) assert.ok(hrefs(sheet).includes(l.href), l.href);
   for (const p of ["/deals", "/this-week", "/back-in-stock", "/price-moves", "/out-of-print", "/sealed", "/type/hobby-boxes", "/type/jumbo-boxes", "/type/mega-boxes", "/type/blaster-boxes", "/type/hobby-cases", "/sets", "/releases", "/guides", "/tools", "/stores"])
     assert.ok(hrefs(sheet).includes(`/ca${p}`), p);

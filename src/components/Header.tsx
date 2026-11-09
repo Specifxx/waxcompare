@@ -2,7 +2,6 @@ import Link from "@/components/Link";
 
 import { inSeason, saleStrip } from "@/lib/black-friday";
 import { navGroups } from "@/lib/nav";
-import { openPreorderGuides } from "@/lib/preorder-guides";
 import { REGIONS, X_DEFAULT_REGION, type Region } from "@/lib/regions";
 import { sectionHref, SECTION_PATHS, type SectionKey } from "@/lib/site";
 import { EbayNavLink } from "./Ebay";
@@ -11,7 +10,7 @@ import { MobileMenu } from "./MobileMenu";
 import { NavLink } from "./NavLink";
 import { RegionSwitcher } from "./RegionSwitcher";
 import { HeaderNavItems, SoftHeaderNavItems, SoftRegionSwitcher, SoftSearchBox, type HeaderNavItem } from "./HeaderNav";
-import { shopMenuColumns } from "./ShopMenu";
+import { brandsMenuColumns, shopMenuColumns, sportsMenuColumns } from "./ShopMenu";
 import { ThemeToggle } from "./ThemeToggle";
 import { CartHeaderLink } from "./cart/CartHeaderLink";
 import { SearchBox } from "./SearchBox";
@@ -20,12 +19,13 @@ import { SearchBox } from "./SearchBox";
  * The desktop nav (lg and up), in order. `also`: other paths (under the region) that count as the section, for its current
  * state: a type page is part of "All sealed", the per-pack ranking and the weekly digest sit with "Deals".
  */
-export const HEADER_NAV: { key: SectionKey; label: string; also?: string[]; xl?: boolean }[] = [
+export const HEADER_NAV: { key: SectionKey | "sports" | "brands"; label: string; also?: string[]; xl?: boolean }[] = [
   { key: "deals", label: "Deals", also: [SECTION_PATHS.thisWeek, SECTION_PATHS.backInStock, SECTION_PATHS.priceMoves, SECTION_PATHS.outOfPrint] },
+  // Owner, 2026-11-09: a collector shops by sport and by brand first. Each opens a dropdown; the sets, the release calendar and the
+  // guides moved to the "All sealed" dropdown, the sidebar and the phone menu (the row had no room for them).
+  { key: "sports", label: "Sports", also: ["/sport"] },
+  { key: "brands", label: "Brands", also: ["/brand"] },
   { key: "sealed", label: "All sealed", also: ["/type"] },
-  { key: "sets", label: "Sets" },
-  { key: "releases", label: "Releases" },
-  { key: "guides", label: "Guides" },
   { key: "stores", label: "Stores" },
 ];
 
@@ -39,19 +39,17 @@ export function headerNav(today = new Date().toISOString().slice(0, 10)): typeof
 }
 
 /**
- * The desktop nav's items for a region, links and all (the "All sealed" dropdown's included). While a set is on pre-order, "Releases"
- * becomes that set's pre-order hub ("Star Trek pre-orders", lib/preorder-guides.ts): Rift Compare's and this site's pre-order pages
- * are their most visited, and the release calendar stays one click away in the sidebar and phone menu. It retires itself on release day.
+ * The desktop nav's items for a region, links and all (the dropdowns of Sports, Brands and All sealed included). An open pre-order
+ * hub leads the sidebar's Releases group (lib/nav.ts); the header row has no room for it.
  */
 export function headerNavItems(region: Region, today = new Date().toISOString().slice(0, 10), listed?: ReadonlySet<string> | null): HeaderNavItem[] {
-  const pre = openPreorderGuides(today)[0];
   return headerNav(today).map((n) => ({
-    href: n.key === "releases" && pre ? `/${region}/preorders/${pre.set.slug}` : sectionHref(region, n.key),
-    label: n.key === "releases" && pre ? `${pre.set.name} pre-orders` : n.label,
-    also: n.key === "releases" && pre ? [`/${region}${SECTION_PATHS.releases}`] : n.also?.map((p) => `/${region}${p}`),
+    href: n.key === "sports" ? `/${region}/sport` : n.key === "brands" ? `/${region}/brand` : sectionHref(region, n.key),
+    label: n.label,
+    also: n.also?.map((p) => `/${region}${p}`),
     xl: n.xl,
-    // The sealed browse item opens the category dropdown (components/ShopMenu.tsx): by product, by set, by value.
-    menu: n.key === "sealed" ? shopMenuColumns(region, today, listed) : undefined,
+    // Three dropdowns (components/ShopMenu.tsx): sports, brands and the sealed browse (by product, by set, by value).
+    menu: n.key === "sealed" ? shopMenuColumns(region, today, listed) : n.key === "sports" ? sportsMenuColumns(region, listed) : n.key === "brands" ? brandsMenuColumns(region, listed) : undefined,
   }));
 }
 
