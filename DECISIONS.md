@@ -1475,3 +1475,7 @@ releases, and the sold-out names at the foot; "Search, sort and filter all" open
 selects (`?sport=&brand=`, also in the phone filter sheet). Indexing is the set and type rule: noindex with fewer than `MIN_HUB_PRODUCTS`
 comparable products, and the sitemap lists only the indexable ones (`lib/facet-rules.ts` is the one rule for both). hreflang names only the
 regions that have the page.
+
+## 2026-11-09 — A damaged-box variant is never a store's price
+
+`priceOf` drops variants titled as damaged, dented or imperfect when the store lists others (all damaged: no listing), so a cheaper cosmetically damaged copy never becomes the product's price. Ported from DexCompare after a store asked for standard and damaged boxes to be kept apart.
