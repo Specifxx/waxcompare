@@ -6733,58 +6733,6 @@
     }
    ]
   },
-  "dejouer": {
-   "market": "CA",
-   "currency": "CAD",
-   "measuredAt": "2026-11-02T11:27:21.329Z",
-   "points": [
-    {
-     "subtotalCents": 599,
-     "rates": {
-      "tor": 1490,
-      "van": 1490,
-      "mtl": 1490,
-      "cgy": 1490
-     }
-    },
-    {
-     "subtotalCents": 4899,
-     "rates": {
-      "tor": 1490,
-      "van": 1490,
-      "mtl": 1490,
-      "cgy": 1490
-     }
-    },
-    {
-     "subtotalCents": 8499,
-     "rates": {
-      "tor": 1490,
-      "van": 1490,
-      "mtl": 1490,
-      "cgy": 1490
-     }
-    },
-    {
-     "subtotalCents": 16999,
-     "rates": {
-      "tor": 1490,
-      "van": 1490,
-      "mtl": 1490,
-      "cgy": 1490
-     }
-    },
-    {
-     "subtotalCents": 42899,
-     "rates": {
-      "tor": 1490,
-      "van": 1490,
-      "mtl": 1490,
-      "cgy": 1490
-     }
-    }
-   ]
-  },
   "derpycards": {
    "market": "CA",
    "currency": "CAD",
@@ -14017,49 +13965,6 @@
     }
    ]
   },
-  "ip5f5c0a": {
-   "market": "US",
-   "currency": "USD",
-   "measuredAt": "2026-11-02T11:45:48.480Z",
-   "points": [
-    {
-     "subtotalCents": 499,
-     "rates": {
-      "ny": 627,
-      "sf": 685,
-      "dal": 572,
-      "chi": 627
-     }
-    },
-    {
-     "subtotalCents": 4499,
-     "rates": {
-      "ny": 673,
-      "sf": 737,
-      "dal": 652,
-      "chi": 673
-     }
-    },
-    {
-     "subtotalCents": 8999,
-     "rates": {
-      "ny": 704,
-      "sf": 995,
-      "dal": 767,
-      "chi": 704
-     }
-    },
-    {
-     "subtotalCents": 15999,
-     "rates": {
-      "ny": 704,
-      "sf": 995,
-      "dal": 767,
-      "chi": 704
-     }
-    }
-   ]
-  },
   "irresistibleforce": {
    "market": "AU",
    "currency": "AUD",
@@ -17292,58 +17197,6 @@
     }
    ]
   },
-  "mantisgamestudio": {
-   "market": "US",
-   "currency": "USD",
-   "measuredAt": "2026-11-02T11:51:47.138Z",
-   "points": [
-    {
-     "subtotalCents": 2500,
-     "rates": {
-      "ny": 1495,
-      "sf": 1495,
-      "dal": 1495,
-      "chi": 1495
-     }
-    },
-    {
-     "subtotalCents": 4000,
-     "rates": {
-      "ny": 1495,
-      "sf": 1495,
-      "dal": 1495,
-      "chi": 1495
-     }
-    },
-    {
-     "subtotalCents": 8000,
-     "rates": {
-      "ny": 1995,
-      "sf": 1995,
-      "dal": 1995,
-      "chi": 1995
-     }
-    },
-    {
-     "subtotalCents": 15000,
-     "rates": {
-      "ny": 2495,
-      "sf": 2495,
-      "dal": 2495,
-      "chi": 2495
-     }
-    },
-    {
-     "subtotalCents": 30000,
-     "rates": {
-      "ny": 4995,
-      "sf": 4995,
-      "dal": 4995,
-      "chi": 4995
-     }
-    }
-   ]
-  },
   "manyrealms": {
    "market": "US",
    "currency": "USD",
@@ -18393,58 +18246,6 @@
       "van": 0,
       "mtl": 0,
       "cgy": 0
-     }
-    }
-   ]
-  },
-  "mymintcards": {
-   "market": "US",
-   "currency": "USD",
-   "measuredAt": "2026-11-02T11:54:14.885Z",
-   "points": [
-    {
-     "subtotalCents": 650,
-     "rates": {
-      "ny": 800,
-      "sf": 800,
-      "dal": 800,
-      "chi": 800
-     }
-    },
-    {
-     "subtotalCents": 5500,
-     "rates": {
-      "ny": 800,
-      "sf": 800,
-      "dal": 800,
-      "chi": 800
-     }
-    },
-    {
-     "subtotalCents": 11499,
-     "rates": {
-      "ny": 800,
-      "sf": 800,
-      "dal": 800,
-      "chi": 800
-     }
-    },
-    {
-     "subtotalCents": 21000,
-     "rates": {
-      "ny": 0,
-      "sf": 0,
-      "dal": 0,
-      "chi": 0
-     }
-    },
-    {
-     "subtotalCents": 44900,
-     "rates": {
-      "ny": 0,
-      "sf": 0,
-      "dal": 0,
-      "chi": 0
      }
     }
    ]
@@ -26331,49 +26132,6 @@
       "sf": 1014,
       "dal": 940,
       "chi": 973
-     }
-    }
-   ]
-  },
-  "theplatypusparty": {
-   "market": "US",
-   "currency": "USD",
-   "measuredAt": "2026-11-02T12:10:10.856Z",
-   "points": [
-    {
-     "subtotalCents": 500,
-     "rates": {
-      "ny": 600,
-      "sf": 600,
-      "dal": 600,
-      "chi": 600
-     }
-    },
-    {
-     "subtotalCents": 4000,
-     "rates": {
-      "ny": 600,
-      "sf": 600,
-      "dal": 600,
-      "chi": 600
-     }
-    },
-    {
-     "subtotalCents": 8500,
-     "rates": {
-      "ny": 600,
-      "sf": 600,
-      "dal": 600,
-      "chi": 600
-     }
-    },
-    {
-     "subtotalCents": 15000,
-     "rates": {
-      "ny": 600,
-      "sf": 600,
-      "dal": 600,
-      "chi": 600
      }
     }
    ]
