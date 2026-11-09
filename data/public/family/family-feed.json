@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-08T16:07:16.435Z",
+ "generatedAt": "2026-11-09T00:15:52.746Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -32,13 +32,13 @@
    "region": "AU",
    "title": "2026 Topps Chrome MLS Hobby Box",
    "url": "https://sportscardcompare.com/au/p/2026-topps-chrome-mls-hobby-box",
-   "cents": 32500,
+   "cents": 40000,
    "currency": "AUD",
-   "store": "One Place Trading Card Shop",
+   "store": "Kollecter",
    "image": "https://cdn.shopify.com/s/files/1/0530/9867/6400/files/ToppsChromeMLS2026-Hobby.png?v=1787151098",
-   "refCents": 56000,
+   "refCents": 72000,
    "refLabel": "median store price",
-   "savingPct": 42
+   "savingPct": 44
   },
   {
    "kind": "deal",
@@ -302,7 +302,7 @@
    "currency": "CAD",
    "store": "Hope Club Collectibles",
    "image": "https://cdn.shopify.com/s/files/1/0875/0101/3279/files/2026PaniniPrizmBaseballHobbyBox.jpg?v=1789018679",
-   "refCents": 34999,
+   "refCents": 34995,
    "refLabel": "median store price",
    "savingPct": 49
   },
@@ -380,6 +380,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
+   "title": "2026 Topps Chrome Formula 1 Value Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-formula-1-value-pack",
+   "cents": 4300,
+   "currency": "EUR",
+   "store": "PokeFamily",
+   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T124806.079.png?v=1793361008",
+   "refCents": 6499,
+   "refLabel": "median store price",
+   "savingPct": 34
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
    "title": "2025 Topps Finest Football Breaker's Delight Box",
    "url": "https://sportscardcompare.com/eu/p/2025-topps-finest-football-breakers-delight-box",
    "cents": 79990,
@@ -401,20 +415,6 @@
    "store": "deichcards.de",
    "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsChromeUFC2026ValueBox_c2057a85-a753-4ca8-b95a-b7b1f377adbd.png?v=1778507514",
    "refCents": 3499,
-   "refLabel": "median store price",
-   "savingPct": 29
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2026 Topps Chrome Formula 1 Value Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-formula-1-value-pack",
-   "cents": 4999,
-   "currency": "EUR",
-   "store": "dennistheripper",
-   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T124806.079.png?v=1793361008",
-   "refCents": 7000,
    "refLabel": "median store price",
    "savingPct": 29
   },
