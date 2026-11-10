@@ -25,6 +25,9 @@ import {
   perProductFeeds,
   purgeCutoff,
   retryAllowance,
+  CANADA_ITEMS_FIRST,
+  canadaFirst,
+  SWEEP_CEILING,
   runCap,
   runImport,
   SEALED_QUERIES,
@@ -1043,7 +1046,8 @@ test("run: with no hot sets the sweep has no hot pass, and the products it misse
   assert.deepEqual([...new Set(sweep.map((c) => c.mp))], MARKETPLACE_ORDER.filter((mp) => ["EBAY_US", "EBAY_GB", "EBAY_CA"].includes(mp)));
   assert.ok(s.sweep.every((m) => m.hotPages === 0 && m.hotQueries.length === 0));
   const perProduct = calls.filter((c) => c.limit === "50").map((c) => `${c.mp} ${c.q}`);
-  assert.deepEqual(perProduct, perProductFeeds(rows, undefined, TODAY).map((f) => `${f.marketplace} ${f.searches[0].q}`));
+  // Canadian products first (CANADA_ITEMS_FIRST), then the value order
+  assert.deepEqual(perProduct, canadaFirst(perProductFeeds(rows, undefined, TODAY)).map((f) => `${f.marketplace} ${f.searches[0].q}`));
   assert.deepEqual(s.hotItems, { keys: 0, fresh: 0, covered: 0, searched: 0, refreshed: 0 });
   assert.equal(db.days.get(s.day), h.searches().length);
   assert.equal(s.buckets.sweep.calls + s.buckets.items.calls, h.searches().length);
@@ -1080,4 +1084,15 @@ test("exit check: a per-product search that completed with no listing is finishe
   // Failed or unfinished searches still fail the job, and so does a run whose fixed feeds came back empty (feedsEmpty counts items only).
   assert.equal(feedsShortfall({ feedsPlanned: 454, feedsRefreshed: 208, feedsEmpty: 0 }), true);
   assert.equal(feedsShortfall({ feedsPlanned: 0, feedsRefreshed: 0, feedsEmpty: 0 }), false);
+});
+
+test("region split (owner, 2026-11-10): the UK, EU and AU sweeps stop at 20 pages; the freed calls go to Canadian products first", () => {
+  assert.equal(SWEEP_CEILING.EBAY_US, undefined, "the US sweep has no ceiling");
+  assert.equal(SWEEP_CEILING.EBAY_CA, undefined, "nor Canada's");
+  assert.deepEqual(SWEEP_CEILING, { EBAY_GB: 20, EBAY_DE: 20, EBAY_AU: 20 });
+  assert.equal(CANADA_ITEMS_FIRST, 113, "the 173 - 3 x 20 calls freed from the sweep");
+  const f = (feed: string) => ({ feed });
+  const order = canadaFirst([f("EBAY_US|item:a"), f("EBAY_CA|item:b"), f("EBAY_GB|item:c"), f("EBAY_CA|item:d"), f("EBAY_US|item:e"), f("EBAY_CA|item:g")], 2);
+  assert.deepEqual(order.map((x) => x.feed), ["EBAY_CA|item:b", "EBAY_CA|item:d", "EBAY_US|item:a", "EBAY_GB|item:c", "EBAY_US|item:e", "EBAY_CA|item:g"], "at most n Canadian first, then the usual order (US first)");
+  assert.deepEqual(canadaFirst([f("EBAY_US|item:a")]).map((x) => x.feed), ["EBAY_US|item:a"]);
 });

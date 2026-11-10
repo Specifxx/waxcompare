@@ -70,6 +70,13 @@ export const DEFAULT_DAILY_CAP = 1400;
  * searches after it found listings for 150 products (0.37 a call). So the sweep gets most of the day.
  */
 export const DEFAULT_SWEEP_CALLS = 950;
+/**
+ * The most sweep pages a marketplace may take in one run, below its share (owner, 2026-11-10; DECISIONS.md). The UK, the EU
+ * (eBay.de) and Australia took 173 sweep calls a day for 13 visitors between them in the 30 days to 11 Nov; 20 each keeps their
+ * first pages of the biggest queries. The US and Canada have none. What a capped marketplace leaves rolls on to Canada's sweep and
+ * then to the per-product searches, Canada's first (CANADA_ITEMS_FIRST).
+ */
+export const SWEEP_CEILING: Partial<Record<MarketplaceId, number>> = { EBAY_GB: 20, EBAY_DE: 20, EBAY_AU: 20 };
 /** Feeds the sweep writes per database transaction. */
 export const SWEEP_WRITE_BATCH = 100;
 /** The hard ceiling for the daily cap setting: Compare Empire's keyset (5,000 a day) is shared with Compare Empire (2,900) and
@@ -420,6 +427,22 @@ export function perProductFeeds(rows: readonly PlanRow[], keys: readonly ItemKey
   });
   const seen = new Set(hot.map((f) => f.feed));
   return [...hot, ...keys.map(itemFeed).filter((f) => !seen.has(f.feed))];
+}
+
+/**
+ * The most per-product searches that go to Canadian products ahead of the usual order (owner, 2026-11-10; DECISIONS.md): Canada sent
+ * 357 visitors in the 30 days to 11 Nov against the US's 282, and earned every eBay dollar (A$10.12). The 113 calls a day taken
+ * from the UK's, the EU's and Australia's sweep (SWEEP_CEILING) go to Canadian products the sweep missed, then the usual order
+ * (US first, by value) carries on.
+ */
+export const CANADA_ITEMS_FIRST = 113;
+
+/** The per-product searches with up to CANADA_ITEMS_FIRST Canadian ones moved to the front, the rest in their own order. */
+export function canadaFirst<T extends { feed: string }>(feeds: readonly T[], n: number = CANADA_ITEMS_FIRST): T[] {
+  const ca: T[] = [];
+  const rest: T[] = [];
+  for (const f of feeds) (ca.length < n && f.feed.startsWith("EBAY_CA|") ? ca : rest).push(f);
+  return [...ca, ...rest];
 }
 
 export interface PlanOptions {
@@ -977,7 +1000,7 @@ export async function runImport(deps: ImportDeps, opts: RunOptions = {}): Promis
     for (let i = 0; i < todo.length && !stop && left > 0; i++) {
       const ix = todo[i];
       buckets.sweep.planned++;
-      const budget = marketplaceShares(todo.slice(i), left).get(ix.marketplace) ?? 0;
+      const budget = Math.min(marketplaceShares(todo.slice(i), left).get(ix.marketplace) ?? 0, SWEEP_CEILING[ix.marketplace] ?? Infinity);
       const collector = new SweepCollector(ix, now());
       const before = buckets.sweep.calls;
       let queries: QueryProgress[] = [];
@@ -1069,7 +1092,7 @@ export async function runImport(deps: ImportDeps, opts: RunOptions = {}): Promis
   if (!stop && wantItems) {
     const room = Math.max(0, plan.cap - spent);
     const take = Math.max(0, room - retryAllowance(Math.min(room, open.length)));
-    const list = open.slice(0, take);
+    const list = canadaFirst(open).slice(0, take);
     buckets.items.planned = list.length;
     summary.feedsPlanned += list.filter(counted).length;
     summary.hotItems.searched = list.filter((f) => f.hot).length;
