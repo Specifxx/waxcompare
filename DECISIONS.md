@@ -1515,6 +1515,7 @@ listing (the card's `useEbayPick`, no second request) when the best store pays n
 within 20% of it: "Ad · or $X on eBay ↗", placement `product-sticky-alt`. Its own price only, no "+N%", as on the card.
 Never called cheaper; the bar's button stays the store's. Amazon is left out: the product page shows Amazon's price only
 in its pinned row, and a second Amazon line beside the card's eBay line would make two ads in the first screen.
+
 ## 2026-11-10: The UK, EU and Australia sweeps stop at 20 pages; the freed calls go to Canadian products (owner: "use the recommendation")
 
 Measured over the 30 days to 11 Nov (`/mnt/project-files/strategy/ebay-site-region-split-2026-11-10.html`): Canada sent 357
