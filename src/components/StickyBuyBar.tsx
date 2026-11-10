@@ -64,8 +64,35 @@ function WithPick(props: StickyBuyBarProps & { pick: BarPick }) {
   const { item, cents, bestable, age } = useEbayPick({ region, slug: pick.slug, floor: pick.floor, packs: pick.packs, placement });
   // In stock: BestPriceCard's rule to the letter (the bar repeats the card). Sold out: the callout's (any new listing of its own).
   const show = store ? bestable && item != null && cents != null && cents < store.cents : bestable && item != null && cents != null;
-  const content = show && item && cents != null ? listingContent(region, item, cents, age, !store) : staticContent(props);
+  // Not cheaper but within PAID_ALTERNATIVE_BAND of a store that pays nothing: the bar's second line names the listing's real price
+  // (RiftCompare's paid alternative, ported 2026-11-10; the card already shows it as "Also on eBay"). Never called cheaper, and its
+  // own price only, no "+N%" (DEPLOY.md, listings-best-price-alt).
+  const alt =
+    !show && store && !store.marketplace && !store.rel.includes("sponsored") && bestable && item != null && cents != null && cents <= store.cents * PAID_ALTERNATIVE_BAND
+      ? { href: item.href, cents }
+      : null;
+  const content = show && item && cents != null ? listingContent(region, item, cents, age, !store) : alt ? altContent(props, alt) : staticContent(props);
   return <Bar {...props} content={content} />;
+}
+
+/** At most 20% above the store's price (lib/paid-alternative on RiftCompare). */
+export const PAID_ALTERNATIVE_BAND = 1.2;
+
+function altContent(props: StickyBuyBarProps, alt: { href: string; cents: number }): Content {
+  const base = staticContent(props);
+  const { region } = props;
+  return {
+    ...base,
+    ad: true,
+    bottom: (
+      <>
+        <span className="ad-pill">Ad</span>
+        <OutboundLink href={alt.href} rel={REL_SPONSORED} retailer={ebayRetailerForHref(alt.href, region)} placement="product-sticky-alt" className="truncate font-semibold text-brand-strong hover:underline">
+          or <span className="tabular">{money(alt.cents, REGIONS[region].market)}</span> on eBay ↗
+        </OutboundLink>
+      </>
+    ),
+  };
 }
 
 interface Content {
