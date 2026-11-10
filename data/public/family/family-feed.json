@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-10T03:08:39.398Z",
+ "generatedAt": "2026-11-10T17:06:00.223Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -184,13 +184,13 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "US",
-   "title": "2024-25 Donruss Basketball Pack",
-   "url": "https://sportscardcompare.com/us/p/2024-25-donruss-basketball-pack",
-   "cents": 300,
+   "title": "2025-26 Panini Prizm Soccer Display Box",
+   "url": "https://sportscardcompare.com/us/p/2025-26-panini-prizm-soccer-display-box",
+   "cents": 4299,
    "currency": "USD",
-   "store": "CARDIACS Sports & Memorabilia",
-   "image": "https://cdn.shopify.com/s/files/1/0586/3758/2489/files/2024-25_Donruss_Basketball_Retail_Pack.jpg?v=1760453152",
-   "refCents": 495,
+   "store": "Collector Store LLC",
+   "image": "https://cdn.shopify.com/s/files/1/0112/5561/1454/files/prizm_fifa_soccer.png?v=1780528683",
+   "refCents": 7000,
    "refLabel": "median store price",
    "savingPct": 39
   },
@@ -207,6 +207,20 @@
    "refCents": 1195,
    "refLabel": "median store price",
    "savingPct": 33
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "UK",
+   "title": "2026-27 Topps Basketball Hanger Box",
+   "url": "https://sportscardcompare.com/uk/p/2026-27-topps-basketball-hanger-box",
+   "cents": 1699,
+   "currency": "GBP",
+   "store": "Sports Cards Direct",
+   "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/topps_flagship_nba_hanger_box_2026_2027.png?v=1793113817",
+   "refCents": 2500,
+   "refLabel": "median store price",
+   "savingPct": 32
   },
   {
    "kind": "deal",
@@ -263,20 +277,6 @@
    "refCents": 49500,
    "refLabel": "median store price",
    "savingPct": 19
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "UK",
-   "title": "2025 Topps Chrome Football Hobby Box",
-   "url": "https://sportscardcompare.com/uk/p/2025-topps-chrome-football-hobby-box",
-   "cents": 50000,
-   "currency": "GBP",
-   "store": "Sports Cards Direct",
-   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/chromecosmicnfl.jpg?v=1779228130",
-   "refCents": 60000,
-   "refLabel": "median store price",
-   "savingPct": 17
   },
   {
    "kind": "deal",
