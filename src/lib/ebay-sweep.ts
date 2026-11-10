@@ -567,6 +567,17 @@ export async function sweepWithHot(
 }
 
 /**
+ * The most sweep pages a marketplace may take in a run (owner, 2026-11-10, the region split brief). Measured 8-10 Nov the sweep
+ * spent US 292 / DE 63 / AU 56 / GB 54 / CA 53; Germany, Australia and the UK hold few visitors and earned nothing, so each is held
+ * to 20 pages (their best queries still run), and the ~113 calls freed go to one-by-one searches of Canadian, then US, products the
+ * sweep missed (ebay-import.ts ITEMS_FIRST_MARKETPLACES). A marketplace not listed is limited only by its share.
+ */
+export const SWEEP_MARKETPLACE_CAP: Partial<Record<MarketplaceId, number>> = { EBAY_DE: 20, EBAY_AU: 20, EBAY_GB: 20 };
+
+/** A marketplace's sweep budget: its share, held to SWEEP_MARKETPLACE_CAP. */
+export const sweepBudgetFor = (marketplace: MarketplaceId, share: number) => Math.max(0, Math.min(share, SWEEP_MARKETPLACE_CAP[marketplace] ?? Infinity));
+
+/**
  * How a sweep budget is shared between marketplaces: by how many products each lists × its audience weight (MARKET_WEIGHT: the US
  * first, then the UK and the EU, then Australia and Canada), with a floor so a small one still gets a few pages. The importer asks
  * again before each marketplace with what is left, so what one leaves unspent rolls forward in MARKETPLACE_ORDER.

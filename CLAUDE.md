@@ -63,7 +63,9 @@ prices into the git-ignored `data/amazon-live/`; `lib/amazon-live.ts` gives the 
 - Only `scripts/ebay-import.ts` (GitHub Actions) calls eBay's Browse API; the website never calls eBay and holds no eBay credential.
 - SportsCardCompare shares Compare Empire's keyset (owner, 2026-11-08: its 5,000 a day split Compare Empire 2,900, this site 1,400,
   MotorCompare 600), capped at 1,400 calls a day
-  (`EBAY_DAILY_CAP`). Never raise it, or point the import at another site's keys, without the owner.
+  (`EBAY_DAILY_CAP`). Never raise it, or point the import at another site's keys, without the owner. Inside it (owner, 2026-11-10):
+  the sweep holds Germany, Australia and the UK to 20 pages each (`SWEEP_MARKETPLACE_CAP`), and the first 113 one-by-one searches
+  go to Canadian, then US, products the sweep missed (`prioritiseItems`).
 - eBay rows are labelled ads, pinned above the stores, never counted as a store and never re-ranked into store rows.
 
 ## Brand and legal copy

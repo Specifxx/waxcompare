@@ -332,3 +332,18 @@ test("run: a 429 during the sweep stops the run, keeps what the sweep already fo
   assert.ok(db.feeds.has("EBAY_US|item:hb"), "the page that came back is written");
   assert.equal(s.buckets.items.planned, 0);
 });
+
+test("the sweep holds Germany, Australia and the UK to 20 pages; the freed calls search Canada then the US first (owner, 2026-11-10)", async () => {
+  const { SWEEP_MARKETPLACE_CAP, sweepBudgetFor } = await import("../src/lib/ebay-sweep");
+  const { prioritiseItems, ITEMS_FIRST_CALLS } = await import("../src/lib/ebay-import");
+  assert.deepEqual(SWEEP_MARKETPLACE_CAP, { EBAY_DE: 20, EBAY_AU: 20, EBAY_GB: 20 });
+  assert.equal(sweepBudgetFor("EBAY_DE", 300), 20);
+  assert.equal(sweepBudgetFor("EBAY_GB", 12), 12, "a smaller share stays");
+  assert.equal(sweepBudgetFor("EBAY_US", 900), 900, "the US is never capped");
+  assert.equal(sweepBudgetFor("EBAY_CA", 300), 300);
+  assert.equal(ITEMS_FIRST_CALLS, 113);
+  const f = (mp: "EBAY_US" | "EBAY_CA" | "EBAY_GB", i: number) => ({ feed: `${mp}|item:${i}`, marketplace: mp });
+  const open = [f("EBAY_GB", 1), f("EBAY_US", 1), f("EBAY_CA", 1), f("EBAY_US", 2), f("EBAY_CA", 2)];
+  assert.deepEqual(prioritiseItems(open, 3).map((x) => x.feed), ["EBAY_CA|item:1", "EBAY_CA|item:2", "EBAY_US|item:1", "EBAY_GB|item:1", "EBAY_US|item:2"]);
+  assert.equal(prioritiseItems(open, 0).length, open.length, "nothing lost, nothing doubled");
+});

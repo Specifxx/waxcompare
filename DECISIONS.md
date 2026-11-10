@@ -1515,3 +1515,15 @@ listing (the card's `useEbayPick`, no second request) when the best store pays n
 within 20% of it: "Ad · or $X on eBay ↗", placement `product-sticky-alt`. Its own price only, no "+N%", as on the card.
 Never called cheaper; the bar's button stays the store's. Amazon is left out: the product page shows Amazon's price only
 in its pinned row, and a second Amazon line beside the card's eBay line would make two ads in the first screen.
+
+## 2026-11-10: eBay calls follow visitors: the sweep holds DE, AU and GB to 20 pages, Canada and the US get the freed calls (owner)
+
+Measured 8-10 Nov, the run spent its 1,400 calls as the fixed feeds, a sweep of US 292 / DE 63 / AU 56 / GB 54 / CA 53 pages,
+and about 590 one-by-one searches. Canada had 357 visitors (the US 282) and all A$10.12 of the eBay earnings; Germany, Australia
+and the UK had few visitors and none. The owner approved the region split brief (`strategy/ebay-region-split-brief-2026-11-10.md`).
+
+- `SWEEP_MARKETPLACE_CAP` (`lib/ebay-sweep.ts`): EBAY_DE, EBAY_AU and EBAY_GB sweep at most 20 pages a run (`sweepBudgetFor`); the
+  US and Canada keep their shares. What a capped marketplace does not spend stays with the run for the per-product searches.
+- `prioritiseItems` (`lib/ebay-import.ts`): the first `ITEMS_FIRST_CALLS` (113, the three markets' 3 × ~58 → 20) one-by-one
+  searches are products the sweep missed in Canada, then the US, each in the plan's own order; the rest keep the old order.
+- The site cap (1,400 a day, the Compare Empire keyset) does not change. The US still sweeps first.

@@ -54,7 +54,7 @@ import {
   type ItemTarget,
 } from "./ebay-normalise";
 import { budgetDay, type ImportDb, type PlanRow } from "./ebay-store";
-import { buildSweepIndex, hotSweepQueries, marketplaceShares, SweepCollector, sweepSignatureSets, sweepVocabulary, sweepWithHot, type QueryProgress, type SweepIndex } from "./ebay-sweep";
+import { buildSweepIndex, hotSweepQueries, marketplaceShares, SweepCollector, sweepBudgetFor, sweepSignatureSets, sweepVocabulary, sweepWithHot, type QueryProgress, type SweepIndex } from "./ebay-sweep";
 import { HOT_SET_QUERY, HOT_SETS, hotRank, isHotSet, PRIORITY_MARKETPLACES } from "./popular";
 import type { Region } from "./regions";
 import { normalizeTitle, roughUsdCents, TYPE_BY_KEY, TYPE_BY_LABEL, TYPE_BY_SLUG, type TypeKey } from "./sealed-title";
@@ -420,6 +420,22 @@ export function perProductFeeds(rows: readonly PlanRow[], keys: readonly ItemKey
   });
   const seen = new Set(hot.map((f) => f.feed));
   return [...hot, ...keys.map(itemFeed).filter((f) => !seen.has(f.feed))];
+}
+
+/** Where the calls the sweep's caps freed go first (owner, 2026-11-10): Canada (more visitors than the US, all of the eBay
+ *  earnings) then the US. */
+export const ITEMS_FIRST_MARKETPLACES: readonly MarketplaceId[] = ["EBAY_CA", "EBAY_US"];
+/** How many per-product searches go first to ITEMS_FIRST_MARKETPLACES: the ~113 sweep calls DE, AU and GB gave up (3 × ~58 → 20). */
+export const ITEMS_FIRST_CALLS = 113;
+
+/**
+ * The per-product searches in the order they are bought: the first ITEMS_FIRST_CALLS are products the sweep missed in Canada, then
+ * the US (each in the plan's own order: hot first, then most valuable); everything else keeps the plan's order. Pure.
+ */
+export function prioritiseItems<F extends { feed: string; marketplace: MarketplaceId }>(open: readonly F[], first = ITEMS_FIRST_CALLS): F[] {
+  const lead = ITEMS_FIRST_MARKETPLACES.flatMap((mp) => open.filter((f) => f.marketplace === mp)).slice(0, Math.max(0, first));
+  const taken = new Set(lead.map((f) => f.feed));
+  return [...lead, ...open.filter((f) => !taken.has(f.feed))];
 }
 
 export interface PlanOptions {
@@ -977,7 +993,9 @@ export async function runImport(deps: ImportDeps, opts: RunOptions = {}): Promis
     for (let i = 0; i < todo.length && !stop && left > 0; i++) {
       const ix = todo[i];
       buckets.sweep.planned++;
-      const budget = marketplaceShares(todo.slice(i), left).get(ix.marketplace) ?? 0;
+      // Its share, held to SWEEP_MARKETPLACE_CAP (DE, AU, GB 20 pages: owner, 2026-11-10); what it does not spend is left for the
+      // marketplaces after it and then the per-product searches, where Canada and the US come first (prioritiseItems).
+      const budget = sweepBudgetFor(ix.marketplace, marketplaceShares(todo.slice(i), left).get(ix.marketplace) ?? 0);
       const collector = new SweepCollector(ix, now());
       const before = buckets.sweep.calls;
       let queries: QueryProgress[] = [];
@@ -1054,12 +1072,13 @@ export async function runImport(deps: ImportDeps, opts: RunOptions = {}): Promis
     }
   }
 
-  // 3. Per-product searches for what the sweep did not cover, with what is left of the cap: the hot-set products of the US, UK and EU
-  //    first (any type, any price), then the eligible keys, most valuable first (perProductFeeds: the plan's own order).
+  // 3. Per-product searches for what the sweep did not cover, with what is left of the cap: first ITEMS_FIRST_CALLS of Canada's, then
+  //    the US's (owner, 2026-11-10), then the hot-set products of the US, UK and EU (any type, any price), then the eligible keys, most
+  //    valuable first (perProductFeeds: the plan's own order).
   const wantItems = !opts.only || opts.only.includes("items");
   const perProduct = wantItems ? perProductFeeds(rows, plan.keys, today) : [];
   const notFresh = perProduct.filter((f) => !fresh?.has(f.feed));
-  const open = notFresh.filter((f) => !swept.has(f.feed));
+  const open = prioritiseItems(notFresh.filter((f) => !swept.has(f.feed)));
   buckets.items.covered = notFresh.length - open.length;
   const hotFeeds = perProduct.filter((f) => f.hot);
   summary.hotItems.keys = hotFeeds.length;

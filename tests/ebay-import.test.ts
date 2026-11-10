@@ -23,6 +23,7 @@ import {
   itemQuery,
   MARKETPLACE_ORDER,
   perProductFeeds,
+  prioritiseItems,
   purgeCutoff,
   retryAllowance,
   runCap,
@@ -1043,7 +1044,8 @@ test("run: with no hot sets the sweep has no hot pass, and the products it misse
   assert.deepEqual([...new Set(sweep.map((c) => c.mp))], MARKETPLACE_ORDER.filter((mp) => ["EBAY_US", "EBAY_GB", "EBAY_CA"].includes(mp)));
   assert.ok(s.sweep.every((m) => m.hotPages === 0 && m.hotQueries.length === 0));
   const perProduct = calls.filter((c) => c.limit === "50").map((c) => `${c.mp} ${c.q}`);
-  assert.deepEqual(perProduct, perProductFeeds(rows, undefined, TODAY).map((f) => `${f.marketplace} ${f.searches[0].q}`));
+  // Canada's and then the US's first (prioritiseItems, owner 2026-11-10), the rest in the plan's order.
+  assert.deepEqual(perProduct, prioritiseItems(perProductFeeds(rows, undefined, TODAY)).map((f) => `${f.marketplace} ${f.searches[0].q}`));
   assert.deepEqual(s.hotItems, { keys: 0, fresh: 0, covered: 0, searched: 0, refreshed: 0 });
   assert.equal(db.days.get(s.day), h.searches().length);
   assert.equal(s.buckets.sweep.calls + s.buckets.items.calls, h.searches().length);
