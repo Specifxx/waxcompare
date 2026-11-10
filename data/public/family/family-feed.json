@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-09T19:23:10.476Z",
+ "generatedAt": "2026-11-10T03:08:39.398Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -324,6 +324,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
+   "title": "2021-22 Upper Deck Series 1 Hockey Display Box",
+   "url": "https://sportscardcompare.com/ca/p/2021-22-upper-deck-series-1-hockey-display-box",
+   "cents": 4995,
+   "currency": "CAD",
+   "store": "Rémi Card Trader",
+   "image": "https://cdn.shopify.com/s/files/1/0469/6417/9110/products/2021-22UpperDeckSeries1Hockeyretail.jpg?v=1637693725",
+   "refCents": 8999,
+   "refLabel": "median store price",
+   "savingPct": 44
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "CA",
    "title": "2026 Panini Prizm World Cup Mega Box",
    "url": "https://sportscardcompare.com/ca/p/2026-panini-prizm-world-cup-mega-box",
    "cents": 5995,
@@ -338,29 +352,15 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
-   "title": "2025-26 Panini Pitch Kings Soccer International Hobby Box",
-   "url": "https://sportscardcompare.com/ca/p/2025-26-panini-pitch-kings-soccer-international-hobby-box",
-   "cents": 14999,
+   "title": "2025 Panini Score Football Blaster Box",
+   "url": "https://sportscardcompare.com/ca/p/2025-panini-score-football-blaster-box",
+   "cents": 3495,
    "currency": "CAD",
-   "store": "Fan of the Sport",
-   "image": "https://cdn.shopify.com/s/files/1/0530/9867/6400/files/BF26_Panini_Pitch_Kings_Soccer_2025-26_Hobby_International_Box.png?v=1793966093",
-   "refCents": 24995,
+   "store": "Morrison Trading Post",
+   "image": "https://cdn.shopify.com/s/files/1/0414/6957/files/panini.fw_62103e92-49a0-4192-80ab-c27ce5f2a61c.png?v=1762314990",
+   "refCents": 5497,
    "refLabel": "median store price",
-   "savingPct": 40
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "CA",
-   "title": "2021-22 Upper Deck Series 1 Hockey Display Box",
-   "url": "https://sportscardcompare.com/ca/p/2021-22-upper-deck-series-1-hockey-display-box",
-   "cents": 4995,
-   "currency": "CAD",
-   "store": "Rémi Card Trader",
-   "image": "https://cdn.shopify.com/s/files/1/0469/6417/9110/products/2021-22UpperDeckSeries1Hockeyretail.jpg?v=1637693725",
-   "refCents": 7999,
-   "refLabel": "median store price",
-   "savingPct": 38
+   "savingPct": 36
   },
   {
    "kind": "deal",
