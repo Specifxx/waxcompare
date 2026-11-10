@@ -1504,3 +1504,14 @@ hreflang, JSON-LD, headings and every link are byte-identical (compared). The sa
   reads `components/store-vote.css` (imported by the root layout so node tests can load the component).
 - The shipping sentence is said once, under the table, not on every row.
 - `Flag` is an `<img>` of `public/flags/<code>.svg`, written by `scripts/write-flags.tsx`, not ~2 KB of inline SVG per flag.
+
+## 2026-11-10: The phone buy bar names eBay's listing when it is within 20% of an unpaid store
+
+The zero-earnings diagnosis (10 Nov) found 136 buy clicks in 30 days, 20 of them to a link that can earn. RiftCompare's
+paid-alternative rule (owner 2026-10-27) was asked for here too. The best-price card already does it, and more widely
+(`listings-best-price-alt`, owner 2026-10-28: "Also on eBay" with the listing's real price whenever a store is the best
+price), so the card is unchanged. The phone buy bar repeated only the store, so its second line now names the same
+listing (the card's `useEbayPick`, no second request) when the best store pays nothing and the listing is not cheaper but
+within 20% of it: "Ad · or $X on eBay ↗", placement `product-sticky-alt`. Its own price only, no "+N%", as on the card.
+Never called cheaper; the bar's button stays the store's. Amazon is left out: the product page shows Amazon's price only
+in its pinned row, and a second Amazon line beside the card's eBay line would make two ads in the first screen.

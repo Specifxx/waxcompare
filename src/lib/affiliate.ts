@@ -31,6 +31,7 @@ export const PLACEMENTS = [
   "browse-search", // /[region]/sealed with a search query: the one query-matched eBay (and, in the US, TCGplayer) search box after the first results
   "store-page", // a store's "Visit" link
   "product-sticky", // product page, phones only: the buy bar that repeats the top of the page's action once it has scrolled away
+  "product-sticky-alt", // the buy bar's second line: the product's eBay listing within 20% of a store that pays nothing (StickyBuyBar.tsx)
   "soldout-ebay", // product page, sold out: the eBay search button in the sold-out callout's own eBay box (the server HTML)
   "set-tcgplayer", // set page, US only: the labelled "Shop <set> on TCGplayer" search link in the hero card
   "guide-tcgplayer", // a guide, US only: the labelled TCGplayer search link in its closing "Where to buy" section
