@@ -1490,3 +1490,17 @@ and the CDN copy lives longer), labelled Ad with the Associates disclosure under
 (`lib/amazon-rail.ts`), asked for in the browser from 1280px and CDN-cached a day: nothing in the server HTML. The left eBay rail,
 the flush layout (2026-11-07) and the 1280px gate are unchanged. Amazon is never in the phone dock (an overlay; the dock is eBay only),
 and no AdSense. `tcgplayer-strip-side` and `tcgplayer-strip-dock` are retired placements.
+
+## 2026-11-10: Product page weight cut, every store row kept (site review X1, ported from DexCompare)
+
+Measured on a local production build with today's data: /ca/p/2026-27-upper-deck-series-1-hockey-tin (28 stores) went from 419 KB to 305 KB; /us 593 KB to 506 KB of HTML. The title, meta tags, canonical,
+hreflang, JSON-LD, headings and every link are byte-identical (compared). The same change as DexCompare's entry of the same day:
+
+- Price-table rows past `FULL_ROWS` (20, `lib/ebay-offer-row.ts`) in the server's price order are lean (`OfferRows.tsx` LeanRow):
+  store, stock pill, price, button. Their data drops title, cart, per-pack, host and shipping text; the shipping cents stay, so
+  "Price + shipping" still ranks them. Every row stays visible and in the server HTML. `FULL_ROWS` lives in a server module: a
+  server component importing a value from a "use client" module gets a client reference, not the number.
+- Row cells, `StockPill` and `ProductCard` use short `@apply` classes in `globals.css` (`.or-*`, `.sp-*`, `.pc-*`); `StoreVote`
+  reads `components/store-vote.css` (imported by the root layout so node tests can load the component).
+- The shipping sentence is said once, under the table, not on every row.
+- `Flag` is an `<img>` of `public/flags/<code>.svg`, written by `scripts/write-flags.tsx`, not ~2 KB of inline SVG per flag.
