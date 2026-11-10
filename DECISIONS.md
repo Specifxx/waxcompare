@@ -1515,3 +1515,17 @@ listing (the card's `useEbayPick`, no second request) when the best store pays n
 within 20% of it: "Ad · or $X on eBay ↗", placement `product-sticky-alt`. Its own price only, no "+N%", as on the card.
 Never called cheaper; the bar's button stays the store's. Amazon is left out: the product page shows Amazon's price only
 in its pinned row, and a second Amazon line beside the card's eBay line would make two ads in the first screen.
+
+## 2026-11-10: The UK, EU and Australia sweeps stop at 20 pages; the freed calls go to Canadian products (owner: "use the recommendation")
+
+Measured over the 30 days to 11 Nov (`/mnt/project-files/strategy/ebay-site-region-split-2026-11-10.html`): Canada sent 357
+visitors against the US's 282 and earned every eBay dollar (A$10.12), while eBay.de (63 pages), Australia (56) and the UK (54)
+took 173 sweep calls a day for 13 visitors between them. The run of 2026-11-10 swept US 292 / EU 63 / AU 56 / UK 54 / CA 53 pages
+and then searched 590 products one by one. The owner approved the recommended split on 2026-11-10.
+
+- `SWEEP_CEILING` (`src/lib/ebay-import.ts`): the UK, EU and Australia sweeps take at most **20 pages** each a run, below their
+  share. The US and Canada have no ceiling. The US is still swept first.
+- `CANADA_ITEMS_FIRST` (113, the calls freed: 173 - 3 x 20): the per-product searches after the sweep put up to 113 Canadian
+  products the sweep missed first, then carry on in the usual order (US first, by value).
+- The daily cap (1,400), the keyset (Compare Empire's) and the fixed feeds do not change. Recheck about 24 Nov: the Sweep table,
+  no 429, and wax-ca-* earnings against the 30 days to 11 Nov.
