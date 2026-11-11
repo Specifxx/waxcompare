@@ -73,6 +73,16 @@ export const SWEEP_QUERIES: readonly SweepQuery[] = [
   { key: "case", q: "hobby case", types: ["hobby-case"] },
 ];
 
+/**
+ * Canada's hockey pass (owner, 2026-11-11: hockey is big in Canada): run first on eBay.ca, in the hot pass's half of its share, before the
+ * general queries. Paged like any query, so it stops once a query stops gaining.
+ */
+export const CANADA_HOCKEY_QUERIES: readonly SweepQuery[] = [
+  { key: "ca-hockey-hobby", q: "hockey hobby box", types: ["hobby-box", "hobby-case"] },
+  { key: "ca-hockey-blaster", q: "hockey blaster box", types: ["blaster-box", "mega-box", "hanger-box"] },
+  { key: "ca-upper-deck", q: "upper deck hockey box", types: ["hobby-box", "jumbo-box"] },
+];
+
 // ─── Hot sets ──────────────────────────────────────────────────────────────────
 
 /** The most of a marketplace's sweep share its hot pass may spend (in pages); the general queries get the rest. */

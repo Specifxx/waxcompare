@@ -26,6 +26,7 @@ import {
   purgeCutoff,
   retryAllowance,
   CANADA_ITEMS_FIRST,
+  HOCKEY_NAME,
   canadaFirst,
   SWEEP_CEILING,
   runCap,
@@ -45,7 +46,7 @@ import { hoursToMs, MARKET_WEIGHT, MARKETPLACE_OF_REGION } from "../src/lib/ebay
 import type { Region } from "../src/lib/regions";
 import { PRODUCT_TYPES, fromRoughUsdCents, type TypeKey } from "../src/lib/sealed-title";
 import { SETS } from "../src/lib/sets";
-import { hotSweepQueries, SWEEP_PAGE, SWEEP_QUERIES } from "../src/lib/ebay-sweep";
+import { CANADA_HOCKEY_QUERIES, hotSweepQueries, SWEEP_PAGE, SWEEP_QUERIES } from "../src/lib/ebay-sweep";
 import { HOT_SETS, PRIORITY_MARKETPLACES } from "../src/lib/popular";
 import { fakeDb, harness, json, NOW, okToken, planRow, requestedReference, summary, withReference, type FakeDb, type Handler } from "./helpers/ebay-fakes";
 
@@ -472,7 +473,7 @@ test("run: every search is reserved BEFORE it is made; the database counter equa
   const s = await runImport(deps(db, h), { concurrency: 1 });
   // the fixed feeds (FIXED), the sweep (every query's first page in each of the 5 marketplaces: the mock's pages are short, so each
   // query ends after one), then one search per eligible key the sweep did not cover (the mock's cards match no product: all 40)
-  const sweepCalls = SWEEP_QUERIES.length * MARKETPLACE_ORDER.length;
+  const sweepCalls = SWEEP_QUERIES.length * MARKETPLACE_ORDER.length + CANADA_HOCKEY_QUERIES.length; // + Canada's hockey pass (one page each)
   const total = FIXED + sweepCalls + 40;
   assert.equal(s.buckets.sweep.calls, sweepCalls);
   assert.equal(s.sweep.length, 5);
@@ -500,7 +501,7 @@ test("run: every search is reserved BEFORE it is made; the database counter equa
   // phase order: every fixed feed's search, then the sweep's pages, then the per-product searches
   const kinds = h.searches().map((c) => requestedReference(c.init)!.split("-")[2]);
   const qs = h.searches().map((c) => new URL(c.url).searchParams.get("q") ?? "");
-  const sweepQs = new Set(SWEEP_QUERIES.map((x) => x.q));
+  const sweepQs = new Set([...SWEEP_QUERIES, ...CANADA_HOCKEY_QUERIES].map((x) => x.q));
   const firstSweep = qs.findIndex((q) => sweepQs.has(q));
   assert.equal(firstSweep, FIXED);
   assert.ok(kinds.slice(0, FIXED).every((k) => k !== "item"), "fixed feeds first");
@@ -1044,7 +1045,8 @@ test("run: with no hot sets the sweep has no hot pass, and the products it misse
   const sweep = calls.filter((c) => c.limit === "200");
   // only the marketplaces the rows list (US, UK, CA), in the priority order
   assert.deepEqual([...new Set(sweep.map((c) => c.mp))], MARKETPLACE_ORDER.filter((mp) => ["EBAY_US", "EBAY_GB", "EBAY_CA"].includes(mp)));
-  assert.ok(s.sweep.every((m) => m.hotPages === 0 && m.hotQueries.length === 0));
+  // no hot SETS: only Canada has a hot pass (its hockey queries, 2026-11-11)
+  assert.ok(s.sweep.every((m) => (m.marketplace === "EBAY_CA" ? m.hotQueries.length === CANADA_HOCKEY_QUERIES.length : m.hotPages === 0 && m.hotQueries.length === 0)));
   const perProduct = calls.filter((c) => c.limit === "50").map((c) => `${c.mp} ${c.q}`);
   // Canadian products first (CANADA_ITEMS_FIRST), then the value order
   assert.deepEqual(perProduct, canadaFirst(perProductFeeds(rows, undefined, TODAY)).map((f) => `${f.marketplace} ${f.searches[0].q}`));
@@ -1090,9 +1092,18 @@ test("region split (owner, 2026-11-10): the UK, EU and AU sweeps stop at 20 page
   assert.equal(SWEEP_CEILING.EBAY_US, undefined, "the US sweep has no ceiling");
   assert.equal(SWEEP_CEILING.EBAY_CA, undefined, "nor Canada's");
   assert.deepEqual(SWEEP_CEILING, { EBAY_GB: 20, EBAY_DE: 20, EBAY_AU: 20 });
-  assert.equal(CANADA_ITEMS_FIRST, 113, "the 173 - 3 x 20 calls freed from the sweep");
+  assert.equal(CANADA_ITEMS_FIRST, 250, "113 freed from the sweep + 137 from the US per-product searches");
   const f = (feed: string) => ({ feed });
   const order = canadaFirst([f("EBAY_US|item:a"), f("EBAY_CA|item:b"), f("EBAY_GB|item:c"), f("EBAY_CA|item:d"), f("EBAY_US|item:e"), f("EBAY_CA|item:g")], 2);
   assert.deepEqual(order.map((x) => x.feed), ["EBAY_CA|item:b", "EBAY_CA|item:d", "EBAY_US|item:a", "EBAY_GB|item:c", "EBAY_US|item:e", "EBAY_CA|item:g"], "at most n Canadian first, then the usual order (US first)");
   assert.deepEqual(canadaFirst([f("EBAY_US|item:a")]).map((x) => x.feed), ["EBAY_US|item:a"]);
+});
+
+test("Canada (owner, 2026-11-11): hockey products lead the Canadian per-product searches; eBay.ca's hot pass searches hockey", () => {
+  assert.deepEqual(CANADA_HOCKEY_QUERIES.map((q) => q.q), ["hockey hobby box", "hockey blaster box", "upper deck hockey box"]);
+  for (const n of ["2025-26 Upper Deck Series 1 Hockey Hobby Box", "2024-25 O-Pee-Chee Platinum Hobby Box", "2025 Topps NHL Sticker Box", "Upper Deck SP Authentic Hobby Box"]) assert.ok(HOCKEY_NAME.test(n), n);
+  assert.ok(!HOCKEY_NAME.test("2025 Topps Chrome Baseball Hobby Box"));
+  const f = (feed: string, name?: string) => ({ feed, ...(name ? { item: { name } } : {}) });
+  const order = canadaFirst([f("EBAY_US|a", "Hockey x"), f("EBAY_CA|b", "Topps Chrome Baseball Box"), f("EBAY_CA|c", "Upper Deck Series 1 Hockey Hobby Box"), f("EBAY_CA|d", "Topps Chrome Baseball Jumbo")], 2);
+  assert.deepEqual(order.map((x) => x.feed), ["EBAY_CA|c", "EBAY_CA|b", "EBAY_US|a", "EBAY_CA|d"], "Canadian hockey first, then the other Canadian ones up to n, then the usual order");
 });

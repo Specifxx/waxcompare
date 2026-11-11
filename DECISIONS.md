@@ -1529,3 +1529,17 @@ and then searched 590 products one by one. The owner approved the recommended sp
   products the sweep missed first, then carry on in the usual order (US first, by value).
 - The daily cap (1,400), the keyset (Compare Empire's) and the fixed feeds do not change. Recheck about 24 Nov: the Sweep table,
   no 429, and wax-ca-* earnings against the 30 days to 11 Nov.
+
+## 2026-11-11: Canada's eBay share grows and leads with hockey (owner: "hockey is big there so delegate some")
+
+Canada already has a real eBay pass (eBay.ca, Canadian sellers, CAD, stated postage; the US-converted fallback is RiftCompare's
+way and is not used here: this site has Canadian visitors and an explicit reason). The 2026-11-10 split gave Canadian products
+113 first-in-line per-product searches. Extended, inside the same 1,400-a-day cap (Compare Empire's keyset, no spare 700 used):
+
+- `CANADA_ITEMS_FIRST` 113 -> **250**; the extra 137 come from the US per-product searches (44% of those came back empty).
+  Among the Canadian ones, hockey products (`HOCKEY_NAME`: hockey, NHL, Upper Deck, O-Pee-Chee, Young Guns, SP Authentic, SPx…)
+  go first.
+- `CANADA_HOCKEY_QUERIES`: eBay.ca's sweep opens with three hockey searches (hobby box, blaster box, Upper Deck box) in the hot
+  pass's half of its share, paged like any query (about 3 pages when a query stops gaining), before the general queries.
+- No other site changes: other sites follow RiftCompare's rule (Canada follows the US prices) unless a decision says otherwise.
+Recheck: the Sweep table and Canadian items in the next run's log (calls per marketplace, no 429), wax-ca-* earnings about 24 Nov.
