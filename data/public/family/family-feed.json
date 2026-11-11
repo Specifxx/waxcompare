@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-11T01:09:05.294Z",
+ "generatedAt": "2026-11-11T16:51:28.575Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -240,20 +240,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "UK",
-   "title": "2025 Panini Prizm Football International Hobby Box",
-   "url": "https://sportscardcompare.com/uk/p/2025-panini-prizm-football-international-hobby-box",
-   "cents": 34995,
-   "currency": "GBP",
-   "store": "The Card Vault",
-   "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/panini_prizm_football_nfl_hobby_international_box_2025_png.jpg?v=1773139140",
-   "refCents": 49500,
-   "refLabel": "median store price",
-   "savingPct": 29
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "UK",
    "title": "2026-27 Topps Basketball Value Pack",
    "url": "https://sportscardcompare.com/uk/p/2026-27-topps-basketball-value-pack",
    "cents": 799,
@@ -277,6 +263,20 @@
    "refCents": 49500,
    "refLabel": "median store price",
    "savingPct": 19
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "UK",
+   "title": "2025 Topps Chrome Football Hobby Box",
+   "url": "https://sportscardcompare.com/uk/p/2025-topps-chrome-football-hobby-box",
+   "cents": 50000,
+   "currency": "GBP",
+   "store": "Sports Cards Direct",
+   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/chromecosmicnfl.jpg?v=1779228130",
+   "refCents": 60000,
+   "refLabel": "median store price",
+   "savingPct": 17
   },
   {
    "kind": "deal",
