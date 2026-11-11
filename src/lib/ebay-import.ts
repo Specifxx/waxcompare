@@ -54,7 +54,7 @@ import {
   type ItemTarget,
 } from "./ebay-normalise";
 import { budgetDay, type ImportDb, type PlanRow } from "./ebay-store";
-import { buildSweepIndex, hotSweepQueries, marketplaceShares, SweepCollector, sweepSignatureSets, sweepVocabulary, sweepWithHot, type QueryProgress, type SweepIndex } from "./ebay-sweep";
+import { buildSweepIndex, CANADA_HOCKEY_QUERIES, hotSweepQueries, marketplaceShares, SweepCollector, sweepSignatureSets, sweepVocabulary, sweepWithHot, type QueryProgress, type SweepIndex } from "./ebay-sweep";
 import { HOT_SET_QUERY, HOT_SETS, hotRank, isHotSet, PRIORITY_MARKETPLACES } from "./popular";
 import type { Region } from "./regions";
 import { normalizeTitle, roughUsdCents, TYPE_BY_KEY, TYPE_BY_LABEL, TYPE_BY_SLUG, type TypeKey } from "./sealed-title";
@@ -430,19 +430,26 @@ export function perProductFeeds(rows: readonly PlanRow[], keys: readonly ItemKey
 }
 
 /**
- * The most per-product searches that go to Canadian products ahead of the usual order (owner, 2026-11-10; DECISIONS.md): Canada sent
+ * The most per-product searches that go to Canadian products ahead of the usual order (owner, 2026-11-10; DECISIONS.md; 250 since 2026-11-11, the extra 137 from the US searches, daily cap unchanged): Canada sent
  * 357 visitors in the 30 days to 11 Nov against the US's 282, and earned every eBay dollar (A$10.12). The 113 calls a day taken
  * from the UK's, the EU's and Australia's sweep (SWEEP_CEILING) go to Canadian products the sweep missed, then the usual order
  * (US first, by value) carries on.
  */
-export const CANADA_ITEMS_FIRST = 113;
+export const CANADA_ITEMS_FIRST = 250;
 
-/** The per-product searches with up to CANADA_ITEMS_FIRST Canadian ones moved to the front, the rest in their own order. */
-export function canadaFirst<T extends { feed: string }>(feeds: readonly T[], n: number = CANADA_ITEMS_FIRST): T[] {
-  const ca: T[] = [];
-  const rest: T[] = [];
-  for (const f of feeds) (ca.length < n && f.feed.startsWith("EBAY_CA|") ? ca : rest).push(f);
-  return [...ca, ...rest];
+/** Hockey by its words (owner, 2026-11-11: hockey is big in Canada): the sport, the league, Upper Deck's lines and the chase cards' name. */
+export const HOCKEY_NAME = /\bhockey\b|\bnhl\b|upper\s*deck|o\s*-?\s*pee\s*-?\s*chee|\bopc\b|young\s*guns|sp\s*authentic|\bspx\b|metal\s*universe|sp\s*game\s*used/i;
+
+/**
+ * The per-product searches with up to CANADA_ITEMS_FIRST Canadian ones moved to the front, Canadian HOCKEY products first among them
+ * (value order kept inside each group), the rest in their own order.
+ */
+export function canadaFirst<T extends { feed: string; item?: { name: string } }>(feeds: readonly T[], n: number = CANADA_ITEMS_FIRST): T[] {
+  const ca = feeds.filter((f) => f.feed.startsWith("EBAY_CA|"));
+  const hockey = ca.filter((f) => f.item && HOCKEY_NAME.test(f.item.name));
+  const front = [...hockey, ...ca.filter((f) => !hockey.includes(f))].slice(0, n);
+  const taken = new Set(front);
+  return [...front, ...feeds.filter((f) => !taken.has(f))];
 }
 
 export interface PlanOptions {
@@ -1006,10 +1013,13 @@ export async function runImport(deps: ImportDeps, opts: RunOptions = {}): Promis
       let queries: QueryProgress[] = [];
       let hotQueries: QueryProgress[] = [];
       // The hot searches for what THIS marketplace lists (a type only another market stocks would cost pages that can match nothing).
-      const hot = hotSweepQueries(
-        rows.filter((r) => MARKETPLACE_OF_REGION[r.market.toLowerCase() as Region] === ix.marketplace),
-        today,
-      );
+      const hot = [
+        ...(ix.marketplace === "EBAY_CA" ? CANADA_HOCKEY_QUERIES : []),
+        ...hotSweepQueries(
+          rows.filter((r) => MARKETPLACE_OF_REGION[r.market.toLowerCase() as Region] === ix.marketplace),
+          today,
+        ),
+      ];
       const hotQs = new Set(hot.map((q) => q.q));
       let hotFetched = 0; // counted as the pages are made, so a run that stops during the hot pass still reports them
       try {
