@@ -1,13 +1,13 @@
 {
  "format": 1,
- "generatedAt": "2026-11-11T01:06:51.696Z",
+ "generatedAt": "2026-11-11T16:41:25.990Z",
  "source": "actions-postgres",
  "counts": {
   "Product": 1315,
   "Offer": 13323,
   "ProductStat": 3286,
   "StoreStat": 235,
-  "EbayListing": 6984
+  "EbayListing": 6615
  },
  "seen": {
   "151collectables": "2026-11-11T00:54:50.894Z",
