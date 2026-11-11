@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-10T17:06:00.223Z",
+ "generatedAt": "2026-11-11T01:09:05.294Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -302,7 +302,7 @@
    "currency": "CAD",
    "store": "Hope Club Collectibles",
    "image": "https://cdn.shopify.com/s/files/1/0875/0101/3279/files/2026PaniniPrizmBaseballHobbyBox.jpg?v=1789018679",
-   "refCents": 34995,
+   "refCents": 34997,
    "refLabel": "median store price",
    "savingPct": 49
   },
@@ -361,6 +361,20 @@
    "refCents": 5497,
    "refLabel": "median store price",
    "savingPct": 36
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Holiday Football Mega Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-holiday-football-mega-box",
+   "cents": 2790,
+   "currency": "EUR",
+   "store": "POKEMILLON - La Tienda Pokémon",
+   "image": "https://cdn.shopify.com/s/files/1/0483/6543/7089/files/1040489_004_102026.jpg?v=1793233011",
+   "refCents": 4500,
+   "refLabel": "median store price",
+   "savingPct": 38
   },
   {
    "kind": "deal",
@@ -431,20 +445,6 @@
    "refCents": 9499,
    "refLabel": "median store price",
    "savingPct": 26
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2025 Topps Chrome Football Hobby Box",
-   "url": "https://sportscardcompare.com/eu/p/2025-topps-chrome-football-hobby-box",
-   "cents": 64990,
-   "currency": "EUR",
-   "store": "Spielewelt",
-   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/chromecosmicnfl.jpg?v=1779228130",
-   "refCents": 84999,
-   "refLabel": "median store price",
-   "savingPct": 24
   }
  ]
 }
