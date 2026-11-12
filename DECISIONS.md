@@ -1558,3 +1558,9 @@ hairline (cranberry then pine, flat) at the top of every page and the same two c
 bottom border. No banner card, no new element, no animation, image or script; nothing in the existing decor changes. Set the constant to false after
 New Year, or let the window end on 26 December, and it goes.
 
+
+## 2026-11-12: invite-only, raffle and lottery listings are never a price
+
+- A visitor reported (on DexCompare) that most of the cheapest prices were invite-only offers. Same reader here, so the same fix:
+  `src/lib/invite-only.ts` reads title, link, tags, description and option names; `priceOf` drops a match and the public-data reader
+  drops any such Offer row an older export holds. Rules may only refuse more. Tests: `tests/invite-only.test.ts`.
