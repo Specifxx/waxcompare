@@ -180,12 +180,6 @@ body {
   .or-hl {
     @apply bg-open-soft/40 outline outline-2 -outline-offset-2 outline-[#0ea5e9];
   }
-  .or-amz {
-    @apply outline outline-2 -outline-offset-2 outline-[#f59e0b];
-  }
-  .or-ebay {
-    @apply outline outline-2 -outline-offset-2 outline-[#16a34a];
-  }
   .or-top {
     @apply flex h-5 items-center gap-2 overflow-hidden sm:h-6;
   }

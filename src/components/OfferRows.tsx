@@ -28,8 +28,8 @@ export const ROW_BUTTON_LINK = "or-btn";
  * tint (.or-hl), winning over either. Inset, so the row keeps its height and grid.
  */
 export const PIN_OUTLINE = {
-  ebay: "or-ebay",
-  amazon: "or-amz",
+  ebay: "",
+  amazon: "",
   cheapest: "or-hl",
 } as const;
 
