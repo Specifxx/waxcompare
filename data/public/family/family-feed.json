@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-11T16:51:28.575Z",
+ "generatedAt": "2026-11-12T02:10:35.339Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -114,15 +114,15 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "US",
-   "title": "2024-25 Panini Prizm Premier League Blaster Box",
-   "url": "https://sportscardcompare.com/us/p/2024-25-panini-prizm-premier-league-blaster-box",
-   "cents": 1694,
+   "title": "2026 Panini Prizm World Cup Pack",
+   "url": "https://sportscardcompare.com/us/p/2026-panini-prizm-world-cup-pack",
+   "cents": 399,
    "currency": "USD",
-   "store": "Collect Binghamton",
-   "image": "https://cdn.shopify.com/s/files/1/0950/2733/1402/files/2024-25PaniniPrizmEPLBlasterBox.webp?v=1780490652",
-   "refCents": 2999,
+   "store": "Minted TCG",
+   "image": "https://cdn.shopify.com/s/files/1/0556/4717/4735/files/20260817_083110.jpg?v=1787076296",
+   "refCents": 749,
    "refLabel": "median store price",
-   "savingPct": 44
+   "savingPct": 47
   },
   {
    "kind": "deal",
@@ -134,9 +134,23 @@
    "currency": "USD",
    "store": "CARDPOPUSA",
    "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/2026-Topps-Update-Series-MLB-Baseball--Hanger-Box.jpg?v=1792254529",
-   "refCents": 1750,
+   "refCents": 1799,
    "refLabel": "median store price",
-   "savingPct": 43
+   "savingPct": 44
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "US",
+   "title": "2024-25 Panini Prizm Premier League Blaster Box",
+   "url": "https://sportscardcompare.com/us/p/2024-25-panini-prizm-premier-league-blaster-box",
+   "cents": 1694,
+   "currency": "USD",
+   "store": "Collect Binghamton",
+   "image": "https://cdn.shopify.com/s/files/1/0950/2733/1402/files/2024-25PaniniPrizmEPLBlasterBox.webp?v=1780490652",
+   "refCents": 2999,
+   "refLabel": "median store price",
+   "savingPct": 44
   },
   {
    "kind": "deal",
@@ -162,9 +176,9 @@
    "currency": "USD",
    "store": "Bunk's Card Corner",
    "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/topps_stadium_club_ufc_value_box_2026.png?v=1786692034",
-   "refCents": 2549,
+   "refCents": 2599,
    "refLabel": "median store price",
-   "savingPct": 41
+   "savingPct": 42
   },
   {
    "kind": "deal",
@@ -179,20 +193,6 @@
    "refCents": 500,
    "refLabel": "median store price",
    "savingPct": 40
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "US",
-   "title": "2025-26 Panini Prizm Soccer Display Box",
-   "url": "https://sportscardcompare.com/us/p/2025-26-panini-prizm-soccer-display-box",
-   "cents": 4299,
-   "currency": "USD",
-   "store": "Collector Store LLC",
-   "image": "https://cdn.shopify.com/s/files/1/0112/5561/1454/files/prizm_fifa_soccer.png?v=1780528683",
-   "refCents": 7000,
-   "refLabel": "median store price",
-   "savingPct": 39
   },
   {
    "kind": "deal",
@@ -240,6 +240,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "UK",
+   "title": "2026-27 Topps Match Attax UEFA Club Competitions Pack",
+   "url": "https://sportscardcompare.com/uk/p/2026-27-topps-match-attax-uefa-club-competitions-pack",
+   "cents": 200,
+   "currency": "GBP",
+   "store": "JAC Stores IOM",
+   "image": "https://cdn.shopify.com/s/files/1/0945/0104/4551/files/match-attax-box.jpg?v=1790580808",
+   "refCents": 249,
+   "refLabel": "median store price",
+   "savingPct": 20
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "UK",
    "title": "2026-27 Topps Basketball Value Pack",
    "url": "https://sportscardcompare.com/uk/p/2026-27-topps-basketball-value-pack",
    "cents": 799,
@@ -263,20 +277,6 @@
    "refCents": 49500,
    "refLabel": "median store price",
    "savingPct": 19
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "UK",
-   "title": "2025 Topps Chrome Football Hobby Box",
-   "url": "https://sportscardcompare.com/uk/p/2025-topps-chrome-football-hobby-box",
-   "cents": 50000,
-   "currency": "GBP",
-   "store": "Sports Cards Direct",
-   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/chromecosmicnfl.jpg?v=1779228130",
-   "refCents": 60000,
-   "refLabel": "median store price",
-   "savingPct": 17
   },
   {
    "kind": "deal",
