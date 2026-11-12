@@ -1564,3 +1564,9 @@ New Year, or let the window end on 26 December, and it goes.
 - A visitor reported (on DexCompare) that most of the cheapest prices were invite-only offers. Same reader here, so the same fix:
   `src/lib/invite-only.ts` reads title, link, tags, description and option names; `priceOf` drops a match and the public-data reader
   drops any such Offer row an older export holds. Rules may only refuse more. Tests: `tests/invite-only.test.ts`.
+
+## 2026-11-12: Amazon's row only with a real price
+
+Owner: "we just want eBay and TCGplayer as the paid links at the top. That is why our revenue is declining." The pinned Amazon row
+is drawn only when this build fetched a real Amazon price; the sold-out page's Amazon search row is gone.
+`tests/paid-rows.test.ts` pins it.
