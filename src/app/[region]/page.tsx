@@ -19,6 +19,7 @@ import { RegionChips } from "@/components/RegionChips";
 import { Empty, Section } from "@/components/Section";
 import { homeRails, regionOverview, tcgplayerTiles, type ProductCardData } from "@/lib/data";
 import { TcgplayerStrip } from "@/components/TcgplayerStrip";
+import { featured as featuredByPrice, featureWorthy, priciestFirst } from "@/lib/feature-floor";
 import { dealsCopy, dealsInMarket, nearestRegion, stockLabel } from "@/lib/deals";
 import { cardOpen } from "@/lib/compact";
 import { money, plural, timeAgo } from "@/lib/format";
@@ -75,10 +76,10 @@ const QUICK_TYPES = ["hobby-boxes", "jumbo-boxes", "mega-boxes", "blaster-boxes"
 
 export default async function RegionHome({ params }: { params: { region: string } }) {
   const r = regionOrNotFound(params.region);
-  const [{ boxes, etbs, preorders, latestSets: bySet }, overview, deals, report, older, featured, setCounts, listedTypes, picks] = await Promise.all([
+  const [{ boxes, etbs, preorders, latestSets: bySet }, overview, allDeals, report, older, featured, setCounts, listedTypes, picks] = await Promise.all([
     homeRails(r.market),
     getOverview(r.market),
-    dealsInMarket(r.market, { take: 8 }),
+    dealsInMarket(r.market, { take: 24 }),
     // The written market report, moved here from the landing page (2026-10-25): this region's figures, after the rails.
     loadHomeReport(r.region).catch(() => emptyHomeReport(r.region)),
     olderInStockData(r.market).catch(() => []),
@@ -87,6 +88,13 @@ export default async function RegionHome({ params }: { params: { region: string 
     typeLabelsInMarket(r.market),
     regionPicks(r.region).catch((): Pick[] => []),
   ]);
+  // The deals rail and the pre-order grid feature the dearer products (lib/feature-floor.ts, owner 2026-11-12): deals by the biggest saving
+  // in money; the pre-order grid keeps every pre-order only when none clears the floor.
+  const deals = priciestFirst(allDeals.filter((p) => featureWorthy(p.lowestPriceCents, r.market)), r.market, (p) => (p.medianOpenCents ?? 0) - (p.lowestPriceCents ?? 0)).slice(0, 8);
+  const preorderShelf = (() => {
+    const top = featuredByPrice(preorders, r.market, (p) => p.lowestPriceCents, 8);
+    return top.length ? top : preorders;
+  })();
   // The soonest upcoming set with a pre-order page: the rail's "see all" goes there.
   const preorderGuide = openPreorderGuides()[0] ?? null;
   const storeCount = storesInMarket(r.market).length;
@@ -232,7 +240,7 @@ export default async function RegionHome({ params }: { params: { region: string 
             href={preorderGuide ? `/${r.region}/preorders/${preorderGuide.set.slug}` : `/${r.region}/releases`}
             linkLabel={preorderGuide ? `Compare ${preorderGuide.set.name} pre-orders` : "Release calendar"}
           >
-            <ProductGrid products={preorders} region={r.region} />
+            <ProductGrid products={preorderShelf} region={r.region} />
           </Section>
         )}
 
