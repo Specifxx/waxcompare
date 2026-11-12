@@ -1171,3 +1171,27 @@ html[data-geo="pending"] main { visibility: hidden; }
   border-radius: 2px;
   box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.35);
 }
+
+/* Festive layer (owner, 2026-11-12): a hairline and two accent colours only, on the sports-card look; the one off switch is
+   CHRISTMAS_FESTIVE_LAYER in lib/season.ts (it sets data-festive on <html>). No snow, lights, stripes, animation or image. */
+:root {
+  --xmas-red: 158 34 53;
+  --xmas-pine: 31 94 61;
+}
+:root:not([data-theme="light"]) {
+  --xmas-red: 214 84 100;
+  --xmas-pine: 74 163 116;
+}
+:root[data-season="christmas"][data-festive] body::before {
+  content: "";
+  display: block;
+  flex: none;
+  height: 3px;
+  background: linear-gradient(to right, rgb(var(--xmas-red)) 50%, rgb(var(--xmas-pine)) 50%);
+}
+:root[data-season="christmas"][data-festive] .xmas-pill {
+  border-color: rgb(var(--xmas-red) / 0.5);
+}
+:root[data-season="christmas"][data-festive] [data-holiday-strip] {
+  border-bottom-color: rgb(var(--xmas-pine) / 0.6);
+}

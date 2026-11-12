@@ -65,3 +65,16 @@ test("the Christmas decoration is gated, aria-hidden, never takes a tap, and sto
     assert.ok(svg.startsWith("<svg") && svg.length < 4000, `${f}.svg stays a small vector file`);
   }
 });
+
+test("the festive layer (owner, 2026-11-12) is a hairline and two colour tokens behind one off switch", () => {
+  const css = read("src/app/globals.css");
+  const block = css.slice(css.indexOf("/* Festive layer (owner, 2026-11-12)")).replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.match(block, /:root\[data-season="christmas"\]\[data-festive\] body::before \{[^}]*height: 3px;[^}]*linear-gradient\(to right, rgb\(var\(--xmas-red\)\) 50%, rgb\(var\(--xmas-pine\)\) 50%\)/);
+  assert.match(block, /\.xmas-pill \{[^}]*--xmas-red/);
+  assert.match(block, /\[data-holiday-strip\] \{[^}]*--xmas-pine/);
+  for (const bad of ["@keyframes", "animation", "snow", "flake", "canvas", "repeating-", "url("]) {
+    assert.ok(!block.toLowerCase().includes(bad), `${bad} is not in the festive layer`);
+  }
+  assert.match(read("src/lib/season.ts"), /export const CHRISTMAS_FESTIVE_LAYER = true;/);
+  assert.match(read("src/app/layout.tsx"), /data-festive=\{CHRISTMAS_FESTIVE_LAYER \? "on" : undefined\}/);
+});

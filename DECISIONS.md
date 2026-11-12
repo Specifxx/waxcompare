@@ -1547,3 +1547,14 @@ Recheck: the Sweep table and Canadian items in the next run's log (calls per mar
 ## 2026-11-12: front pages feature the dearer products
 
 Owner: "promote the more expensive items, so when users buy them we get more commission". Where the site chooses what to FEATURE (the landing page's five picks, the region home's hero cards, deals rail and pre-order grid) it keeps only products at or above US$150 (`FEATURE_MIN_USD_CENTS`, `lib/feature-floor.ts`; other markets through `roughUsdCents`) and puts the dearer first. Real US data of 2026-11-12: median in-stock product $85, hobby boxes $240, hobby cases $2,997, jumbo $350; mega boxes $60, blasters $30, hangers, packs and tins under $100, so $150 keeps hobby, jumbo, FOTL boxes and cases and drops every retail product (the landing picks used to be topped up with blasters). The deals rail ranks by the saving in money, not percent. Cheap products stay listed, searchable and linked from their type and set pages; URLs, titles, metadata, JSON-LD, the sitemap and each product's price-ordered store rows are unchanged, and no commission rate is read. The landing hero tops up to five picks if fewer clear the floor; the pre-order grid falls back to every pre-order when none does. The TCGplayer tile read is unchanged (TCGplayer sells no sports cards here). To change the bar, change the one constant.
+
+
+## 2026-11-12: a festive hairline on the Christmas season (owner)
+
+Bill asked on 2026-11-08 to tone Christmas down to match each domain, and on 2026-11-12 asked for the sites to be more festive again. We chose
+tasteful accents. WaxCompare keeps its own sports-card look, so it gets the smallest part only: behind the existing season window
+(`data-season="christmas"`) and ONE off switch, `CHRISTMAS_FESTIVE_LAYER` in `src/lib/season.ts` (it sets `data-festive` on `<html>`), a 3px two-tone
+hairline (cranberry then pine, flat) at the top of every page and the same two colour tokens on the gifts pill's border and the Black Friday strip's
+bottom border. No banner card, no new element, no animation, image or script; nothing in the existing decor changes. Set the constant to false after
+New Year, or let the window end on 26 December, and it goes.
+
