@@ -904,8 +904,8 @@ html[data-geo="pending"] main { visibility: hidden; }
   .max-w-shell {
     max-width: none;
     width: auto;
-    margin-left: 136px;
-    margin-right: 136px;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 /* A rail's list scrolls inside it (up to ten tiles): a thin bar, and the page does not scroll on past the list's end. */
