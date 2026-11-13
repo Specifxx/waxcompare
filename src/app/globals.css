@@ -1183,3 +1183,12 @@ html[data-geo="pending"] main { visibility: hidden; }
 :root[data-season="christmas"][data-festive] [data-holiday-strip] {
   border-bottom-color: rgb(var(--xmas-pine) / 0.6);
 }
+
+/* A sideways scroller is the containing block of what it holds (2026-11-13). Visually hidden labels (`sr-only`, position
+   absolute) inside a tile strip were laid out at their static place far to the right of an unpositioned scroller, outside
+   its clip, so a 390px phone page measured 650-960px wide: the page slid sideways and sticky bars sat off screen. With the
+   scroller positioned, its own overflow clips them. :where() keeps it at zero specificity, so `sticky`/`fixed`/`absolute`
+   utilities on the same element still win. Pinned by tests/scroller-clip.test.ts. */
+:where(.scroller, .overflow-x-auto, .overflow-x-scroll, .ex-scroll, .ad-scroll) {
+  position: relative;
+}
