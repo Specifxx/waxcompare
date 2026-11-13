@@ -1,7 +1,7 @@
 import { amazonRail } from "@/lib/amazon-rail";
 import { isRegion } from "@/lib/regions";
 
-// GET /api/rails/amazon/<region>: the Amazon side rail's tiles (lib/amazon-rail.ts), read by the browser from 1280px wide. Rendered per
+// GET /api/rails/amazon/<region>: the in-page ad block's Amazon tiles (lib/amazon-rail.ts), read by the browser. Rendered per
 // request and kept by Vercel's CDN for a day (the data only changes with a release, which empties the CDN): one function invocation
 // per region per release, never ISR. No price is ever in it. /api/ is disallowed in robots.txt.
 export const dynamic = "force-dynamic";

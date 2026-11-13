@@ -1,5 +1,5 @@
-// The Amazon side rail's tiles (components/SideAds.tsx AmazonRail; owner, 2026-11-09: "the eBay ad banner and Amazon ad banner on the
-// left and right side of the site"). Served as one CDN-cached JSON per region (/api/rails/amazon/<region>) that the rail asks for in the
+// The in-page block's Amazon tiles (components/InlineAds.tsx, formerly the side rail; owner, 2026-11-09: "the eBay ad banner and Amazon ad banner on the
+// left and right side of the site"). Served as one CDN-cached JSON per region (/api/rails/amazon/<region>) that the block asks for in the
 // browser, so a page carries none of it.
 //
 //   • The region's most-listed in-stock sealed products, each a tagged link to Amazon's own page of that product when the daily
@@ -42,7 +42,7 @@ export async function amazonRail(region: Region): Promise<AmazonRail | null> {
     id: p.slug,
     name: p.name,
     img: p.imageUrl!,
-    href: amazonUrl(p.name, { slug: p.slug, region, placement: "amazon-side", asin }),
+    href: amazonUrl(p.name, { slug: p.slug, region, placement: "amazon-inline", asin }),
   }));
   if (tiles.length < AMAZON_RAIL_MIN) return null;
   return { region, label: store.host.replace(/^www\./, ""), tiles };

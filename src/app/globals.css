@@ -908,12 +908,6 @@ html[data-geo="pending"] main { visibility: hidden; }
     margin-right: 0;
   }
 }
-/* A rail's list scrolls inside it (up to ten tiles): a thin bar, and the page does not scroll on past the list's end. */
-.rail-scroll {
-  scrollbar-width: thin;
-  scrollbar-gutter: stable;
-}
-
 /* ── The sports-card look (owner, 2026-11-08) ─────────────────────────────────────────────────────────────────────────────────────
    "More sports themed … similar to Topps": our own take on classic trading-card packaging, with no maker's logo, wordmark or trade
    dress. A night-navy hero with a halftone dot field and one bold diagonal stripe (jersey red, white, trophy gold), condensed italic
