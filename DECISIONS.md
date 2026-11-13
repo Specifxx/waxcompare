@@ -1570,3 +1570,7 @@ New Year, or let the window end on 26 December, and it goes.
 Owner: "we just want eBay and TCGplayer as the paid links at the top. That is why our revenue is declining." The pinned Amazon row
 is drawn only when this build fetched a real Amazon price; the sold-out page's Amazon search row is gone.
 `tests/paid-rows.test.ts` pins it.
+
+## 2026-11-13: urgent release
+
+Owner asked for every site to be released now: the unpriced-Amazon fix, Fetch as an ordinary store row and the blue TCGplayer button had been merged without a deploy marker. One build, via this commit's subject.
