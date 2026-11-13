@@ -17,8 +17,8 @@ import { SearchBox } from "@/components/SearchBox";
 import { Flag } from "@/components/Flag";
 import { RegionChips } from "@/components/RegionChips";
 import { Empty, Section } from "@/components/Section";
-import { homeRails, regionOverview, tcgplayerTiles, type ProductCardData } from "@/lib/data";
-import { TcgplayerStrip } from "@/components/TcgplayerStrip";
+import { homeRails, regionOverview, type ProductCardData } from "@/lib/data";
+import { InlineAds } from "@/components/InlineAds";
 import { featured as featuredByPrice, featureWorthy, priciestFirst } from "@/lib/feature-floor";
 import { dealsCopy, dealsInMarket, nearestRegion, stockLabel } from "@/lib/deals";
 import { cardOpen } from "@/lib/compact";
@@ -273,6 +273,8 @@ export default async function RegionHome({ params }: { params: { region: string 
           )}
         </Section>
 
+        {/* The one in-page ad block (components/InlineAds.tsx), between the sections: eBay and Amazon, browser only. */}
+        <InlineAds region={r.region} className="mt-14" />
 
         {older.length > 0 && (
           <Section title="Older releases still in stock" kicker="Released 18+ months ago" href={`/${r.region}/out-of-print`} linkLabel="All older releases in stock">
