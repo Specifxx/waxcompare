@@ -1595,3 +1595,11 @@ No pop-up, no overlay, no side space.
 - **Paid links:** `rel` sponsored (Amazon keeps `REL_AMAZON`), placements `listings-inline` and `amazon-inline` (`listings-side`, `amazon-side` and
   `tcgplayer-strip-side` are retired). Amazon tiles stay priceless and carry the Associates disclosure; never a store row, best price, deal or alert.
   `tests/side-ads.test.ts` pins it. The rail code is deleted.
+
+## 2026-11-13: the collection's button and link are written with their class, not :where()
+
+"+ I own this" drew with its words against its border, and "See my collection" took the text colour instead of the accent:
+`vault.css` wrote both as `:where(.ce-vault-btn)` / `:where(.ce-vault-link)`, which weigh nothing, and Tailwind's preflight styles a
+bare `<button>` (no padding, the parent's size and weight) and a bare `<a>` (the parent's colour). Both are now plain class rules;
+the rest of the file keeps `:where()`. Ported from YGO Compare #154 / DexCompare #210. `tests/vault.test.ts` reads the reset itself
+and the components' markup, so any class on an element the reset styles is held to the same.
