@@ -113,13 +113,13 @@ body {
     @apply bg-open-soft text-open;
   }
   .sp-open::before {
-    @apply animate-pulse;
+    @apply motion-safe:animate-pulse;
   }
   .sp-pre {
     @apply bg-pre-soft text-pre;
   }
   .sp-pre::before {
-    @apply animate-pulse;
+    @apply motion-safe:animate-pulse;
   }
   .sp-sold {
     @apply bg-sold-soft text-sold;
@@ -880,6 +880,15 @@ body:has([data-ebay-no-prefooter]) [data-ebay-prefooter] {
   --fm-radius: 14px;
   --fm-head: var(--font-display), var(--font-sans), system-ui, sans-serif;
 }
+/* The forum's page and thread titles speak the same voice as every other page title (.page-h1-sm below). */
+.fm h1.fm-h1 {
+  font-size: clamp(1.6rem, 1vw + 1.2rem, 2.2rem);
+  font-style: italic;
+  line-height: 1.02;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
 
 /* lib/region-boot.ts: while a visitor is moved to their own region's copy of the page, at most 1.5 s. */
 html[data-geo="pending"] main { visibility: hidden; }
@@ -1055,16 +1064,17 @@ html[data-geo="pending"] main { visibility: hidden; }
 }
 .page-h2 {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
-  font-size: 1.5rem;
+  font-size: 26px;
   font-style: italic;
   font-weight: 800;
-  line-height: 1.08;
+  line-height: 1.1;
   letter-spacing: 0.01em;
   text-transform: uppercase;
   text-wrap: balance;
 }
+/* The same size as the home page's section headings (Section.tsx: 26px, 32px from sm), so a page never mixes two. */
 @media (min-width: 640px) {
-  .page-h2 { font-size: 1.75rem; }
+  .page-h2 { font-size: 32px; }
 }
 .art-h2 {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
