@@ -33,7 +33,7 @@ export default function ToolsIndex({ params }: { params: { region: string } }) {
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Tools" }]} />
       <header className="max-w-3xl">
         <div className="eyebrow">Tools</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Sports card tools</h1>
+        <h1 className="mt-2 page-h1">Sports card tools</h1>
         <p className="mt-3 text-lg leading-8 text-muted">
           Free calculators for buying and selling sealed sports cards in {r.inName}. The value checker reads today’s prices at the stores we compare; the fee calculator works
           from the numbers you enter, in {r.currency}, and keep them in your own browser.

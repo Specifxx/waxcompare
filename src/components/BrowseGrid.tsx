@@ -14,6 +14,7 @@ import { PRODUCT_TYPES, TYPE_BY_SLUG, typeRank } from "@/lib/sealed-title";
 import { SET_BY_SLUG, SETS } from "@/lib/sets";
 import { NoPreFooter } from "./Ebay";
 import { Icon } from "./Icon";
+import Link from "./Link";
 import { MarketplaceSearch } from "./Marketplaces";
 import { pageHref, Pagination } from "./Pagination";
 import { ProductGrid } from "./ProductGrid";
@@ -520,11 +521,27 @@ export function BrowseGrid({ rows, total, region, base, page = 1, strip }: { row
           <div className="card px-6 py-12 text-center text-muted">
             <NoPreFooter />
             <p className="font-display text-lg font-bold text-ink">Nothing matches those filters.</p>
-            <p className="mt-1 text-sm">Try fewer words, another set, or every type.</p>
+            <p className="mt-1 text-sm">Try fewer words or another set, or clear the filters to see everything.</p>
             <button type="button" onClick={clearAll} className="chip mt-4 min-h-10">
               Clear filters <Icon name="close" size={14} />
             </button>
             {elsewhere && <MarketplaceSearch region={region} query={elsewhere} placement="browse-empty" />}
+            {/* Somewhere useful instead (internal links only, after the sponsored box so it keeps its place). */}
+            <p className="mt-6 text-sm">Or start from one of these:</p>
+            <ul className="mt-3 flex flex-wrap justify-center gap-2">
+              {[
+                { href: `/${region}/type/hobby-boxes`, label: "Hobby boxes", icon: "check" as const },
+                { href: `/${region}/deals`, label: "Today’s deals", icon: "tag" as const },
+                { href: `/${region}/releases`, label: "Release calendar", icon: "calendar" as const },
+              ].map((a) => (
+                <li key={a.href} className="empty-action">
+                  <Icon name={a.icon} size={16} />
+                  <Link href={a.href} prefetch={false} className="chip min-h-10">
+                    {a.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

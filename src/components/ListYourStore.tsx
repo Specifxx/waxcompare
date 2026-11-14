@@ -8,7 +8,7 @@
 import type { ReactNode } from "react";
 import { ListStore } from "./ReportForms";
 
-const h2 = { fontSize: "1.25rem", fontWeight: 700, margin: "28px 0 8px" } as const;
+const h2 = { margin: "28px 0 8px" } as const;
 const ul = { paddingLeft: 20, margin: "8px 0", lineHeight: 1.6 } as const;
 const ol = { paddingLeft: 22, margin: "8px 0", lineHeight: 1.6 } as const;
 const p = { margin: "8px 0", lineHeight: 1.6 } as const;
@@ -59,20 +59,20 @@ export function ListYourStore({
   const count = storeCount && storeCount >= 5 ? `${storeCount} stores` : "stores";
   return (
     <div style={{ maxWidth: 720 }}>
-      {showTitle ? <h1 style={{ fontSize: "1.9rem", fontWeight: 800, margin: "8px 0 12px" }}>List your store on {site}</h1> : null}
+      {showTitle ? <h1 className="page-h1" style={{ margin: "8px 0 12px" }}>List your store on {site}</h1> : null}
       <p style={p}>
         {site} compares prices for {what} across {count} in {markets}, and sends buyers straight to the store with the best price.
         Listing is free, there is no contract and no fee, and you never pay to rank: prices are sorted by price only.
       </p>
 
-      <h2 style={h2}>What your store gets</h2>
+      <h2 className="art-h2" style={h2}>What your store gets</h2>
       <ul style={ul}>
         <li><strong>Buyers who are ready to order.</strong> Every product you stock shows your price beside the other stores&apos;, with a link to your own product page. The cheapest in-stock price wins the badge.</li>
         <li><strong>Nothing to maintain.</strong> We read your prices and stock from your shop every day. No feed to upload, no account, no plugin.</li>
         <li><strong>A fair comparison.</strong> No store pays to be listed or to rank higher, and we never sell your listing to a competitor.</li>
       </ul>
 
-      <h2 style={h2}>What we need</h2>
+      <h2 className="art-h2" style={h2}>What we need</h2>
       <ul style={ul}>
         <li><strong>A shop we can read.</strong> {platforms} work straight away; most other platforms with a public product feed do too. We read your public product listing once a day, gently, and respect robots.txt.</li>
         <li><strong>{what.charAt(0).toUpperCase() + what.slice(1)} in your own currency,</strong> with clear product titles. A listing we cannot match exactly is left out rather than guessed{pricesRule ? `, and ${pricesRule}` : ""}.</li>
@@ -80,14 +80,14 @@ export function ListYourStore({
         {children}
       </ul>
 
-      <h2 style={h2}>How it works</h2>
+      <h2 className="art-h2" style={h2}>How it works</h2>
       <ol style={ol}>
         <li>Send the form below. It takes a minute.</li>
         <li>We check your store within a few days and reply through the contact details on your website.</li>
         <li>Once it passes, your prices appear with the next daily update and stay up to date on their own.</li>
       </ol>
 
-      <h2 style={h2}>List your store</h2>
+      <h2 className="art-h2" style={h2}>List your store</h2>
       <ListStore regions={regions} what={what} buttonClassName={buttonClassName} />
       {email ? (
         <p style={p}>
@@ -105,7 +105,7 @@ export function ListYourStore({
           never sent to anyone. */}
       {badge ? (
         <>
-          <h2 style={h2}>Already listed? Add our badge</h2>
+          <h2 className="art-h2" style={h2}>Already listed? Add our badge</h2>
           <p style={p}>
             Show your customers that your prices are compared in the open. Paste this into your footer or product pages. It is
             plain HTML: no script, no image to load and no tracking.

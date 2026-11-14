@@ -94,7 +94,7 @@ export default async function Landing() {
               <input
                 name="q"
                 type="search"
-                placeholder="Search a release, e.g. 2025 Topps Chrome"
+                placeholder="e.g. Topps Chrome"
                 aria-label="Search sealed products"
                 className="min-w-0 flex-1 bg-transparent py-1.5 text-base outline-none placeholder:text-faint sm:text-sm"
               />

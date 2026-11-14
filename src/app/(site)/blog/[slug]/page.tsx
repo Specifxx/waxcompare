@@ -43,7 +43,7 @@ export default async function PostPage({ params }: Params) {
         <article className="min-w-0 max-w-[68ch]">
           <header>
             <div className="eyebrow">{p.kicker}</div>
-            <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{p.title}</h1>
+            <h1 className="mt-2 page-h1">{p.title}</h1>
             <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
               <span className="font-medium text-ink">By SportsCardCompare</span>
               <span aria-hidden="true">·</span>
@@ -64,7 +64,7 @@ export default async function PostPage({ params }: Params) {
           <div className="mt-8">{o.intro}</div>
           {o.sections.map((s) => (
             <section key={s.id} aria-labelledby={s.id} className="mt-12">
-              <h2 id={s.id} className="mb-4 font-display text-xl font-bold tracking-tight text-ink sm:text-2xl">
+              <h2 id={s.id} className="art-h2 mb-4">
                 {s.title}
               </h2>
               {s.body}
@@ -78,7 +78,7 @@ export default async function PostPage({ params }: Params) {
         </aside>
       </div>
       <section aria-labelledby="more" className="mt-16 border-t border-line pt-10">
-        <h2 id="more" className="font-display text-xl font-bold tracking-tight">
+        <h2 id="more" className="page-h2">
           More from the blog
         </h2>
         <ul role="list" className="mt-4 grid gap-4 sm:grid-cols-3">

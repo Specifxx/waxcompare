@@ -47,7 +47,7 @@ export default async function OutOfPrintPage({ params }: { params: { region: str
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Older sets in stock" }]} />
       <header className="max-w-3xl">
         <div className="eyebrow">Stock · {r.name}</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Older sports card releases still in stock in {r.inName}</h1>
+        <h1 className="mt-2 page-h1">Older sports card releases still in stock in {r.inName}</h1>
         <p className="mt-3 leading-7 text-muted">
           Hobby, mega and blaster boxes from releases more than {OLDER_MONTHS} months ago (before {formatRelease(olderCutoff(today))}) that {r.adjective} stores, often local game
           stores, still have on the shelf today. Sets most stores carry come first. Older product is usually at only a few stores and its prices can move a lot; we show today&rsquo;s stock and
@@ -59,7 +59,7 @@ export default async function OutOfPrintPage({ params }: { params: { region: str
           {groups.map((g) => (
             <section key={g.set.code} aria-labelledby={`set-${g.set.code}`}>
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h2 id={`set-${g.set.code}`} className="font-display text-xl font-bold tracking-tight">
+                <h2 id={`set-${g.set.code}`} className="page-h2">
                   <Link href={`/${r.region}/sets/${g.set.slug}`} prefetch={false} className="hover:text-brand">
                     {g.set.name}
                   </Link>

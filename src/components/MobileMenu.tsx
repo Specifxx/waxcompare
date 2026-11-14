@@ -183,7 +183,7 @@ export function MenuSheet({
       <div className="flex h-[var(--hdr)] items-center gap-3 border-b border-line">
         <LogoMark className="h-8 w-8 shrink-0" />
         <span className="min-w-0 flex-1 truncate font-display text-lg font-bold tracking-tight">
-          <Flag code={current.short} /> SportsCardCompare {current.name}
+          <Flag code={current.short} /> SportsCardCompare <span className="font-sans text-sm font-medium text-muted">{current.name}</span>
         </span>
         <button
           type="button"

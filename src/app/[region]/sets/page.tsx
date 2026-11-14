@@ -42,7 +42,7 @@ export default async function SetsPage({ params }: { params: { region: string } 
   return (
     <div className="page py-8">
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Sets" }]} />
-      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Every sports card release, by sport</h1>
+      <h1 className="page-h1">Every sports card release, by sport</h1>
       <p className="mt-3 max-w-2xl leading-7 text-muted">
         Every release at least two card shops we track sell sealed, grouped by sport, newest first, with how much of it{" "}
         {r.adjective} stores have in stock today. Each links to its price comparison.
@@ -79,7 +79,7 @@ export default async function SetsPage({ params }: { params: { region: string } 
         return (
           <section key={g.series} id={slugify(g.series)} aria-labelledby={`h-${slugify(g.series)}`} className="mt-12">
             <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-              <h2 id={`h-${slugify(g.series)}`} className="font-display text-2xl font-bold tracking-tight">
+              <h2 id={`h-${slugify(g.series)}`} className="page-h2">
                 {g.series}
               </h2>
               <p className="text-sm text-muted">

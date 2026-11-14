@@ -83,7 +83,7 @@ export function HomeRegionGrid({ initial, preorder = null }: { initial: Pick[]; 
 
   return (
     <section id="regions" aria-labelledby="home-grid-h" className="page scroll-mt-20" data-home-grid="">
-      <h2 id="home-grid-h" className="font-display text-2xl font-bold tracking-tight">
+      <h2 id="home-grid-h" className="page-h2">
         Most stocked in {r.inName} today
       </h2>
       {/* The region switcher: real links (they work without script, and crawl to every region home); with script, a click
@@ -153,7 +153,7 @@ export function HomeRegionGrid({ initial, preorder = null }: { initial: Pick[]; 
         {source === "geo" || source === "language" ? "Region suggested from your location." : null}
       </p>
 
-      <h2 className="mt-10 font-display text-xl font-bold tracking-tight">Jump to</h2>
+      <h2 className="mt-10 page-h2">Jump to</h2>
       <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4" aria-label={`Popular pages in ${r.inName}`}>
         {hot.map((h) => (
           <li key={h.label} className="flex">

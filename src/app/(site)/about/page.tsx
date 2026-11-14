@@ -51,7 +51,7 @@ export default function About() {
   return (
     <div className="page max-w-3xl py-12">
       <Breadcrumbs items={[{ href: "/", label: "SportsCardCompare" }, { label: "About" }]} />
-      <h1 className="font-display text-4xl font-extrabold tracking-tight">How SportsCardCompare works</h1>
+      <h1 className="page-h1">How SportsCardCompare works</h1>
       <div className="prose-dex mt-6">
         <p>
           SportsCardCompare compares <b>sealed sports cards</b> — hobby, jumbo, mega, blaster and hanger boxes, hobby cases and packs, of every sport
@@ -285,7 +285,7 @@ export default function About() {
       </div>
 
       <section id="compare" className="mt-10" aria-labelledby="compare-h">
-        <h2 id="compare-h" className="mb-3 font-display text-xl font-bold text-ink">
+        <h2 id="compare-h" className="mb-3 art-h2">
           What we compare
         </h2>
         <SuggestedTypeLinks types={PRODUCT_TYPES.slice(0, 13).map((t) => ({ slug: t.slug, label: t.plural }))} align="start" />
@@ -295,7 +295,7 @@ export default function About() {
       </section>
 
       <section id="faq" className="mt-10" aria-labelledby="faq-h">
-        <h2 id="faq-h" className="mb-4 font-display text-xl font-bold text-ink">
+        <h2 id="faq-h" className="mb-4 art-h2">
           Questions
         </h2>
         {/* Written out, not collapsed: every answer is visible text in the first render, each question a real <h3>. */}

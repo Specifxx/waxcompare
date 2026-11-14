@@ -415,7 +415,7 @@ function HowItWorks({ r, stores }: { r: RegionInfo; stores: number }) {
   ];
   return (
     <section className="mt-16" aria-labelledby="how">
-      <h2 id="how" className="font-display text-xl font-bold tracking-tight">
+      <h2 id="how" className="page-h2">
         How SportsCardCompare works
       </h2>
       <ol className="mt-4 grid gap-3 md:grid-cols-3">

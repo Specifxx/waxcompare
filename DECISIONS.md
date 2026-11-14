@@ -1621,3 +1621,28 @@ With "Add to cart" beside the store's button, a phone row's second column took t
 PRICE" on the cheapest row). Below 640px a full row is now name and stock, price, host, then the cart button and the store's
 button side by side at full width (`globals.css`, after `.or-act`). The name keeps the whole row and the cart button says "Add to
 cart" in full. Lean rows, the order of rows and every paid row's wording are unchanged.
+
+## 2026-11-14: inner pages speak the home page's voice (design polish, no money or crawl change)
+
+Owner: "all our compare websites are more aesthetic on the homepage now but can we make all the other pages more aesthetic as well".
+SportsCardCompare keeps its own sports-card look (not the calm three-colour palette or the minimal hero of the other sites); this pass
+carries that look from the home page into every other page, in CSS and class names only.
+
+- **Every page title** (products, sets, types, sport and brand hubs, all sealed and search, deals, releases, stores, guides, posts,
+  tools, about, terms, privacy, contact, how we choose stores, list your store, the 404 and error pages) is the hero's condensed
+  italic uppercase at an inner-page size (`.page-h1`; `.page-h1-sm` for product and set names beside their photo). An eyebrow over a
+  title or section heading carries the home's short red-and-gold bar.
+- **Every page section heading** ("About …", "Questions about …", "Most in stock today", "Related", "More guides", the releases
+  lists, the market report) is the home's section heading (`.page-h2`, the look of `Section.tsx`), so a product page no longer mixes
+  two heading styles.
+- **Article headings** in guides, posts, the about page and the static pages are condensed, heavy and italic in sentence case
+  (`.art-h2`, `.prose-dex h2`); article measure (68ch) and body text were already right and are unchanged.
+- **Search:** the big search box's example was a Magic product ("Edge of Eternities bundle") and was cut off on a phone; both search
+  boxes now say "e.g. Topps Chrome". A search with no results keeps its words, its Clear filters chip and its sponsored eBay box in
+  place, then offers three existing pages (hobby boxes, today's deals, the release calendar) under it.
+- **Phone menu:** the region name beside the wordmark is set apart (smaller, muted) instead of running into it.
+
+Unchanged, checked on 11 URLs (server HTML of origin/main against this branch, scripts off): every title, meta description,
+canonical, robots, Open Graph and JSON-LD, every h1 and h2 text, the set of internal links, every outbound link in order with its
+`rel`, and every word of server text. No paid link, ad block, pinned row, affiliate tag or placement name moved, changed or was
+reworded, so the 19 November clicks-per-placement recheck is unaffected. No URL, revalidate, data read, font or script was added.

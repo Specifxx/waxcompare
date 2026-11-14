@@ -514,7 +514,7 @@ export default async function ProductPage({ params }: { params: { region: string
               </div>
               <div className="mt-2">
                 <ShareButton title={heading} path={`/${r.region}/p/${p.slug}`} kind="product" text={shareText(heading, priceGap(open.filter((o) => !o.marketplace).map((o) => ({ priceCents: o.priceCents, storeName: o.storeName }))), (c) => money(c, r.market))} className="float-right -mt-1 ml-2" />
-                <h1 className="font-display text-2xl font-bold leading-tight sm:text-3xl">{heading}</h1>
+                <h1 className="page-h1 page-h1-sm">{heading}</h1>
               </div>
               {/* My collection (lib/vault.ts): valued in this region from /prices.json, kept in the browser only. */}
               <VaultAddButton id={p.id} name={heading} href={`/${r.region}/p/${p.slug}`} image={img?.small ?? null} market={r.market} currency={r.currency} addedCents={here?.lowestPriceCents ?? 0} className="mt-3" />
@@ -683,7 +683,7 @@ export default async function ProductPage({ params }: { params: { region: string
       </div>
 
       <section aria-labelledby="about-h" className="mt-14 max-w-3xl">
-        <h2 id="about-h" className="font-display text-2xl font-bold tracking-tight">
+        <h2 id="about-h" className="page-h2">
           About {heading}
         </h2>
         <div className="mt-4 space-y-3 leading-7 text-muted">
@@ -707,7 +707,7 @@ export default async function ProductPage({ params }: { params: { region: string
 
       {faq.length > 0 && (
         <section aria-labelledby="faq-h" className="mt-14 max-w-3xl">
-          <h2 id="faq-h" className="font-display text-2xl font-bold tracking-tight">
+          <h2 id="faq-h" className="page-h2">
             Questions about {heading}
           </h2>
           <dl className="mt-4 space-y-5">

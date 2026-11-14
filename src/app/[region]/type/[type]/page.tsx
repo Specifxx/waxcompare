@@ -108,7 +108,7 @@ export default async function TypePage({ params }: { params: { region: string; t
     <div className="page py-8">
       {!(gridPageHasRoomForFooter(open.length + sold.length) && open.length + sold.length >= FOOTER_STRIP_MIN) && <NoPreFooter />}
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: t.plural }]} />
-      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 className="page-h1">
         {name} in {r.inName}
       </h1>
 
@@ -268,7 +268,7 @@ export default async function TypePage({ params }: { params: { region: string; t
 
       {index.length > 0 && (
         <section aria-labelledby="type-index-h" className="mt-14">
-          <h2 id="type-index-h" className="font-display text-2xl font-bold tracking-tight">
+          <h2 id="type-index-h" className="page-h2">
             More {t.plural.toLowerCase()} in {r.inName}, A to Z
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-muted">Not part of a numbered set, so not on any set page: each with its cheapest in-stock price today.</p>

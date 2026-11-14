@@ -47,7 +47,7 @@ export default async function StoresPage({ params }: { params: { region: string 
   return (
     <div className="page py-8">
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Stores" }]} />
-      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Where to buy sealed sports cards online in {r.inName}</h1>
+      <h1 className="page-h1">Where to buy sealed sports cards online in {r.inName}</h1>
       <p className="mt-3 max-w-2xl leading-7 text-muted">
         {/* One text node: a sentence split around {values} moves its later pieces when the web font arrives (a layout shift). */}
         {`${plural(stores.length, "independent card shop")} that sell sealed sports cards online in ${r.currency}, compared in one place. We read their public product listings about twice a day; every product page ranks them by price and stock, and no store pays to be listed or to rank higher.`}
@@ -55,7 +55,7 @@ export default async function StoresPage({ params }: { params: { region: string 
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-10">
         <section aria-labelledby="most-in-stock">
-          <h2 id="most-in-stock" className="font-display text-2xl font-bold tracking-tight sm:text-[28px]">
+          <h2 id="most-in-stock" className="page-h2">
             Most in stock today
           </h2>
           {lead ? (
@@ -98,7 +98,7 @@ export default async function StoresPage({ params }: { params: { region: string 
         </section>
 
         <section aria-labelledby="before-you-buy" className="lg:pt-1">
-          <h2 id="before-you-buy" className="font-display text-xl font-bold tracking-tight">
+          <h2 id="before-you-buy" className="page-h2">
             Before you buy
           </h2>
           <ul className="mt-4 space-y-3">
@@ -133,7 +133,7 @@ export default async function StoresPage({ params }: { params: { region: string 
 
       <section aria-labelledby="all-stores" className="mt-14">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-          <h2 id="all-stores" className="font-display text-2xl font-bold tracking-tight sm:text-[28px]">
+          <h2 id="all-stores" className="page-h2">
             All {stores.length} stores, A–Z
           </h2>
           <p className="text-sm text-muted">

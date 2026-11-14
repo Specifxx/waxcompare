@@ -70,7 +70,7 @@ export default function ToolPage({ params }: { params: { region: string; tool: s
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { href: `/${r.region}/tools`, label: "Tools" }, { label: t.title }]} />
       <header className="max-w-3xl">
         <div className="eyebrow">{t.kicker}</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{t.title}</h1>
+        <h1 className="mt-2 page-h1">{t.title}</h1>
         <p className="mt-3 text-lg leading-8 text-muted">{t.lede}</p>
       </header>
 
@@ -83,7 +83,7 @@ export default function ToolPage({ params }: { params: { region: string; tool: s
       <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,68ch)_minmax(0,1fr)] lg:gap-16">
         <article className="min-w-0">
           <section aria-labelledby="how">
-            <h2 id="how" className="font-display text-2xl font-bold tracking-tight">
+            <h2 id="how" className="page-h2">
               How to use it
             </h2>
             <ol className="mt-4 grid gap-2">
@@ -99,7 +99,7 @@ export default function ToolPage({ params }: { params: { region: string; tool: s
           </section>
 
           <section aria-labelledby="about" className="mt-12">
-            <h2 id="about" className="font-display text-2xl font-bold tracking-tight">
+            <h2 id="about" className="page-h2">
               About the {t.kicker.toLowerCase()}
             </h2>
             <div className="prose-dex mt-4">
@@ -128,7 +128,7 @@ export default function ToolPage({ params }: { params: { region: string; tool: s
           </section>
 
           <section aria-labelledby="faq" className="mt-12">
-            <h2 id="faq" className="font-display text-2xl font-bold tracking-tight">
+            <h2 id="faq" className="page-h2">
               Questions
             </h2>
             <dl className="mt-4 divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">

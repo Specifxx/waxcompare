@@ -81,7 +81,7 @@ export function CountryBody({ data }: { data: CountryData }) {
       )}
       {o.sections.map((s) => (
         <section key={s.id} aria-labelledby={s.id} className="mt-12">
-          <h2 id={s.id} className="mb-4 font-display text-xl font-bold tracking-tight text-ink sm:text-2xl">
+          <h2 id={s.id} className="art-h2 mb-4">
             {s.title}
           </h2>
           {s.body}

@@ -68,7 +68,7 @@ export async function SaleSeasonPage({ slug, params }: { slug: SaleSlug; params:
         <div className="eyebrow flex items-center gap-1.5 text-brand-strong">
           <Icon name="tag" size={14} /> {name} {year} · {r.name}
         </div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{saleCopy.h1(slug, r)}</h1>
+        <h1 className="mt-2 page-h1">{saleCopy.h1(slug, r)}</h1>
         <p className="mt-3 leading-7 text-muted">
           {when} Stores set their own prices, so this page doesn’t guess at sales: it ranks the sealed sports card products whose cheapest in-stock price sits furthest under the median of the{" "}
           {r.adjective} stores that have them, from the prices we checked{" "}
@@ -139,7 +139,7 @@ export async function SaleSeasonPage({ slug, params }: { slug: SaleSlug; params:
       )}
 
       <section aria-labelledby="season-more" className="mt-14 max-w-3xl">
-        <h2 id="season-more" className="font-display text-2xl font-bold tracking-tight">
+        <h2 id="season-more" className="page-h2">
           More ways to save this season
         </h2>
         <ul className="mt-4 grid gap-2 text-[15px] leading-6 text-muted">

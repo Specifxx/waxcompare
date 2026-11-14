@@ -30,7 +30,7 @@ export default async function DailyPage({ params }: { params: { region: string }
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Price Duel" }]} />
       <header className="max-w-3xl">
         <div className="eyebrow">Daily game</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{SITE_NAME} Price Duel</h1>
+        <h1 className="mt-2 page-h1">{SITE_NAME} Price Duel</h1>
         <p className="mt-3 text-lg leading-8 text-muted">
           Ten pairs of sealed products. Tap the one that costs more at stores in {r.inName} today. A new puzzle every day at midnight UTC, the same for everyone here, so you can compare scores with friends.
         </p>
