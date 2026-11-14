@@ -1646,3 +1646,20 @@ Unchanged, checked on 11 URLs (server HTML of origin/main against this branch, s
 canonical, robots, Open Graph and JSON-LD, every h1 and h2 text, the set of internal links, every outbound link in order with its
 `rel`, and every word of server text. No paid link, ad block, pinned row, affiliate tag or placement name moved, changed or was
 reworded, so the 19 November clicks-per-placement recheck is unaffected. No URL, revalidate, data read, font or script was added.
+
+## 2026-11-14: review of the inner-pages pass, three finishing touches (no money or crawl change)
+
+A second check of the pass above, built against the commit before it (`09ba029`) on 13 URLs at 390 and 1440 px in both themes, and
+the server HTML of 18 URLs compared with scripts off. Nothing regressed: no sideways scroll, no new console error, layout shift
+unchanged, and every title, meta description, canonical, robots, Open Graph, JSON-LD, h1, h2, internal link, paid link (order, words,
+`rel`) and word of server text identical. Three things were left half done, and are finished here in CSS only:
+
+- **Section headings are the home's size.** `.page-h2` was 24/28px against the home's 26/32px (`Section.tsx`), so a product page
+  still drew "Questions about …" smaller than "More from …" beside it. It is now 26px, 32px from `sm`, on every page that uses it.
+- **The forum's title** ("SportsCardCompare forum" and a thread's title) was the one page title still in plain type; it now takes the
+  same condensed italic capitals as every other title (`.fm h1.fm-h1` in `globals.css`; the shared `forum.css` is untouched).
+- **Stock dots stop pulsing under reduced motion.** The green and pre-order dots (`.sp-open`, `.sp-pre`) pulsed for visitors who ask
+  for reduced motion; they pulse only under `motion-safe` now.
+
+No paid link, ad block, pinned row, affiliate tag or placement name moved, changed or was reworded, so the 19 November
+clicks-per-placement recheck is unaffected. No URL, metadata, revalidate, data read, font or script changed.
