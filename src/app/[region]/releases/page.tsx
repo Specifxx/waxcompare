@@ -150,7 +150,7 @@ export default async function ReleasesPage({ params }: { params: { region: strin
   return (
     <div className="page py-8">
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Releases" }]} />
-      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Sports card release dates {year}</h1>
+      <h1 className="page-h1">Sports card release dates {year}</h1>
       <p className="mt-3 max-w-2xl leading-7 text-muted">
         {/* One text node, so nothing in it moves when the web font arrives. */}
         {`The release calendar for ${r.inName}: upcoming releases and the ones out in the last ${RECENT_DAYS} days, with what ${r.adjective} card shops have in stock or open for pre-order today, then every dated release of ${year} and ${year - 1}. Dates are the makers' announced release dates; a release without a confirmed date is left off, and stores may ship a few days either side.`}
@@ -159,7 +159,7 @@ export default async function ReleasesPage({ params }: { params: { region: strin
       <NextSetBox r={r} next={next} c={nextCount} today={today} />
 
       <section className="mt-12" aria-labelledby="upcoming">
-        <h2 id="upcoming" className="mb-4 font-display text-2xl font-bold tracking-tight">
+        <h2 id="upcoming" className="mb-4 page-h2">
           Upcoming
         </h2>
         {upcoming.length ? (
@@ -174,7 +174,7 @@ export default async function ReleasesPage({ params }: { params: { region: strin
       </section>
 
       <section className="mt-12" aria-labelledby="recent">
-        <h2 id="recent" className="mb-4 font-display text-2xl font-bold tracking-tight">
+        <h2 id="recent" className="mb-4 page-h2">
           Just released
         </h2>
         {recent.length ? (
@@ -256,7 +256,7 @@ function NextSetBox({ r, next, c, today }: { r: RegionInfo; next: MtgSet | null;
 function YearTable({ id, title, r, sets, counts, now, empty }: { id: string; title: string; r: RegionInfo; sets: MtgSet[]; counts: Map<string, SetCount>; now: Date; empty: string }) {
   return (
     <section className="mt-12" aria-labelledby={id}>
-      <h2 id={id} className="mb-4 font-display text-2xl font-bold tracking-tight">
+      <h2 id={id} className="mb-4 page-h2">
         {title}
       </h2>
       {sets.length ? (

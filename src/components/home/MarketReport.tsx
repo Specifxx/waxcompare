@@ -81,7 +81,7 @@ export function MarketReport({ report }: { report: HomeReport }) {
     <section className="page mt-14" aria-labelledby="report-h">
       <div className="mx-auto max-w-3xl space-y-10 text-[15px] leading-7 text-muted">
         <div>
-          <h2 id="report-h" className="font-display text-2xl font-bold tracking-tight text-ink">
+          <h2 id="report-h" className="page-h2">
             Sealed sports card prices today: hobby, jumbo, mega and blaster boxes
           </h2>
           <p className="mt-3">
@@ -97,7 +97,7 @@ export function MarketReport({ report }: { report: HomeReport }) {
 
         {cheapToday.length > 0 && (
           <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-ink">What’s cheapest this week</h2>
+            <h2 className="page-h2">What’s cheapest this week</h2>
             <p className="mt-3">
               The lowest open price of each kind of product in {r.inName} today. A low price on an older release often means only one or two stores still hold it, so check the
               store count on the product page before you decide.
@@ -134,7 +134,7 @@ export function MarketReport({ report }: { report: HomeReport }) {
 
         {lines.length > 0 && (
           <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-ink">How prices differ by region</h2>
+            <h2 className="page-h2">How prices differ by region</h2>
             <p className="mt-3">
               Each region compares only stores that charge in its own currency, and we never convert a price: an Australian dollar figure and a US dollar figure are two
               different shelves, not one price in two currencies. What changes between regions is how many stores we read, how much of the catalogue they carry and where
@@ -214,7 +214,7 @@ export function MarketReport({ report }: { report: HomeReport }) {
 
         {lines.length > 0 && (
           <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-ink">Stock: what is on the shelf, and when it changes</h2>
+            <h2 className="page-h2">Stock: what is on the shelf, and when it changes</h2>
             <p className="mt-3">
               We keep a product listed after it sells out, so its page shows which stores had it and when we last read them. Of the products we list in each region, this
               many are open (in stock somewhere, or on pre-order) today:{" "}

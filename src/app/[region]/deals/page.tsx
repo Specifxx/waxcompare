@@ -100,7 +100,7 @@ export default async function DealsPage({ params }: { params: { region: string }
         <div className="eyebrow flex items-center gap-1.5 text-brand-strong">
           <Icon name="tag" size={14} /> Deals · {r.name}
         </div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{dealsCopy.h1(r)}</h1>
+        <h1 className="mt-2 page-h1">{dealsCopy.h1(r)}</h1>
         <p className="mt-3 leading-7 text-muted">
           {lede.lead} {checked ? <Ago iso={checked.toISOString()} initial={timeAgo(checked)} /> : "twice a day"}
           {lede.tail}

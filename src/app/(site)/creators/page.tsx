@@ -172,7 +172,7 @@ export default function CreatorsPage() {
       <Breadcrumbs items={crumbs} />
       <header className="max-w-2xl">
         <div className="eyebrow">Creators</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-5xl">Sports card creators we feature</h1>
+        <h1 className="mt-2 page-h1">Sports card creators we feature</h1>
         <p className="mt-3 text-lg leading-8 text-muted">
           The collectors and breakers who make the hobby fun to follow. Have a look at their work, follow them, and tell them {SITE_NAME} sent you.
         </p>
@@ -186,7 +186,7 @@ export default function CreatorsPage() {
 
       {rest.length > 0 && (
         <section className="mt-10">
-          <h2 className="font-display text-2xl font-bold tracking-tight">More creators</h2>
+          <h2 className="page-h2">More creators</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rest.map((c) => (
               <CreatorCard key={c.slug} c={c} />
@@ -196,7 +196,7 @@ export default function CreatorsPage() {
       )}
 
       <section id="get-featured" className="card mt-10 scroll-mt-24 border-dashed p-6 sm:p-8">
-        <h2 className="font-display text-2xl font-bold tracking-tight">Make sports card content? Get featured, free</h2>
+        <h2 className="page-h2">Make sports card content? Get featured, free</h2>
         <p className="mt-2 max-w-2xl text-[15px] leading-7 text-muted">
           Box openings, collection tours, hobby news or grading: if you make sports card content regularly, we&rsquo;d love to feature you
           here and on our homepage. Mention {SITE_NAME} in your content now and then, and we send collectors your way.
@@ -212,7 +212,7 @@ export default function CreatorsPage() {
       </section>
 
       <section id="work-with-us" className="mt-10 scroll-mt-24" aria-labelledby="work-with-us-title">
-        <h2 id="work-with-us-title" className="font-display text-2xl font-bold tracking-tight">How to work with us</h2>
+        <h2 id="work-with-us-title" className="page-h2">How to work with us</h2>
         <p className="mt-2 max-w-2xl text-[15px] leading-7 text-muted">
           Creators often ask how we&rsquo;d like {SITE_NAME} promoted. Honestly, however suits you: no contract, no script, no quota and nothing to send us first. We help you, you help us, and we keep featuring you either way.
         </p>
@@ -238,7 +238,7 @@ export default function CreatorsPage() {
       </section>
 
       <section className="mt-10 max-w-2xl" aria-labelledby="creators-faq">
-        <h2 id="creators-faq" className="font-display text-2xl font-bold tracking-tight">
+        <h2 id="creators-faq" className="page-h2">
           Creators FAQ
         </h2>
         <dl className="mt-4 space-y-5">

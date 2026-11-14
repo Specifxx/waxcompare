@@ -20,7 +20,7 @@ export function SetIndex({ r, counts, types }: { r: RegionInfo; counts: Readonly
   if (!series.length) return null;
   return (
     <section aria-labelledby="every-set-h" className="mt-16">
-      <h2 id="every-set-h" className="font-display text-2xl font-bold tracking-tight">
+      <h2 id="every-set-h" className="page-h2">
         Every set and product type in {r.inName}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted">Each set&rsquo;s sealed products at {r.adjective} stores, with how many are listed here today.</p>

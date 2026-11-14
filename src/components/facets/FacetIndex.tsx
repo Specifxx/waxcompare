@@ -21,7 +21,7 @@ export function FacetIndex({ r, tagged, kind }: { r: RegionInfo; tagged: FacetCa
     <div className="page py-8">
       <NoPreFooter />
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: kind === "sport" ? "Sports" : "Brands" }]} />
-      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">{kind === "sport" ? "Shop sports card boxes by sport" : "Shop sports card boxes by brand"}</h1>
+      <h1 className="page-h1">{kind === "sport" ? "Shop sports card boxes by sport" : "Shop sports card boxes by brand"}</h1>
       <p className="mt-3 max-w-3xl leading-7 text-muted">
         {kind === "sport"
           ? `Pick your sport, then narrow to a brand. Every box, case and pack ${r.adjective} stores list, with what is in stock and the lowest price today.`

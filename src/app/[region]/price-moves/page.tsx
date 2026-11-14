@@ -59,7 +59,7 @@ export default async function PriceMovesPage({ params }: { params: { region: str
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Price moves" }]} />
       <header className="max-w-3xl">
         <div className="eyebrow">Prices · {r.name}</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Biggest price moves this week in {r.inName}</h1>
+        <h1 className="mt-2 page-h1">Biggest price moves this week in {r.inName}</h1>
         <p className="mt-3 leading-7 text-muted">
           The cheapest in-stock price at {r.adjective} storestoday against the same product&rsquo;s {MOVE_DAYS} days ago, for the hobby, mega and blaster boxes
           of popular releases only. A move counts at {MOVE_MIN_PCT}% or more and at least {money(MOVE_MIN_CENTS, r.market)}. Prices move when the cheapest store sells out

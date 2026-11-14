@@ -36,7 +36,7 @@ export default function BlogIndex() {
       />
       <header className="max-w-3xl">
         <div className="eyebrow">Blog</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="mt-2 page-h1">
           The SportsCardCompare blog
         </h1>
         <p className="mt-3 text-lg leading-8 text-muted">

@@ -131,7 +131,7 @@ export function RecentlyViewed({ region, exclude }: { region: Region; exclude?: 
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
         <div>
           <div className="eyebrow mb-1">Kept on this device</div>
-          <h2 id={titleId} className="font-display text-2xl font-bold tracking-tight sm:text-[28px]">
+          <h2 id={titleId} className="page-h2">
             Recently viewed
           </h2>
         </div>

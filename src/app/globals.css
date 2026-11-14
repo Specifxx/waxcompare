@@ -296,8 +296,10 @@ body {
   .prose-dex p {
     @apply mb-4 leading-7 text-muted;
   }
+  /* The article heading (.art-h2 below): condensed, heavy, italic, sentence case. */
   .prose-dex h2 {
-    @apply mb-3 mt-8 font-display text-xl font-bold text-ink;
+    @apply mb-3 mt-10 font-display text-[1.45rem] font-extrabold italic leading-[1.12] text-ink sm:text-[1.65rem];
+    text-wrap: balance;
   }
   .prose-dex a {
     @apply font-medium text-brand underline underline-offset-2;
@@ -1023,6 +1025,61 @@ html[data-geo="pending"] main { visibility: hidden; }
   letter-spacing: 0.01em;
 }
 .wx-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 4px;
+  margin-right: 8px;
+  vertical-align: middle;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, rgb(var(--brand)) 0 60%, rgb(var(--gold)) 60% 100%);
+}
+
+/* Inner pages speak the home page's voice (2026-11-14): every page title is the hero's condensed italic uppercase at an inner-page
+   size, every page section heading is the home's section heading (Section.tsx), and an eyebrow over a title carries the same short
+   red-and-gold bar. Article headings inside guides, posts and the about page stay sentence case (they are read, not scanned),
+   condensed, heavy and italic. One place to change them all; the h1 and h2 words are untouched (CSS only). */
+.page-h1 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(1.95rem, 1.6vw + 1.35rem, 2.85rem);
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.page-h1-sm {
+  font-size: clamp(1.6rem, 1vw + 1.2rem, 2.2rem);
+  line-height: 1.02;
+}
+.page-h2 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+@media (min-width: 640px) {
+  .page-h2 { font-size: 1.75rem; }
+}
+.art-h2 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: 1.45rem;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1.12;
+  color: rgb(var(--ink));
+  text-wrap: balance;
+}
+@media (min-width: 640px) {
+  .art-h2 { font-size: 1.65rem; }
+}
+.eyebrow:has(+ .page-h1)::before,
+.eyebrow:has(+ .page-h2)::before {
   content: "";
   display: inline-block;
   width: 18px;

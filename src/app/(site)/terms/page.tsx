@@ -16,7 +16,7 @@ export default function Terms() {
   return (
     <div className="page max-w-3xl py-12">
       <Breadcrumbs items={[{ href: "/", label: "SportsCardCompare" }, { label: "Terms" }]} />
-      <h1 className="font-display text-4xl font-extrabold tracking-tight">Terms of use</h1>
+      <h1 className="page-h1">Terms of use</h1>
       <p className="mt-2 text-sm text-faint">Last updated {LAST_UPDATED}</p>
       <div className="prose-dex mt-6">
         <p>

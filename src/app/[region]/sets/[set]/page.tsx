@@ -130,7 +130,7 @@ export default async function SetPage({ params }: { params: { region: string; se
           <div className="min-w-0 sm:self-end">
             <div className="eyebrow">{s.series} series</div>
             <div className="mt-1 flex items-start justify-between gap-3">
-              <h1 id="set-title" className="min-w-0 break-words font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              <h1 id="set-title" className="min-w-0 break-words page-h1 page-h1-sm">
                 {name}
               </h1>
               <ShareButton title={name} path={`/${r.region}/sets/${s.slug}`} kind="set" />
@@ -231,7 +231,7 @@ export default async function SetPage({ params }: { params: { region: string; se
 
       <section aria-labelledby="about-set" className="mt-14 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
         <div>
-          <h2 id="about-set" className="font-display text-2xl font-bold tracking-tight sm:text-[28px]">
+          <h2 id="about-set" className="page-h2">
             About {name}
           </h2>
           <div className="mt-4 max-w-2xl space-y-3 leading-7 text-muted">

@@ -43,7 +43,7 @@ export default function GuidesIndex({ params }: { params: { region: string } }) 
       <Breadcrumbs items={[{ href: `/${r.region}`, label: r.name }, { label: "Guides" }]} />
       <header className="max-w-3xl">
         <div className="eyebrow">Guides</div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Sports card hobby box &amp; blaster price guides</h1>
+        <h1 className="mt-2 page-h1">Sports card hobby box &amp; blaster price guides</h1>
         <p className="mt-3 text-lg leading-8 text-muted">
           Plain-English answers to what people ask before they buy sealed sports cards in {r.inName}, with prices from today’s listings at the card shops we
           compare.
@@ -71,7 +71,7 @@ export default function GuidesIndex({ params }: { params: { region: string } }) 
 
       <div className="mt-14 grid gap-10 lg:grid-cols-2">
         <section aria-labelledby="from-blog">
-          <h2 id="from-blog" className="font-display text-xl font-bold tracking-tight">
+          <h2 id="from-blog" className="page-h2">
             From the blog
           </h2>
           <ul role="list" className="mt-4 flex flex-wrap gap-2">
@@ -85,7 +85,7 @@ export default function GuidesIndex({ params }: { params: { region: string } }) 
           </ul>
         </section>
         <section aria-labelledby="by-set">
-          <h2 id="by-set" className="font-display text-xl font-bold tracking-tight">
+          <h2 id="by-set" className="page-h2">
             Newest sets
           </h2>
           <ul role="list" className="mt-4 flex flex-wrap gap-2">

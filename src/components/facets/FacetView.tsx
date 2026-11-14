@@ -105,7 +105,7 @@ export function FacetView({
     <div className="page py-8">
       {!(gridPageHasRoomForFooter(shownCards.length) && shownCards.length >= 12) && <NoPreFooter />}
       <Breadcrumbs items={crumbs} />
-      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 className="page-h1">
         {name} card boxes in {r.inName}
       </h1>
       <p className="mt-3 max-w-3xl leading-7 text-muted">{intro}</p>
@@ -185,7 +185,7 @@ export function FacetView({
         sections.map(({ t, all, shown, soldCount }) => (
           <section key={t.slug} id={`type-${t.slug}`} className="mt-10 scroll-mt-24">
             <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-              <h2 className="font-display text-2xl font-extrabold leading-tight sm:text-[28px]">
+              <h2 className="page-h2">
                 {name} {t.plural}
               </h2>
               <span className="text-sm text-muted">
@@ -206,7 +206,7 @@ export function FacetView({
 
       {releases.length > 1 && (
         <section aria-labelledby="facet-releases" className="mt-14">
-          <h2 id="facet-releases" className="font-display text-2xl font-bold tracking-tight">
+          <h2 id="facet-releases" className="page-h2">
             {name} by release
           </h2>
           <ul className="mt-4 flex flex-wrap gap-2">

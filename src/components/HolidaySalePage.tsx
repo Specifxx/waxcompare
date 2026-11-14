@@ -104,7 +104,7 @@ export async function HolidaySalePage({ event, params }: { event: SaleEvent } & 
         <div className="eyebrow flex items-center gap-1.5 text-brand-strong">
           <Icon name="tag" size={14} /> {name} {year} · {r.name}
         </div>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{copy.h1(r)}</h1>
+        <h1 className="mt-2 page-h1">{copy.h1(r)}</h1>
         <p className="mt-3 leading-7 text-muted">
           {when} Stores set their own prices, so this page doesn’t guess at sales: it ranks the sealed sports card products whose cheapest in-stock price sits furthest under the median of the{" "}
           {r.adjective} stores that have them, from the prices we checked{" "}
@@ -178,7 +178,7 @@ export async function HolidaySalePage({ event, params }: { event: SaleEvent } & 
       {/* THE PRICE WATCH (lib/price-watch.ts, DECISIONS.md 2026-11-06): the high-value end of the market, an eBay search beside every row. */}
       <div id="price-watch" className="mt-14 max-w-3xl">
         <div className="eyebrow">Price watch · {r.name}</div>
-        <h2 className="mt-1 font-display text-2xl font-bold tracking-tight sm:text-[28px]">Sealed, older sets and graded cards to watch</h2>
+        <h2 className="mt-1 page-h2">Sealed, older sets and graded cards to watch</h2>
         <p className="mt-2 text-sm leading-6 text-muted">
           The high-value end of the {r.adjective} market from today&rsquo;s prices, each row with a tagged eBay search beside the store price. eBay sellers set their own
           prices and are never counted as a store or ranked into a comparison; the strips show live listings.
@@ -272,7 +272,7 @@ export async function HolidaySalePage({ event, params }: { event: SaleEvent } & 
       <FamilyCluster kind="deal" region={r.region} />
 
       <section aria-labelledby="season-more" className="mt-14 max-w-3xl">
-        <h2 id="season-more" className="font-display text-2xl font-bold tracking-tight">
+        <h2 id="season-more" className="page-h2">
           More ways to save this season
         </h2>
         <ul className="mt-4 grid gap-2 text-[15px] leading-6 text-muted">
