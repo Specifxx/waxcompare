@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-15T00:31:17.120Z",
+ "generatedAt": "2026-11-15T16:08:34.694Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -288,7 +288,7 @@
    "currency": "CAD",
    "store": "Hope Club Collectibles",
    "image": "https://cdn.shopify.com/s/files/1/0875/0101/3279/files/2026PaniniPrizmBaseballHobbyBox.jpg?v=1789018679",
-   "refCents": 34997,
+   "refCents": 34999,
    "refLabel": "median store price",
    "savingPct": 49
   },
@@ -305,6 +305,20 @@
    "refCents": 9497,
    "refLabel": "median store price",
    "savingPct": 37
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "CA",
+   "title": "2021-22 Donruss Basketball Value Pack",
+   "url": "https://sportscardcompare.com/ca/p/2021-22-donruss-basketball-value-pack",
+   "cents": 1400,
+   "currency": "CAD",
+   "store": "KadOone",
+   "image": "https://cdn.shopify.com/s/files/1/0261/9795/0486/files/2021-22-panini-donruss-basketball-value-box-685.jpg?v=1775003847",
+   "refCents": 2199,
+   "refLabel": "median store price",
+   "savingPct": 36
   },
   {
    "kind": "deal",
@@ -351,16 +365,58 @@
   {
    "kind": "deal",
    "cluster": "cards",
-   "region": "CA",
-   "title": "2026 Donruss Football Blaster Box",
-   "url": "https://sportscardcompare.com/ca/p/2026-donruss-football-blaster-box",
-   "cents": 3294,
-   "currency": "CAD",
-   "store": "Let's Play! Cards and Games!",
-   "image": "https://cdn.shopify.com/s/files/1/0921/7330/files/panini_2026_donruss_nfl_football_blaster_box_653e2.jpg?v=1792820628",
-   "refCents": 4995,
+   "region": "EU",
+   "title": "2026 Topps Chrome UFC Value Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-value-pack",
+   "cents": 1499,
+   "currency": "EUR",
+   "store": "dennistheripper",
+   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsChromeUFC2026ValueBox_c2057a85-a753-4ca8-b95a-b7b1f377adbd.png?v=1778507514",
+   "refCents": 2900,
    "refLabel": "median store price",
-   "savingPct": 34
+   "savingPct": 48
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2025 Topps Signature Class Football Value Box",
+   "url": "https://sportscardcompare.com/eu/p/2025-topps-signature-class-football-value-pack",
+   "cents": 2499,
+   "currency": "EUR",
+   "store": "dennistheripper",
+   "image": "https://cdn.shopify.com/s/files/1/0506/6856/8762/files/Topps-2025-NFL-Signature-Class-Value-Box-282115069.webp?v=1787087986",
+   "refCents": 4495,
+   "refLabel": "median store price",
+   "savingPct": 44
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Chrome UFC Mega Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-mega-box",
+   "cents": 3999,
+   "currency": "EUR",
+   "store": "dennistheripper",
+   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsUFCChrome2026MegaBox.png?v=1778507434",
+   "refCents": 6499,
+   "refLabel": "median store price",
+   "savingPct": 38
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Stadium Club UFC Mega Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-stadium-club-ufc-mega-box",
+   "cents": 3499,
+   "currency": "EUR",
+   "store": "dennistheripper",
+   "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/topps_stadium_club_ufc_mega_box_2026.png?v=1786691740",
+   "refCents": 5500,
+   "refLabel": "median store price",
+   "savingPct": 36
   },
   {
    "kind": "deal",
@@ -389,62 +445,6 @@
    "refCents": 4245,
    "refLabel": "median store price",
    "savingPct": 34
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2026 Topps Chrome Formula 1 Value Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-formula-1-value-pack",
-   "cents": 4300,
-   "currency": "EUR",
-   "store": "PokeFamily",
-   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T124806.079.png?v=1793361008",
-   "refCents": 6499,
-   "refLabel": "median store price",
-   "savingPct": 34
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2026 Topps Chrome UFC Value Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-value-pack",
-   "cents": 2500,
-   "currency": "EUR",
-   "store": "deichcards.de",
-   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsChromeUFC2026ValueBox_c2057a85-a753-4ca8-b95a-b7b1f377adbd.png?v=1778507514",
-   "refCents": 3200,
-   "refLabel": "median store price",
-   "savingPct": 22
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2025 Topps Chrome Football Hobby Box",
-   "url": "https://sportscardcompare.com/eu/p/2025-topps-chrome-football-hobby-box",
-   "cents": 64990,
-   "currency": "EUR",
-   "store": "Spielewelt",
-   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/chromecosmicnfl.jpg?v=1779228130",
-   "refCents": 82245,
-   "refLabel": "median store price",
-   "savingPct": 21
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2026-27 Topps Bundesliga Value Pack",
-   "url": "https://sportscardcompare.com/eu/p/2026-27-topps-bundesliga-value-pack",
-   "cents": 2599,
-   "currency": "EUR",
-   "store": "TobisToys",
-   "image": "https://cdn.shopify.com/s/files/1/0549/6170/1032/files/topps-flagship-bundesliga-2026-27-value-box-01.png?v=1793985447",
-   "refCents": 3245,
-   "refLabel": "median store price",
-   "savingPct": 20
   }
  ]
 }
