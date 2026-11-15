@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-14T15:38:25.404Z",
+ "generatedAt": "2026-11-15T00:31:17.120Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -128,20 +128,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "US",
-   "title": "2024 Panini Prizm Football Mega Box",
-   "url": "https://sportscardcompare.com/us/p/2024-panini-prizm-football-mega-box",
-   "cents": 5995,
-   "currency": "USD",
-   "store": "Trademark Cards & Collectibles",
-   "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/panini_prizm_football_nfl_mega_box_2024_67e05f4a-8ed2-48df-8137-9bd1562851d2.png?v=1739524760",
-   "refCents": 10999,
-   "refLabel": "median store price",
-   "savingPct": 45
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "US",
    "title": "2026 Topps Update Baseball Hanger Box",
    "url": "https://sportscardcompare.com/us/p/2026-topps-update-baseball-hanger-box",
    "cents": 999,
@@ -193,6 +179,20 @@
    "refCents": 2599,
    "refLabel": "median store price",
    "savingPct": 42
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "US",
+   "title": "2026 Panini World Cup Stickers Album",
+   "url": "https://sportscardcompare.com/us/p/2026-panini-world-cup-stickers-album",
+   "cents": 300,
+   "currency": "USD",
+   "store": "RbiCru7 Collectibles",
+   "image": "https://cdn.shopify.com/s/files/1/0552/6467/3901/files/8051708029437_W2026SA_PANINI_20WORLD_20CUP_20STICKERS_202026_20STICKER_20ALBUM_20_282_29_Toyworld.jpg?v=1781589053",
+   "refCents": 500,
+   "refLabel": "median store price",
+   "savingPct": 40
   },
   {
    "kind": "deal",
@@ -282,20 +282,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
-   "title": "2026 Panini Prizm World Cup Blaster Box",
-   "url": "https://sportscardcompare.com/ca/p/2026-panini-prizm-world-cup-blaster-box",
-   "cents": 5595,
-   "currency": "CAD",
-   "store": "Elite Cards Toronto Inc.",
-   "image": "https://cdn.shopify.com/s/files/1/0530/0243/6801/files/panini-2026-prizm-world-cup-npp-blaster-box.png?v=1791897260",
-   "refCents": 10999,
-   "refLabel": "median store price",
-   "savingPct": 49
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "CA",
    "title": "2026 Panini Prizm Baseball Hobby Box",
    "url": "https://sportscardcompare.com/ca/p/2026-panini-prizm-baseball-hobby-box",
    "cents": 17999,
@@ -310,29 +296,15 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
-   "title": "2021-22 Upper Deck Series 1 Hockey Display Box",
-   "url": "https://sportscardcompare.com/ca/p/2021-22-upper-deck-series-1-hockey-display-box",
-   "cents": 4995,
-   "currency": "CAD",
-   "store": "Rémi Card Trader",
-   "image": "https://cdn.shopify.com/s/files/1/0469/6417/9110/products/2021-22UpperDeckSeries1Hockeyretail.jpg?v=1637693725",
-   "refCents": 8999,
-   "refLabel": "median store price",
-   "savingPct": 44
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "CA",
    "title": "2026 Panini Prizm World Cup Mega Box",
    "url": "https://sportscardcompare.com/ca/p/2026-panini-prizm-world-cup-mega-box",
    "cents": 5995,
    "currency": "CAD",
    "store": "Mystic Dragon",
    "image": "https://cdn.shopify.com/s/files/1/0022/6158/1926/files/2-20262-20.webp?v=1789955501",
-   "refCents": 9995,
+   "refCents": 9497,
    "refLabel": "median store price",
-   "savingPct": 40
+   "savingPct": 37
   },
   {
    "kind": "deal",
@@ -365,16 +337,30 @@
   {
    "kind": "deal",
    "cluster": "cards",
-   "region": "EU",
-   "title": "2026 Topps Holiday Football Mega Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-holiday-football-mega-box",
-   "cents": 2790,
-   "currency": "EUR",
-   "store": "POKEMILLON - La Tienda Pokémon",
-   "image": "https://cdn.shopify.com/s/files/1/0483/6543/7089/files/1040489_004_102026.jpg?v=1793233011",
-   "refCents": 4500,
+   "region": "CA",
+   "title": "2021-22 Upper Deck SP Hockey Blaster Box",
+   "url": "https://sportscardcompare.com/ca/p/2021-22-upper-deck-sp-hockey-blaster-box",
+   "cents": 2295,
+   "currency": "CAD",
+   "store": "GamesLand Canada",
+   "image": "https://cdn.shopify.com/s/files/1/0710/6602/6299/files/2021-22-upper-deck-sp-hockey-blaster-box-1263794.jpg?v=1754445470",
+   "refCents": 3499,
    "refLabel": "median store price",
-   "savingPct": 38
+   "savingPct": 34
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "CA",
+   "title": "2026 Donruss Football Blaster Box",
+   "url": "https://sportscardcompare.com/ca/p/2026-donruss-football-blaster-box",
+   "cents": 3294,
+   "currency": "CAD",
+   "store": "Let's Play! Cards and Games!",
+   "image": "https://cdn.shopify.com/s/files/1/0921/7330/files/panini_2026_donruss_nfl_football_blaster_box_653e2.jpg?v=1792820628",
+   "refCents": 4995,
+   "refLabel": "median store price",
+   "savingPct": 34
   },
   {
    "kind": "deal",
@@ -386,9 +372,23 @@
    "currency": "EUR",
    "store": "Q's Cards",
    "image": "https://cdn.shopify.com/s/files/1/0510/3052/4074/files/ToppsChromeFootball_Value.png?v=1776036119",
-   "refCents": 5995,
+   "refCents": 5990,
    "refLabel": "median store price",
    "savingPct": 35
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Holiday Football Mega Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-holiday-football-mega-box",
+   "cents": 2790,
+   "currency": "EUR",
+   "store": "POKEMILLON - La Tienda Pokémon",
+   "image": "https://cdn.shopify.com/s/files/1/0483/6543/7089/files/1040489_004_102026.jpg?v=1793233011",
+   "refCents": 4245,
+   "refLabel": "median store price",
+   "savingPct": 34
   },
   {
    "kind": "deal",
@@ -408,43 +408,43 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
-   "title": "2025 Topps Finest Football Breaker's Delight Box",
-   "url": "https://sportscardcompare.com/eu/p/2025-topps-finest-football-breakers-delight-box",
-   "cents": 79990,
-   "currency": "EUR",
-   "store": "Break Machine",
-   "image": "https://cdn.shopify.com/s/files/1/0837/8033/8001/files/2025-topps-finest-nfl-breakers-delight-box.webp?v=1777980391",
-   "refCents": 114900,
-   "refLabel": "median store price",
-   "savingPct": 30
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
    "title": "2026 Topps Chrome UFC Value Box",
    "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-value-pack",
    "cents": 2500,
    "currency": "EUR",
    "store": "deichcards.de",
    "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsChromeUFC2026ValueBox_c2057a85-a753-4ca8-b95a-b7b1f377adbd.png?v=1778507514",
-   "refCents": 3499,
+   "refCents": 3200,
    "refLabel": "median store price",
-   "savingPct": 29
+   "savingPct": 22
   },
   {
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
-   "title": "2026 Topps Chrome WWE Mega Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-wwe-mega-box",
-   "cents": 6990,
+   "title": "2025 Topps Chrome Football Hobby Box",
+   "url": "https://sportscardcompare.com/eu/p/2025-topps-chrome-football-hobby-box",
+   "cents": 64990,
    "currency": "EUR",
    "store": "Spielewelt",
-   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/wwemegachrome.jpg?v=1773851282",
-   "refCents": 9499,
+   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/chromecosmicnfl.jpg?v=1779228130",
+   "refCents": 82245,
    "refLabel": "median store price",
-   "savingPct": 26
+   "savingPct": 21
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026-27 Topps Bundesliga Value Pack",
+   "url": "https://sportscardcompare.com/eu/p/2026-27-topps-bundesliga-value-pack",
+   "cents": 2599,
+   "currency": "EUR",
+   "store": "TobisToys",
+   "image": "https://cdn.shopify.com/s/files/1/0549/6170/1032/files/topps-flagship-bundesliga-2026-27-value-box-01.png?v=1793985447",
+   "refCents": 3245,
+   "refLabel": "median store price",
+   "savingPct": 20
   }
  ]
 }
