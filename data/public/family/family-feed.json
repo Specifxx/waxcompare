@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-15T16:08:34.694Z",
+ "generatedAt": "2026-11-16T00:36:33.932Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -134,9 +134,9 @@
    "currency": "USD",
    "store": "CARDPOPUSA",
    "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/2026-Topps-Update-Series-MLB-Baseball--Hanger-Box.jpg?v=1792254529",
-   "refCents": 1799,
+   "refCents": 1899,
    "refLabel": "median store price",
-   "savingPct": 44
+   "savingPct": 47
   },
   {
    "kind": "deal",
@@ -338,6 +338,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
+   "title": "2026 Topps Series 2 Baseball Display Box",
+   "url": "https://sportscardcompare.com/ca/p/2026-topps-series-2-baseball-display-box",
+   "cents": 9995,
+   "currency": "CAD",
+   "store": "Cartes Leo",
+   "image": "https://cdn.shopify.com/s/files/1/0699/8736/9247/files/2026-topps-baseball-series-2-display-box-baseball-cards-887521164660-3648361.webp?v=1782555787",
+   "refCents": 15299,
+   "refLabel": "median store price",
+   "savingPct": 35
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "CA",
    "title": "2023-24 SP Game Used Hockey Hobby Box",
    "url": "https://sportscardcompare.com/ca/p/2023-24-sp-game-used-hockey-hobby-box",
    "cents": 15999,
@@ -347,20 +361,6 @@
    "refCents": 24497,
    "refLabel": "median store price",
    "savingPct": 35
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "CA",
-   "title": "2021-22 Upper Deck SP Hockey Blaster Box",
-   "url": "https://sportscardcompare.com/ca/p/2021-22-upper-deck-sp-hockey-blaster-box",
-   "cents": 2295,
-   "currency": "CAD",
-   "store": "GamesLand Canada",
-   "image": "https://cdn.shopify.com/s/files/1/0710/6602/6299/files/2021-22-upper-deck-sp-hockey-blaster-box-1263794.jpg?v=1754445470",
-   "refCents": 3499,
-   "refLabel": "median store price",
-   "savingPct": 34
   },
   {
    "kind": "deal",
