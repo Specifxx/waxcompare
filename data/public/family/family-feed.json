@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-16T00:36:33.932Z",
+ "generatedAt": "2026-11-16T19:11:44.148Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -260,9 +260,9 @@
    "currency": "GBP",
    "store": "Sports Cards Direct",
    "image": "https://cdn.shopify.com/s/files/1/0530/9867/6400/files/BF26_Topps_Premier_League_Stickers_2026_-_Sticker_Tin.png?v=1793966396",
-   "refCents": 1047,
+   "refCents": 1042,
    "refLabel": "median store price",
-   "savingPct": 24
+   "savingPct": 23
   },
   {
    "kind": "deal",
@@ -338,6 +338,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "CA",
+   "title": "2022-23 Upper Deck Series 1 Hockey Display Box",
+   "url": "https://sportscardcompare.com/ca/p/2022-23-upper-deck-series-1-hockey-display-box",
+   "cents": 4995,
+   "currency": "CAD",
+   "store": "Collector's Avenue",
+   "image": "https://cdn.shopify.com/s/files/1/0469/6417/9110/products/2022-23UpperDeckSeries1HockeyRetailBox_1_1.png?v=1667686370",
+   "refCents": 7750,
+   "refLabel": "median store price",
+   "savingPct": 36
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "CA",
    "title": "2026 Topps Series 2 Baseball Display Box",
    "url": "https://sportscardcompare.com/ca/p/2026-topps-series-2-baseball-display-box",
    "cents": 9995,
@@ -347,34 +361,6 @@
    "refCents": 15299,
    "refLabel": "median store price",
    "savingPct": 35
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "CA",
-   "title": "2023-24 SP Game Used Hockey Hobby Box",
-   "url": "https://sportscardcompare.com/ca/p/2023-24-sp-game-used-hockey-hobby-box",
-   "cents": 15999,
-   "currency": "CAD",
-   "store": "Overtime Sportscards",
-   "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/upper_deck_sp_game_used_hockey_hobby_box_2023_2024.png?v=1711818875",
-   "refCents": 24497,
-   "refLabel": "median store price",
-   "savingPct": 35
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2026 Topps Chrome UFC Value Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-value-pack",
-   "cents": 1499,
-   "currency": "EUR",
-   "store": "dennistheripper",
-   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsChromeUFC2026ValueBox_c2057a85-a753-4ca8-b95a-b7b1f377adbd.png?v=1778507514",
-   "refCents": 2900,
-   "refLabel": "median store price",
-   "savingPct": 48
   },
   {
    "kind": "deal",
@@ -389,20 +375,6 @@
    "refCents": 4495,
    "refLabel": "median store price",
    "savingPct": 44
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2026 Topps Chrome UFC Mega Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-mega-box",
-   "cents": 3999,
-   "currency": "EUR",
-   "store": "dennistheripper",
-   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsUFCChrome2026MegaBox.png?v=1778507434",
-   "refCents": 6499,
-   "refLabel": "median store price",
-   "savingPct": 38
   },
   {
    "kind": "deal",
@@ -445,6 +417,34 @@
    "refCents": 4245,
    "refLabel": "median store price",
    "savingPct": 34
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Chrome Formula 1 Value Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-formula-1-value-pack",
+   "cents": 4300,
+   "currency": "EUR",
+   "store": "PokeFamily",
+   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T124806.079.png?v=1793361008",
+   "refCents": 6499,
+   "refLabel": "median store price",
+   "savingPct": 34
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Heritage Football Value Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-heritage-football-value-box",
+   "cents": 1999,
+   "currency": "EUR",
+   "store": "dennistheripper",
+   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T131001.247.png?v=1793362336",
+   "refCents": 2997,
+   "refLabel": "median store price",
+   "savingPct": 33
   }
  ]
 }
