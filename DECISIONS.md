@@ -1663,3 +1663,9 @@ unchanged, and every title, meta description, canonical, robots, Open Graph, JSO
 
 No paid link, ad block, pinned row, affiliate tag or placement name moved, changed or was reworded, so the 19 November
 clicks-per-placement recheck is unaffected. No URL, metadata, revalidate, data read, font or script changed.
+
+## 2026-11-16: A small unpriced "Also on Amazon" line under the product table
+
+The 2026-11-12 rule (Amazon row only with a real price) took Amazon buy clicks to zero on 13 Nov. Not a row: one line under the product page's price
+table, only where the daily ASIN pass matched Amazon's own listing to the product, unpriced, labelled paid, hidden when the priced row shows,
+never the quick view, never pinned, best, a deal or an alert. Placement `amazon-below-table`. `tests/amazon-below-table.test.ts` pins it.
