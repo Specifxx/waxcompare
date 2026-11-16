@@ -1669,3 +1669,7 @@ clicks-per-placement recheck is unaffected. No URL, metadata, revalidate, data r
 The 2026-11-12 rule (Amazon row only with a real price) took Amazon buy clicks to zero on 13 Nov. Not a row: one line under the product page's price
 table, only where the daily ASIN pass matched Amazon's own listing to the product, unpriced, labelled paid, hidden when the priced row shows,
 never the quick view, never pinned, best, a deal or an alert. Placement `amazon-below-table`. `tests/amazon-below-table.test.ts` pins it.
+
+## 2026-11-16: urgent release of the "Also on Amazon" line
+
+Amazon clicks were about 0 a day since 13 Nov. The owner approved one urgent production build (subject carries the urgent marker) so the unpriced matched line goes live now instead of waiting for the next daily release. One build, no previews.
