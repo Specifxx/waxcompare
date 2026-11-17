@@ -770,10 +770,15 @@ export function OfferRowsWithEbay({
   if (EBAY_CAN_BE_BEST && byPrice && allowGiven && bestable && cents != null && cents < low) top = "ebay";
   const ebayRow = <EbayOfferRow key={EBAY_ROW_KEY} region={region} placement={placement} query={query} item={item} cents={cents} age={age} best={top === "ebay"} />;
   type Slot = { key: string; open: boolean; node: ReactNode };
-  const slots: Slot[] = [
+  // Owner, 2026-11-17 (final): eBay first, then TCGplayer, then Amazon (priced, or the unpriced "Check on Amazon" row), all above the
+  // stores, in the quick view too (they are slots, so a row cap never pushes them below "more listings on the full page").
+  const pinSlots: Slot[] = [
     { key: EBAY_ROW_KEY, open: true, node: ebayRow },
-    ...(amazon?.live ? [{ key: amazon.key, open: true, node: <StoreRow key={amazon.key} d={amazon} preorder={preorder} top={false} /> }] : []),
     ...(tcg ? [{ key: tcg.key, open: tcg.open, node: <StoreRow key={tcg.key} d={tcg} preorder={preorder} top={top === "tcg"} /> }] : []),
+    ...(amazon ? [{ key: amazon.key, open: true, node: <StoreRow key={amazon.key} d={amazon} preorder={preorder} top={false} /> }] : []),
+  ];
+  const slots: Slot[] = [
+    ...pinSlots,
     ...rows.map((d) => ({ key: d.key, open: d.open, node: <StoreRow key={d.key} d={d} preorder={preorder} top={top === "store" && d === store} /> })),
   ];
   const { shown, moreOpen, moreClosed } = splitRows(slots);
@@ -797,8 +802,6 @@ export function OfferRowsWithEbay({
         <ul className="divide-y divide-line">{list(shown)}</ul>
         {moreOpen.length > 0 && more(moreOpenLabel(moreOpen, preorder), moreOpen)}
         {moreClosed.length > 0 && more(moreClosedLabel(moreClosed.length, shown.some((r) => !r.open)), moreClosed)}
-        {/* No Amazon price: the unpriced "Check on Amazon" row, an ordinary last row (owner, 2026-11-17), never pinned and always shown */}
-        {amazon && !amazon.live && <ul className="divide-y divide-line border-t border-line"><StoreRow key={amazon.key} d={amazon} preorder={preorder} top={false} /></ul>}
       </div>
     </div>
   );
