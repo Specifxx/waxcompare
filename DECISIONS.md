@@ -1710,3 +1710,16 @@ brands) keep the import time. No URL, page, metadata or data read changed. Rides
 The Amazon audit found `status-uk.json` "InvalidAssociate" here while DexCompare, KaeYoung, Scent, Figure and Wargame read the UK as ok: the
 import workflow passed only the AU and US credentials. It now passes the CA, UK and EU ones too (each from its own Associates account; a
 region with no secret stays refused, as before). No secrets are handled here: they are set by the owner's PowerShell script.
+
+## 2026-11-17: Fiverr first-time-shopper review of DexCompare, applied here (owner)
+
+The owner bought a professional first-time-shopper QA review of DexCompare (the engine this site shares) and asked for every finding to
+reach every site. Applied here (reasoning in DexCompare's DECISIONS.md, same date):
+
+- **An eBay ad is never "Best price".** `EBAY_CAN_BE_BEST = false` (`lib/ebay-offer-row.ts`): the table badge, the best-price card and the sticky bar
+  name the cheapest store (or TCGplayer when cheaper); eBay stays at the top as a labelled ad with its real price. Set the constant true to roll back.
+- **A total on every row that charges postage:** `ShipCell.total` ("≈ $X total" / "from $X total"), also under the quick view headline.
+- **Cart hand-off:** the drawer opens with "You pay each store on its own site. We never take payment."; "Estimated total (before postage)".
+  The label stays "Add to cart" (owner, 2026-11-14).
+- **The quick view sets the tab title and description while open;** CSP (report-only) frame-src gained the Google ad-quality hosts.
+  Not applied here: the banner-pair and eBay-tile-floor changes (this site has neither the same banners nor the median floor).
