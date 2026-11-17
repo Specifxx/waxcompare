@@ -10,6 +10,7 @@ import { activeStoreKeys } from "@/lib/hub-data";
 import { detailIndexed, MIN_HUB_PRODUCTS, productInSitemap } from "@/lib/index-tiers";
 import { regionOfSitemapId, SITEMAP_IDS, STATIC_SITEMAP_ID, regionSitemap, staticSitemap } from "@/lib/sitemap";
 import { REGION_LIST, type Market } from "@/lib/regions";
+import { productLastmods, readPriceHistory } from "@/lib/price-history";
 import { thinSections } from "@/lib/section-thin";
 
 export const revalidate = 86400;
@@ -52,7 +53,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       lastImport(r.market),
       taggedProducts(r.market).then(facetSitemapKeys),
     ]);
-    return regionSitemap(r, { typeLabels, setCodes, productSlugs, lastmod, facets });
+    return regionSitemap(r, { typeLabels, setCodes, productSlugs, lastmod, facets, productLastmod: productLastmods(readPriceHistory(), r.market) });
   } catch (e) {
     if (process.env.NEXT_PHASE === "phase-production-build") {
       console.error(`sitemap/${n}: database unavailable at build (${(e as Error).message}); written without products until the first refresh.`);
