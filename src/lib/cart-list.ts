@@ -21,8 +21,8 @@
 // prices should function exactly like a normal store price row. So you can also add to
 // cart"): they add manual lines, grouped as one "store" per eBay / Amazon domain.
 // Amazon's licence lets a price be kept 24 hours, so an Amazon line's price is dropped
-// after AMAZON_PRICE_TTL_MS (priceCents 0 = "see the price on Amazon"). TCGplayer and
-// Cardmarket stay references, never lines.
+// after AMAZON_PRICE_TTL_MS (priceCents 0 = "see the price on Amazon"). Cardmarket
+// stays a reference, never a line.
 //
 // Pure apart from the guarded localStorage/window helpers at the bottom.
 
@@ -117,19 +117,22 @@ export function storeHost(input: { href: string; productUrl?: string | null }): 
 }
 
 /**
- * TCGplayer and Cardmarket are references, never a cart line. eBay and Amazon rows are
- * (manual lines on their tagged links, owner 2026-11-06), still never counted as a store.
+ * Cardmarket is a reference, never a cart line. TCGplayer, eBay and Amazon rows are (manual lines on their tagged links; owner 2026-11-06
+ * for eBay and Amazon, 2026-11-16 and 2026-11-17 for TCGplayer, priced or a search row), still never counted as a store.
  */
-const MARKETPLACE = /(?:^|\.)(?:tcgplayer|cardmarket)(?:\.|$)/i;
+const MARKETPLACE = /(?:^|\.)cardmarket(?:\.|$)/i;
 
 export function isMarketplace(host: string | null | undefined): boolean {
   return !!host && MARKETPLACE.test(host);
 }
 
-/** Build the line a row adds, or null when the row has no usable link or price. */
+/**
+ * Build the line a row adds, or null when the row has no usable link. A priceCents of 0 is a row with no price (an eBay or TCGplayer
+ * search row, an Amazon link): the line opens that row's own tagged link and says "See today's price" (owner, 2026-11-17: every row gets Add to cart).
+ */
 export function makeLine(input: CartAddInput, now = new Date()): CartLine | null {
   const store = storeHost(input);
-  if (!store || isMarketplace(store) || isMarketplace(hostOf(input.href)) || !input.title || !Number.isFinite(input.priceCents) || input.priceCents <= 0) return null;
+  if (!store || isMarketplace(store) || isMarketplace(hostOf(input.href)) || !input.title || !Number.isFinite(input.priceCents) || input.priceCents < 0) return null;
   // eBay and Amazon are never a Shopify checkout, whatever the link looks like.
   const cart = /^(?:ebay|amazon)\./.test(store) ? null : cartTarget(input.href);
   const id = cart ? `${store}:v:${cart.variantId}` : `${store}:u:${input.productUrl || input.href}`;
