@@ -772,7 +772,7 @@ export function OfferRowsWithEbay({
   type Slot = { key: string; open: boolean; node: ReactNode };
   const slots: Slot[] = [
     { key: EBAY_ROW_KEY, open: true, node: ebayRow },
-    ...(amazon ? [{ key: amazon.key, open: true, node: <StoreRow key={amazon.key} d={amazon} preorder={preorder} top={false} /> }] : []),
+    ...(amazon?.live ? [{ key: amazon.key, open: true, node: <StoreRow key={amazon.key} d={amazon} preorder={preorder} top={false} /> }] : []),
     ...(tcg ? [{ key: tcg.key, open: tcg.open, node: <StoreRow key={tcg.key} d={tcg} preorder={preorder} top={top === "tcg"} /> }] : []),
     ...rows.map((d) => ({ key: d.key, open: d.open, node: <StoreRow key={d.key} d={d} preorder={preorder} top={top === "store" && d === store} /> })),
   ];
@@ -797,6 +797,8 @@ export function OfferRowsWithEbay({
         <ul className="divide-y divide-line">{list(shown)}</ul>
         {moreOpen.length > 0 && more(moreOpenLabel(moreOpen, preorder), moreOpen)}
         {moreClosed.length > 0 && more(moreClosedLabel(moreClosed.length, shown.some((r) => !r.open)), moreClosed)}
+        {/* No Amazon price: the unpriced "Check on Amazon" row, an ordinary last row (owner, 2026-11-17), never pinned and always shown */}
+        {amazon && !amazon.live && <ul className="divide-y divide-line border-t border-line"><StoreRow key={amazon.key} d={amazon} preorder={preorder} top={false} /></ul>}
       </div>
     </div>
   );
