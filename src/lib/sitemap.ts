@@ -129,6 +129,11 @@ export interface RegionSitemapData {
   /** Slugs of the market's comparable products (data.ts COMPARABLE). */
   productSlugs: Iterable<string>;
   lastmod: Date | null;
+  /**
+   * Product slug → the day its cheapest in-stock price or stock count last changed (lib/price-history.ts `productLastmods`). A product
+   * page's lastmod is this, never the import time (DECISIONS.md, 2026-11-17); a product with no history has none.
+   */
+  productLastmod?: ReadonlyMap<string, Date>;
   /** The sport, brand and sport-and-brand pages with enough comparable products (lib/facet-data.ts facetSitemapKeys; sports are Sport keys). */
   facets?: { sports: Iterable<string>; brands: Iterable<string>; combos: Iterable<string> };
 }
@@ -149,7 +154,7 @@ export function regionSitemap(r: RegionInfo, d: RegionSitemapData): MetadataRout
   }
   const codes = new Set(d.setCodes);
   for (const s of SETS) if (codes.has(s.code)) out.push(url(`/${r.region}/sets/${s.slug}`, d.lastmod, "daily", 0.6));
-  for (const slug of d.productSlugs) out.push(url(`/${r.region}/p/${slug}`, d.lastmod, "daily", 0.7));
+  for (const slug of d.productSlugs) out.push(url(`/${r.region}/p/${slug}`, d.productLastmod?.get(slug), "daily", 0.7));
   return out;
 }
 

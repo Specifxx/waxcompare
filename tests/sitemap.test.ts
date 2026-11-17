@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { productLastmods, updatePriceHistory } from "../src/lib/price-history";
 import { REGION_LIST, REGIONS } from "../src/lib/regions";
 import { regionOfSitemapId, regionSitemap, SITEMAP_IDS, sitemapIdOf, STATIC_SITEMAP_ID, staticSitemap } from "../src/lib/sitemap";
 import { SITE_URL } from "../src/lib/site";
@@ -119,4 +120,18 @@ test("the creators hub is in the sitemap, linked from the footer, and no longer 
   const rules = await cfg.redirects();
   assert.ok(!rules.some((r) => r.destination === "/about" && /creators/.test(r.source)), "/creators is a page, not a redirect");
   assert.ok(rules.some((r) => r.source === "/creators/:rest+" && r.destination === "/creators"));
+});
+
+test("region sitemap: a product's lastmod is its last price change, never the import time; no history, no lastmod", () => {
+  const h = updatePriceHistory(null, [{ market: "US", slug: "a-box", cents: 1000, stores: 1 }], 20764);
+  const h2 = updatePriceHistory(h, [{ market: "US", slug: "a-box", cents: 900, stores: 1 }], 20766);
+  const day = productLastmods(h2, "US");
+  assert.deepEqual(day.get("a-box"), new Date(20766 * 86_400_000));
+  assert.equal(productLastmods(null, "US").size, 0);
+  const imp = new Date("2026-11-17T03:00:00Z");
+  const e = regionSitemap(REGIONS.us, { typeLabels: ["Hobby Box"], setCodes: [], productSlugs: ["a-box", "b-box"], lastmod: imp, productLastmod: day });
+  const at = (u: string) => e.find((x) => x.url.endsWith(u))!;
+  assert.deepEqual(at("/p/a-box").lastModified, new Date(20766 * 86_400_000));
+  assert.equal(at("/p/b-box").lastModified, undefined);
+  assert.deepEqual(at("/type/hobby-boxes").lastModified, imp, "hubs keep the import time");
 });
