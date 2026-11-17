@@ -1704,3 +1704,9 @@ Every product URL in the regional sitemaps carried the market's last import time
 (Grok growth report, sitemap churn). A product's lastmod is now the day of its last change-point in `data/public/price-history.json`
 (cheapest in-stock price or stock count; `productLastmods`), and a product with no history has none. Hub pages (types, sets, sports,
 brands) keep the import time. No URL, page, metadata or data read changed. Rides the daily release.
+
+## 2026-11-17: the ASIN pass gets the UK, Canada and EU credentials
+
+The Amazon audit found `status-uk.json` "InvalidAssociate" here while DexCompare, KaeYoung, Scent, Figure and Wargame read the UK as ok: the
+import workflow passed only the AU and US credentials. It now passes the CA, UK and EU ones too (each from its own Associates account; a
+region with no secret stays refused, as before). No secrets are handled here: they are set by the owner's PowerShell script.
