@@ -15,5 +15,7 @@ test("searching another game: the other six card-game sites' own searches, never
   assert.deepEqual(familySearchLinks("  "), []);
   const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8");
   assert.match(read("src/components/FamilySearch.tsx"), /rel="noopener nofollow"/);
-  assert.match(read("src/components/BrowseGrid.tsx"), /\{qOn && <FamilySearch q=\{q\}/);
+  // 2026-11-17 (Grok growth report, item 9): sports cards is on the other side of the network from the card sites, so its
+  // search results no longer offer their searches.
+  assert.doesNotMatch(read("src/components/BrowseGrid.tsx"), /<FamilySearch/);
 });
