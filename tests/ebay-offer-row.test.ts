@@ -113,7 +113,7 @@ test("pinned rows: eBay first, Amazon second (owner, 2026-11-06), then the store
   const us = render(React.createElement(OfferTable, { offers, region: "us", preorder: false, ebay: { slug: "x", query: "X", floor: null, packs: null }, pinned: { productName: "X", tcgplayer: null } }));
   const rows = [...us.matchAll(/<li data-offer-row=""([^>]*)>/g)].map((m) => m[1]);
   assert.equal(rows.length, 4, "eBay, Check on Amazon and two stores");
-  // Owner, 2026-11-17: affiliated rows at the top (unpriced here, so eBay then Amazon), then the cheapest store, then the rest.
+  // Owner, 2026-11-17 (final): eBay, then Amazon, then the cheapest store, then the rest.
   assert.match(rows[0], /data-ad="listings-offer-row"/);
   assert.match(rows[1], /data-row="amazon"/);
   assert.match(rows[2], /or-hl/, "the cheapest store, highlighted");

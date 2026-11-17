@@ -11,5 +11,5 @@ test("Amazon (priced or the unpriced Check row) is an affiliated row at the top 
   const e = readFileSync(new URL("../src/components/EbayStrip.tsx", import.meta.url), "utf8");
   assert.match(e, /\.\.\.\(amazon \? \[\{ key: amazon\.key/);
   assert.doesNotMatch(e, /amazon && !amazon\.live &&/);
-  assert.match(e, /\.\.\.pins\.filter\(\(x\) => x\.cents !== null\)\.sort\(\(x, y\) => x\.cents! - y\.cents!\)/);
+  assert.match(e, /const pinSlots: Slot\[\] = \[\s+\{ key: EBAY_ROW_KEY/);
 });
