@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-16T19:11:44.148Z",
+ "generatedAt": "2026-11-17T03:22:14.644Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -86,6 +86,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "AU",
+   "title": "2025-26 Topps Match Attax UEFA Club Competitions Display Box",
+   "url": "https://sportscardcompare.com/au/p/2025-26-topps-match-attax-uefa-club-competitions-display-box",
+   "cents": 8045,
+   "currency": "AUD",
+   "store": "Gameology",
+   "image": "https://cdn.shopify.com/s/files/1/0498/2122/1019/files/Topps_Match_Attax_UCC_2025_26_Booster_Box.png?v=1764247407",
+   "refCents": 12999,
+   "refLabel": "median store price",
+   "savingPct": 38
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "AU",
    "title": "2025 Panini Select Football Blaster Box",
    "url": "https://sportscardcompare.com/au/p/2025-panini-select-football-blaster-box",
    "cents": 4000,
@@ -95,20 +109,6 @@
    "refCents": 6373,
    "refLabel": "median store price",
    "savingPct": 37
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "AU",
-   "title": "2024 Panini Prizm Golf Blaster Box",
-   "url": "https://sportscardcompare.com/au/p/2024-panini-prizm-golf-blaster-box",
-   "cents": 4500,
-   "currency": "AUD",
-   "store": "FastBreak Cards & Collectables",
-   "image": "https://cdn.shopify.com/s/files/1/0921/7330/files/Panini-2024-Prizm-LIV-Golf-Blaster.png?v=1758516183",
-   "refCents": 6999,
-   "refLabel": "median store price",
-   "savingPct": 36
   },
   {
    "kind": "deal",
@@ -380,20 +380,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
-   "title": "2026 Topps Stadium Club UFC Mega Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-stadium-club-ufc-mega-box",
-   "cents": 3499,
-   "currency": "EUR",
-   "store": "dennistheripper",
-   "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/topps_stadium_club_ufc_mega_box_2026.png?v=1786691740",
-   "refCents": 5500,
-   "refLabel": "median store price",
-   "savingPct": 36
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
    "title": "2025 Topps Chrome Football Value Box",
    "url": "https://sportscardcompare.com/eu/p/2025-topps-chrome-football-value-pack",
    "cents": 3900,
@@ -443,6 +429,20 @@
    "store": "dennistheripper",
    "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T131001.247.png?v=1793362336",
    "refCents": 2997,
+   "refLabel": "median store price",
+   "savingPct": 33
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Heritage Football Mega Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-heritage-football-mega-box",
+   "cents": 3999,
+   "currency": "EUR",
+   "store": "dennistheripper",
+   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-11-02T150118.466.png?v=1793628154",
+   "refCents": 5990,
    "refLabel": "median store price",
    "savingPct": 33
   }
