@@ -1683,3 +1683,17 @@ From sm up the price row's badges wrap under the name instead of squeezing it (`
 Owner: "even if there are no Amazon prices available, we should have an option to check on Amazon in our price rows." The unpriced search
 row returns whenever the region has an Amazon tag: an ordinary row at the END of the list, product page and quick view, never pinned,
 ranked or the best price. A priced Amazon row still pins. The below-table line of 2026-11-16 is removed (it would duplicate the row).
+
+## 2026-11-17: URL freeze, and two sides of the network, one footer link
+
+Owner, from the Grok growth report (items 5 and 9): stop the sitewide cross-links between the sites, and freeze URLs.
+The network now has two sides (`TCG_SIDE`, `sameSide`, `isTcgSide` in `src/lib/family-network.ts`, the same file in every repo): the
+card-game and wargame sites on one, perfume, K-beauty, car parts, cameras, figures, sports cards and tech on the other. `clusterSisters`
+and `footerSisters` return same-side sites only, so deal and pre-order tiles, the data jobs' copied feeds and the `/our-sites` (or
+`/network`) list never cross. The footer keeps its single link to `/our-sites`; the "Every Compare Empire site" link to
+compareempire.com is gone from the card sites. SportsCardCompare is on the other side from the card sites (its search results no
+longer offer their searches). Where this repo had a repeated block of sister links (a blog "Also from us" aside, "Compare other TCGs"
+on every card page, non-card sisters in `SITE.sisterSites`) it is removed. A contextual link from a guide to another game stays.
+DexCompare's links read dexcompare.io (the old host is still accepted in a feed until Dex republishes). Not changed: price alerts,
+`alert-feed.json`, the family feeds and the sister data reads: they are data, not links. Also a "URL freeze" rule in CLAUDE.md:
+no mass path change without a redirect map, agents never flip hosts, no pop-unders or surprise navigation (this repo had none).

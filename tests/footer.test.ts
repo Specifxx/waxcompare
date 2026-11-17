@@ -10,8 +10,8 @@ test("footer: one link to /our-sites, which lists every other site once by name 
   assert.match(footer, /href="\/our-sites"/);
   assert.doesNotMatch(footer, /footerSisters|NETWORK_PAGE|https?:\/\//, "no external site links in the footer");
   const page = src("src/app/(site)/our-sites/page.tsx");
-  assert.match(page, /FAMILY_SITES\.filter\(\(s\) => s\.id !== "wax"\)/);
+  assert.match(page, /FAMILY_SITES\.filter\(\(s\) => s\.id !== "wax" && sameSide\("wax", s\.id\)\)/);
   assert.match(page, /rel="noopener"/);
   assert.doesNotMatch(page, /nofollow|sponsored/);
-  assert.ok(footerSisters("wax").length > 0, "the shared helper still exists for the other sites");
+  assert.deepEqual(footerSisters("wax"), [], "sports cards sit on the other side of the network from the card sites");
 });
