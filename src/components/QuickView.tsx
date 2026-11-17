@@ -121,6 +121,23 @@ export function QuickView() {
     };
   }, []);
 
+  // The tab's title and description follow the product while its quick view is open (Fiverr review F8, 2026-11-17: the tab still said
+  // "All Pokémon sealed products"); both go back on close. Only the browser's document is touched, never the server's HTML.
+  const titleName = (data && data !== "loading" ? data.name : "") || head?.name || "";
+  useEffect(() => {
+    if (!head || !titleName) return;
+    const prevTitle = document.title;
+    const suffix = prevTitle.includes(" | ") ? prevTitle.slice(prevTitle.lastIndexOf(" | ")) : "";
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    const prevDesc = meta?.content;
+    document.title = `${titleName} prices${suffix}`;
+    if (meta) meta.content = `Compare every store's price for ${titleName}, cheapest first.`;
+    return () => {
+      document.title = prevTitle;
+      if (meta && prevDesc != null) meta.content = prevDesc;
+    };
+  }, [head, titleName]);
+
   useEffect(() => {
     if (!head) return;
     const prev = document.body.style.overflow;

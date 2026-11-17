@@ -707,7 +707,7 @@ export function useEbayPick({ region, slug, floor, packs, placement }: { region:
 
 // The price table's split into visible rows and collapsed groups, and its store rows (imported here, beside the two functions that use
 // them; OfferTable.tsx imports this module too, which is fine: neither uses the other while the modules load).
-import { EBAY_ROW_KEY, moreClosedLabel, moreOpenLabel, splitRows } from "@/lib/ebay-offer-row";
+import { EBAY_CAN_BE_BEST, EBAY_ROW_KEY, moreClosedLabel, moreOpenLabel, splitRows } from "@/lib/ebay-offer-row";
 import { PIN_OUTLINE, ROW_ACTIONS, ROW_BUTTON_LINK, ROW_GRID, StoreRow, useRankedRows, type StoreRowData } from "./OfferRows";
 import { StockPill } from "./StockPill";
 import { StoreVote } from "./StoreVote";
@@ -767,7 +767,7 @@ export function OfferRowsWithEbay({
     top = "tcg";
     low = tcg.cents;
   }
-  if (byPrice && allowGiven && bestable && cents != null && cents < low) top = "ebay";
+  if (EBAY_CAN_BE_BEST && byPrice && allowGiven && bestable && cents != null && cents < low) top = "ebay";
   const ebayRow = <EbayOfferRow key={EBAY_ROW_KEY} region={region} placement={placement} query={query} item={item} cents={cents} age={age} best={top === "ebay"} />;
   type Slot = { key: string; open: boolean; node: ReactNode };
   const slots: Slot[] = [

@@ -315,7 +315,6 @@ export default async function ProductPage({ params }: { params: { region: string
     p.offers.some((o) => o.marketplace)
       ? "Prices exclude shipping (each row shows the store’s measured shipping where we have it). Check the store’s own page before you buy."
       : "Store prices exclude shipping (each row shows the store’s measured shipping where we have it); check the store before you buy.",
-    ...(ebayBest && best ? ["An eBay listing shown as the best price is one seller’s, imported from eBay on a schedule; its shipping is beside its price, and eBay’s page is final."] : []),
     ...(packs != null ? ["Per-pack prices are the listed price divided by the packs the product holds."] : []),
     ...(msrp != null ? [RRP_NOTE] : []),
   ];
