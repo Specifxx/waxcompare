@@ -132,6 +132,19 @@ export function typicalPrice(h: PriceHistory, market: string, slug: string, days
   return vals.length % 2 ? vals[mid] : Math.round((vals[mid - 1] + vals[mid]) / 2);
 }
 
+/**
+ * Slug → the day the product's cheapest in-stock price or stock count last changed in the market (its last change-point), for the
+ * sitemap's lastmod. A product with no series is absent: no history, no lastmod, never the import time.
+ */
+export function productLastmods(h: PriceHistory | null, market: string): Map<string, Date> {
+  const out = new Map<string, Date>();
+  for (const [slug, pts] of Object.entries(h?.series[market] ?? {})) {
+    const last = pts[pts.length - 1];
+    if (last) out.set(slug, new Date(last[0] * 86_400_000));
+  }
+  return out;
+}
+
 /** Is this a history file we can read? */
 export function isPriceHistory(x: unknown): x is PriceHistory {
   const h = x as PriceHistory;

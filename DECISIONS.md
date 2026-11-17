@@ -1697,3 +1697,10 @@ on every card page, non-card sisters in `SITE.sisterSites`) it is removed. A con
 DexCompare's links read dexcompare.io (the old host is still accepted in a feed until Dex republishes). Not changed: price alerts,
 `alert-feed.json`, the family feeds and the sister data reads: they are data, not links. Also a "URL freeze" rule in CLAUDE.md:
 no mass path change without a redirect map, agents never flip hosts, no pop-unders or surprise navigation (this repo had none).
+
+## 2026-11-17: Product sitemap lastmod is the day the price last changed, not the import time
+
+Every product URL in the regional sitemaps carried the market's last import time, so all ~1,300 changed daily whether or not anything did
+(Grok growth report, sitemap churn). A product's lastmod is now the day of its last change-point in `data/public/price-history.json`
+(cheapest in-stock price or stock count; `productLastmods`), and a product with no history has none. Hub pages (types, sets, sports,
+brands) keep the import time. No URL, page, metadata or data read changed. Rides the daily release.

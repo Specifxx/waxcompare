@@ -394,6 +394,7 @@ export const TCGPLAYER_IMPACT_LINK = process.env.NEXT_PUBLIC_TCGPLAYER_IMPACT_LI
 export const IMPACT_SITE_VERIFICATIONS: readonly string[] = [
   "ebb0400c-dec0-45ae-a56e-e7bb1596e965",
   "a11ca5e9-2699-42c9-bf8d-09074aae9cec", // SportsCardCompare's own Impact property (the old singles site rendered it)
+  "c144e1aa-a370-4567-a7ee-755dfa81405e", // sportscardcompare.com, re-added to Impact 2026-11-17
 ];
 
 // TCGPLAYER.key in stores.ts. Not imported from there: stores.ts pulls in the
