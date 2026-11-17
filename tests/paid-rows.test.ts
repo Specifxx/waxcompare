@@ -4,11 +4,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-test("the unpriced Amazon row is an ordinary last row; a priced one stays pinned", () => {
+test("Amazon (priced or the unpriced Check row) is an affiliated row at the top (owner, 2026-11-17)", () => {
   const t = readFileSync(new URL("../src/components/OfferTable.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(t, /if \(!live\?\.cents \|\| !live\.at \|\| !clock\) return null;/);
   assert.match(t, /Check on Amazon/);
   const e = readFileSync(new URL("../src/components/EbayStrip.tsx", import.meta.url), "utf8");
-  assert.match(e, /amazon\?\.live \? \[\{ key: amazon\.key/);
-  assert.match(e, /amazon && !amazon\.live &&/);
+  assert.match(e, /\.\.\.\(amazon \? \[\{ key: amazon\.key/);
+  assert.doesNotMatch(e, /amazon && !amazon\.live &&/);
+  assert.match(e, /\.\.\.pins\.filter\(\(x\) => x\.cents !== null\)\.sort\(\(x, y\) => x\.cents! - y\.cents!\)/);
 });

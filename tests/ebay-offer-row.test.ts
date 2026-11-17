@@ -112,10 +112,11 @@ test("pinned rows: eBay first, Amazon second (owner, 2026-11-06), then the store
   const offers = [offer("alpha", 5000), offer("beta", 6000)];
   const us = render(React.createElement(OfferTable, { offers, region: "us", preorder: false, ebay: { slug: "x", query: "X", floor: null, packs: null }, pinned: { productName: "X", tcgplayer: null } }));
   const rows = [...us.matchAll(/<li data-offer-row=""([^>]*)>/g)].map((m) => m[1]);
-  assert.equal(rows.length, 4, "the unpriced Check on Amazon row is the ordinary last row (owner, 2026-11-17)");
+  assert.equal(rows.length, 4, "eBay, Check on Amazon and two stores");
+  // Owner, 2026-11-17: affiliated rows at the top (unpriced here, so eBay then Amazon), then the cheapest store, then the rest.
   assert.match(rows[0], /data-ad="listings-offer-row"/);
-  assert.match(rows[3], /data-row="amazon"/);
-  assert.match(rows[1], /or-hl/, "the cheapest store, highlighted");
+  assert.match(rows[1], /data-row="amazon"/);
+  assert.match(rows[2], /or-hl/, "the cheapest store, highlighted");
   assert.doesNotMatch(us, /data-row="tcgplayer"|TCGplayer sellers|tcgplayer\.com/);
   assert.equal([...us.matchAll(/class="btn-primary/g)].length, 1, "the cheapest store keeps the one red button");
   // outside the US too, whatever match is passed
