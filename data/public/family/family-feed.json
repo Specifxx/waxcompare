@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-18T02:53:44.969Z",
+ "generatedAt": "2026-11-18T17:48:57.987Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -198,20 +198,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "UK",
-   "title": "2026-27 Topps Basketball Value Pack",
-   "url": "https://sportscardcompare.com/uk/p/2026-27-topps-basketball-value-pack",
-   "cents": 500,
-   "currency": "GBP",
-   "store": "Sports Cards Direct",
-   "image": "https://cdn.shopify.com/s/files/1/0598/2244/0600/files/Topps_Flagship_Basketball_2026-27-Value_Box.jpg?v=1793615275",
-   "refCents": 1000,
-   "refLabel": "median store price",
-   "savingPct": 50
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "UK",
    "title": "2025 Topps Chrome Football Blaster Box",
    "url": "https://sportscardcompare.com/uk/p/2025-topps-chrome-football-blaster-box",
    "cents": 3000,
@@ -226,29 +212,15 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "UK",
-   "title": "2026-27 Topps Basketball Hanger Box",
-   "url": "https://sportscardcompare.com/uk/p/2026-27-topps-basketball-hanger-box",
-   "cents": 1699,
-   "currency": "GBP",
-   "store": "Sports Cards Direct",
-   "image": "https://cdn.shopify.com/s/files/1/0782/4094/0356/files/topps_flagship_nba_hanger_box_2026_2027.png?v=1793113817",
-   "refCents": 2500,
-   "refLabel": "median store price",
-   "savingPct": 32
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "UK",
    "title": "2026 Topps Premier League Stickers Value Pack",
    "url": "https://sportscardcompare.com/uk/p/2026-topps-premier-league-stickers-value-pack",
-   "cents": 419,
+   "cents": 429,
    "currency": "GBP",
    "store": "Zatu Games",
    "image": "https://cdn.shopify.com/s/files/1/0530/9867/6400/files/ToppsPremierLeagueOfficialStickers2026_Multipack.png?v=1767880044",
    "refCents": 595,
    "refLabel": "median store price",
-   "savingPct": 30
+   "savingPct": 28
   },
   {
    "kind": "deal",
@@ -277,6 +249,34 @@
    "refCents": 249,
    "refLabel": "median store price",
    "savingPct": 20
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "UK",
+   "title": "2025-26 Topps Hoops Basketball Jumbo Box",
+   "url": "https://sportscardcompare.com/uk/p/2025-26-topps-hoops-basketball-jumbo-box",
+   "cents": 40000,
+   "currency": "GBP",
+   "store": "Sports Cards Direct",
+   "image": "https://cdn.shopify.com/s/files/1/0530/9867/6400/files/BF26_Topps_NBA_Hoops_2025-26_Jumbo_Box.png?v=1793966500",
+   "refCents": 49500,
+   "refLabel": "median store price",
+   "savingPct": 19
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "UK",
+   "title": "2025 Topps Chrome Football Hobby Box",
+   "url": "https://sportscardcompare.com/uk/p/2025-topps-chrome-football-hobby-box",
+   "cents": 50000,
+   "currency": "GBP",
+   "store": "Sports Cards Direct",
+   "image": "https://cdn.shopify.com/s/files/1/0625/5168/7410/files/chromecosmicnfl.jpg?v=1779228130",
+   "refCents": 60000,
+   "refLabel": "median store price",
+   "savingPct": 17
   },
   {
    "kind": "deal",
