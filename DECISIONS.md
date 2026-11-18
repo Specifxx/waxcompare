@@ -1897,3 +1897,13 @@ sitting on top of it.
   `var(--bn-space)` + a small gap up, and the body's bottom padding follows it. Hidden, it slides fully off-screen (transform only, CLS 0).
 - **Measured** (local build, dock stacked): Pixel 7 412×915 nav + dock take 129px (14.1%); iPhone 15 393×852 with a 34px safe area
   143px (16.8%); iPhone SE 375×667 129px (19.3%); the old flush bar took about the same plus the full safe area.
+
+## Ads below content, cross-site block off, shorter footer, who runs it (2026-11-19)
+
+Owner, 2026-11-19 (core-update quality pass): "all the ads that can negatively impact our indexing let's remove and have
+more strategically placed ads". The landing page's eBay banner moves from straight under the hero to below the region's
+products; region, product and set pages already placed their one block after the content. `FamilyCluster` is off
+(`CROSS_SITE_BLOCKS`); the one family link is the footer's `/our-sites`. The footer's SportsCardCompare column is 8 links
+(was 14), Explore 8 (was 17) and Guides the region's newest six. The about page says who runs it (Bill and George), how
+AI tools are used, and what the group costs (about A$790 a month, our books, 30 days to 15 Nov 2026). Kept: the phone
+dock. `tests/shop-menu.test.ts` "nothing is a pre-order without an announced date" fails on `main` too (date-driven).

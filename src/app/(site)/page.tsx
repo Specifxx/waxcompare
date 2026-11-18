@@ -120,13 +120,6 @@ export default async function Landing() {
         </div>
       </section>
 
-      {/* The eBay banner (owner, 2026-11-03), side by side straight under the hero (the featured-creators strip sat under the paragraph below
-          (2026-10-30 to 2026-11-03; /creators is now the hero's button). Real listings and products, labelled Ad; nothing moves when
-          the eBay half arrives or the region changes. */}
-      <div className="page mt-8 max-w-5xl">
-        <LandingAds tcg={tcgTiles} />
-      </div>
-
       {/* The owner's short landing page (2026-10-25, DECISIONS.md): one paragraph on how it is fair, the region's five, the hot
           buttons, the footer. The long text, the FAQ, the regions and what we compare live on /about; the guides on each region's
           guides index; the market report on each region home. Everything here is server-rendered. */}
@@ -155,6 +148,11 @@ export default async function Landing() {
 
       <div className="mb-10 mt-10">
         <HomeRegionGrid initial={initialPicks} />
+      </div>
+      {/* The eBay banner, below the products (owner, 2026-11-19: ads that can hurt indexing out, the rest placed lower; it sat straight
+          under the hero from 2026-11-03). Real listings and products, labelled Ad; nothing moves when the eBay half arrives. */}
+      <div className="page mb-10 max-w-5xl">
+        <LandingAds tcg={tcgTiles} />
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd([{ href: "/", label: SITE_NAME }])) }} />
       {/* The side rails from 1280px, browser-only, in the visitor's region (components/SideAds.tsx; owner 2026-11-06: "the home page must have this as well"). */}
