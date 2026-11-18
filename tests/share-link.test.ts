@@ -25,3 +25,12 @@ test("the share pieces are wired in: product page, quick view, share card, arriv
   assert.match(read("src/app/robots.ts"), /"\/\*utm_source=share"/);
   assert.match(read("src/app/og/p/[region]/[slug]/route.tsx"), /export const dynamic = "force-dynamic";/);
 });
+
+// Share-for-a-deal (owner, 2026-11-18): product and set pages, never the quick view.
+import { pickShareArm } from "../src/lib/share-link";
+test("the share-for-a-deal arm is drawn once, half and half, and kept, and stays out of the quick view", () => {
+  assert.equal(pickShareArm(null, 0.2), "reward");
+  assert.equal(pickShareArm(null, 0.8), "plain");
+  assert.doesNotMatch(readFileSync("src/components/QuickView.tsx", "utf8"), /<ShareButton [^>]*deal=/);
+  assert.match(readFileSync("src/app/[region]/p/[slug]/page.tsx", "utf8"), /<ShareButton [^>]*deal=/);
+});
