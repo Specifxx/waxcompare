@@ -99,8 +99,11 @@ test("the server table: the eBay row FIRST as a search (labelled Ad, sponsored, 
   assert.match(ebay, /class="ad-pill">Ad</);
   assert.match(html, /Search 2025 Topps Chrome Baseball Hobby Box on ebay\.com/);
   // no listing yet: the cheapest store is the best price (tint, badge, the one red button)
-  assert.match(rows[1], /or-hl/, "alpha, the cheapest open store, second");
+  // a plain store: the small neutral chip, not the marked row (owner, 2026-11-18, tests/best-tag.test.ts)
+  assert.doesNotMatch(rows[1], /or-hl/, "alpha, the cheapest open store, second: no marked row");
   assert.match(html, />Best price</);
+  assert.match(html, /<span class="or-tag">Best price<\/span>/);
+  assert.match(html, /aria-label="Prices and stock change: also check eBay"/, "eBay's row is in the list; sports cards have no TCGplayer row");
   assert.doesNotMatch(html, /Best store price/, "nothing cheaper than the store yet");
   assert.match(html, /data-best="store"/);
   assert.ok(html.replace(/&#x27;/g, "'").includes(ebayRowNote("us").trim()), "the note under the table");
@@ -116,7 +119,8 @@ test("pinned rows: eBay first, Amazon second (owner, 2026-11-06), then the store
   // Owner, 2026-11-17 (final): eBay, then Amazon, then the cheapest store, then the rest.
   assert.match(rows[0], /data-ad="listings-offer-row"/);
   assert.match(rows[1], /data-row="amazon"/);
-  assert.match(rows[2], /or-hl/, "the cheapest store, highlighted");
+  assert.doesNotMatch(rows[2], /or-hl/, "the cheapest store is plain: no marked row (owner, 2026-11-18)");
+  assert.match(us, /or-tag/);
   assert.doesNotMatch(us, /data-row="tcgplayer"|TCGplayer sellers|tcgplayer\.com/);
   assert.equal([...us.matchAll(/class="btn-primary/g)].length, 1, "the cheapest store keeps the one red button");
   // outside the US too, whatever match is passed
