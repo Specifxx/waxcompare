@@ -6,7 +6,7 @@ import raw from "../../data/demand.json";
 import type { ProductCardData } from "./data";
 import { rankItems, type DemandFile, type RankFacts } from "./home-rank";
 
-export const HOME_DEMAND = raw as DemandFile;
+export const HOME_DEMAND = raw as unknown as DemandFile; // via unknown: JSON arrays read as number[], never the [28d, 7d] tuple
 
 /** What the ranking reads of a product card: any region's page of it, its buy clicks, stock, price, TCGplayer, release. */
 export function cardFacts(p: ProductCardData, o: { preorder?: boolean } = {}): RankFacts {
