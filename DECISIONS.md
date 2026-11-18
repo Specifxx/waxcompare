@@ -1880,3 +1880,20 @@ when it shows. Not on Dex or MTG Compare (their phone A/B runs to 3 Dec).
 **Why.** The loud green on a store that pays us nothing pulled clicks away from our paid eBay rows. We do not claim eBay is cheaper: the hint says only that prices and stock change.
 
 **Measure.** Paid clicks per 100 buy clicks (eBay + Amazon + affiliate rows against all outbound clicks, by `placement`) for the week before and after the release. `tests/best-tag.test.ts` pins it.
+
+## 2026-11-18 — The bottom nav is a floating pill, and closing the cart gives it back
+
+Owner, 2026-11-18: "after you open the cart and then you close it, the little bottom navigation disappears", and the nav should be
+"the little football field kind of shape … floating above the bottom a little bit" (Catchback's), with the eBay / TCGplayer ad dock
+sitting on top of it.
+
+- **The bug.** A header that mounts the cart button twice (desktop and phone copies) mounted two `CartDrawer`s. Only one draws, but both
+  ran the scroll-lock effect: the second saved the first's `overflow: hidden` as "previous" and put it back on close, so the page stayed
+  locked and `BottomNav` (and the ad dock) read it as an open dialog forever. Now only the drawer that draws locks scroll or checks
+  live prices (`mounted` in both effects). Sites with one header button never hit it, but carry the same guard.
+- **The pill.** Geometry only, colours stay the site's own: 12px from each side (at most 460px wide), rounded ends, a soft shadow, and
+  `bottom: var(--bn-gap)` where `--bn-gap` is `max(8px, safe-area − 14px)`, so it floats above the home indicator without the old full
+  safe-area band. `--bn-h` (54px) and `--bn-space` (height + gap) are on `:root`; the stacked ad dock, nudges and toasts sit
+  `var(--bn-space)` + a small gap up, and the body's bottom padding follows it. Hidden, it slides fully off-screen (transform only, CLS 0).
+- **Measured** (local build, dock stacked): Pixel 7 412×915 nav + dock take 129px (14.1%); iPhone 15 393×852 with a 34px safe area
+  143px (16.8%); iPhone SE 375×667 129px (19.3%); the old flush bar took about the same plus the full safe area.
