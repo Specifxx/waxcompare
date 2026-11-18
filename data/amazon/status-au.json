@@ -1,1 +1,1 @@
-{"at":"2026-11-17T18:08:44.557Z","state":"refused","searched":0,"found":0,"known":0,"waiting":342,"note":"searchItems 403 {\"message\":\"Your account does not currently meet the eligibility requirements.\",\"reason\":\"AssociateNotEl"}
+{"at":"2026-11-18T02:46:06.251Z","state":"ok","searched":1,"found":1,"known":1,"waiting":341,"note":"searchItems 429 {\"message\":\"Request rate limit exceeded. Learn more: https://affiliate-program.amazon.com/creatorsapi/do"}
