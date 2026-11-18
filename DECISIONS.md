@@ -1847,3 +1847,15 @@ collection, how: image|text|saved|copy}`, only once it really went out.
 (`dealsBySection`, `dealPct`, `dealsCopy.summary`), drawn by `lib/og-card.tsx` (text and the logo, no product photo).
 It lists no params, so nothing reads data at build: each region's image is drawn on its first request after a release
 and kept until the next. `pageMeta` names it as the page's image. The quick view is untouched.
+
+## The weekly Hot 100 at /<region>/hot-100 — 2026-11-18
+
+**What.** A new page per region, `/<region>/hot-100`, and its share card `/og/hot-100/<region>`: every product whose cheapest
+in-stock price rose over the last seven days (up to the newest import), biggest rise first, up to 100, each with its place on
+the chart seven days earlier (▲ / ▼ / New). Pure, from `data/public/price-history.json` alone (`lib/hot100.ts`). The weekly
+chart's rules with a lower floor: two or more stores in stock on both days, a rise of 1% or more and under 50% (a bigger jump is a
+misfiled listing). A short week is the Hot 37, never padded (RiftCompare's Hot 40 rule). Noindex under five rows.
+
+**Why.** Owner, 2026-11-18: RiftCompare's Hot chart works on Reddit as a plain link and title; every site gets one stable URL to post
+once a week (tagged `utm_source=reddit&utm_medium=social&utm_campaign=hot100-<site>-<date>`). The dated Sunday chart stays where it
+exists. Shipped with `[deploy] [urgent]` on the owner's ask for today's links. `tests/hot100.test.ts`.
