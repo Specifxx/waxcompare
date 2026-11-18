@@ -224,7 +224,8 @@ export function BottomNav({ mode }: { mode: BottomNavMode }) {
         document.body.style.overflow === "hidden" ||
         root.style.overflow === "hidden" ||
         root.matches(".capacitor-native");
-      buybar = !!document.querySelector("[data-buybar]");
+      // Only a buy bar that is showing: SportsCardCompare's StickyBuyBar stays mounted as data-buybar="hidden".
+      buybar = !!document.querySelector("[data-buybar]:not([data-buybar='hidden']):not([aria-hidden='true'])");
       decide();
     };
 
