@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CART_OPEN_EVENT, cartCount, onCartChange, readCart } from "@/lib/cart-list";
+import { cartArm, CART_OPEN_EVENT, cartCount, onCartChange, readCart } from "@/lib/cart-list";
 import { BOTTOM_NAV_SEARCH_INPUT, bottomNavTabs } from "@/lib/bottom-nav";
 import { CartIcon } from "./cart/CartIcon";
 
@@ -133,6 +133,9 @@ export function BottomNav({ mode }: { mode: BottomNavMode }) {
   const router = useRouter();
   const [enabled, setEnabled] = useState(false);
   const [count, setCount] = useState(0);
+  // The cart A/B (lib/cart-list.ts cartArm): the "off" arm has no Cart tab unless its cart already holds lines.
+  const [cartOn, setCartOn] = useState(false);
+  useEffect(() => setCartOn(cartArm() === "on"), []);
   const [tabs, setTabs] = useState<BottomNavTab[]>([]);
   const ref = useRef<HTMLElement>(null);
 
@@ -327,7 +330,7 @@ export function BottomNav({ mode }: { mode: BottomNavMode }) {
   return (
     <nav ref={ref} aria-label="Quick links" data-bottomnav-bar="hidden" aria-hidden="true" className="bn md:hidden">
       <ul className="bn-row">
-        {tabs.map((t) => {
+        {tabs.filter((t) => t.action !== "cart" || cartOn || count > 0).map((t) => {
           const active = bottomNavActive(pathname, t);
           return (
             <li key={t.key} className="bn-cell">

@@ -5,6 +5,7 @@ import { isCheckoutLink } from "@/lib/checkout-link";
 import { gaEvent } from "@/lib/gtag";
 import type { ReactNode } from "react";
 import type { Placement } from "@/lib/affiliate";
+import { cartArmNow } from "@/lib/cart-list";
 
 // Every outbound buy link — to a store, TCGplayer or eBay — is one of these. A
 // plain <a target="_blank">: no redirect hop and no JS navigation, so a click
@@ -54,7 +55,7 @@ export function OutboundLink({
 }) {
   function record() {
     try {
-      track("buy_click", { retailer: retailer.slice(0, 255), placement: placement.slice(0, 255), link_type: isCheckoutLink(href) ? "checkout" : "product" });
+      track("buy_click", { cart_arm: cartArmNow(), retailer: retailer.slice(0, 255), placement: placement.slice(0, 255), link_type: isCheckoutLink(href) ? "checkout" : "product" });
       // GA4 (lib/gtag.ts, a no-op without NEXT_PUBLIC_GA_ID): a paid link (eBay, TCGplayer: rel "sponsored") is affiliate_click.
       gaEvent(/\bsponsored\b/.test(rel) ? "affiliate_click" : "outbound_store_click", { retailer: retailer.slice(0, 100), placement, link_domain: hostOf(href) });
       if (amazon) gaEvent("amazon_click", { product: amazon.product.slice(0, 100), region: amazon.region, page: amazon.page.slice(0, 100) });
