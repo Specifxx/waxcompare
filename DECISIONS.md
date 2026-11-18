@@ -1801,3 +1801,10 @@ The owner withdrew the 2026-11-17 rule that an eBay ad is never "Best price": th
 badge, whichever it is. `EBAY_CAN_BE_BEST = true` (`lib/ebay-offer-row.ts`): a NEW eBay listing in the stores' currency, strictly cheaper than
 every in-stock store and not more than 25% under their median (`ebayMayBeBest`), takes the table badge, the best-price card and the sticky
 bar; otherwise a store (or TCGplayer when cheaper) keeps it. The row order does not change: eBay, TCGplayer, Amazon, then the stores.
+
+## 2026-11-18: Share for a deal (owner)
+
+Owner: sharing should be easy and rewarded, on every site. Ported from MTG Compare: product and set pages pass `deal` to
+`ShareButton`; half of browsers (`share_arm` in localStorage, `pickShareArm`) see "Share · get a deal", and after a share completes
+a small card under the button (the visitor's own tap, ✕ to close) points to the region's `/deals`. The quick view never passes
+`deal`. Nothing is gated; the other half is the control. Events `share { kind, arm }`, `share_unlock { kind }`.
