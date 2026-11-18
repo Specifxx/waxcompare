@@ -1810,3 +1810,9 @@ row and the unpriced "Check Amazon" row (`OfferRows`), and of the sold-out Amazo
 so is eBay's button. The quick view's
 pinned footer link, already a filled primary button visible without scrolling, becomes a 44px bold button reading "See full page: price history
 and details" (`data-see-full-page`); it was 42px, and the old label was "See price history and details". `tests/amazon-button.test.ts` pins both.
+## 2026-11-18: Share for a deal (owner)
+
+Owner: sharing should be easy and rewarded, on every site. Ported from MTG Compare: product and set pages pass `deal` to
+`ShareButton`; half of browsers (`share_arm` in localStorage, `pickShareArm`) see "Share · get a deal", and after a share completes
+a small card under the button (the visitor's own tap, ✕ to close) points to the region's `/deals`. The quick view never passes
+`deal`. Nothing is gated; the other half is the control. Events `share { kind, arm }`, `share_unlock { kind }`.
