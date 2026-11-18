@@ -64,6 +64,17 @@ export default function About() {
           price is before you click through.
         </p>
 
+        <h2 id="who">Who runs SportsCardCompare</h2>
+        <p>
+          It is run and owned by its two co-founders, Bill and George. No card company, break, store or distributor has a stake or
+          pays for where a box shows up. We built it because a hobby box and a jumbo of the same release can sit next to each other
+          at very different prices, and a break spot or a repack is easy to mistake for a sealed box; the site keeps all of those apart.
+        </p>
+        <p>
+          AI tools help us write the code and draft the guides, and we check what they produce before it goes up. Prices are never typed
+          in: a program reads each shop&rsquo;s own listings every day.
+        </p>
+
         <h2>Where the prices come from</h2>
         <p>
           About twice a day we read each store&rsquo;s public product listings (the same catalogue feed their own website uses), in the
@@ -197,6 +208,10 @@ export default function About() {
           We keep them out of your way: at most one ad on a phone screen at a time and two on a wide screen, no pop-ups or countdowns, space
           kept for every ad before it loads so nothing you are reading gets pushed aside, and no ads on this page or the Terms, Privacy or
           Contact pages.
+        </p>
+        <p>
+          What it costs: hosting, the price imports and the tools we build with come to about A$790 a month for SportsCardCompare and our
+          other price sites together (our own books, the 30 days to 15 November 2026). The commission above is what pays for it.
         </p>
 
         <h3 id="ebay" className="mb-2 mt-6 font-display text-base font-bold text-ink">eBay</h3>
