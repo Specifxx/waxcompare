@@ -1830,3 +1830,12 @@ The "off" arm sees no Add to cart button, and no header or bottom-nav cart unles
 carries `cart_arm`. Verdict 2 Dec: buy clickers and paid buy clicks per arm (the arms are equal halves of visitors). Keep the cart
 only if the "on" arm is not lower; otherwise `cartArm()` returns "off" for everyone. Not on Dex or MTG Compare (their quick-view
 A/B runs to 3 Dec).
+
+## Collection value card (owner, 2026-11-18: "we need more shareable artefacts")
+
+My collection's "Share my collection" now draws a 1200×630 picture of the visitor's own totals (value, change since
+added, item count, three most valuable items, "Track yours free at <host>") in the browser with a canvas
+(`components/vault/collection-card.ts`, ported from TCG Prices) and hands it to the share sheet as a file; where files
+can't be shared it saves the PNG and copies the link. No server, no function, no Vercel image cost, nothing sent to us.
+Link: `/?utm_source=share&utm_medium=collection&utm_campaign=collection-card`. Counted in Vercel as `share {kind:
+collection, how: image|text|saved|copy}`, only once it really went out.
