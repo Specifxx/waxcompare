@@ -1830,3 +1830,45 @@ The "off" arm sees no Add to cart button, and no header or bottom-nav cart unles
 carries `cart_arm`. Verdict 2 Dec: buy clickers and paid buy clicks per arm (the arms are equal halves of visitors). Keep the cart
 only if the "on" arm is not lower; otherwise `cartArm()` returns "off" for everyone. Not on Dex or MTG Compare (their quick-view
 A/B runs to 3 Dec).
+
+## Collection value card (owner, 2026-11-18: "we need more shareable artefacts")
+
+My collection's "Share my collection" now draws a 1200×630 picture of the visitor's own totals (value, change since
+added, item count, three most valuable items, "Track yours free at <host>") in the browser with a canvas
+(`components/vault/collection-card.ts`, ported from TCG Prices) and hands it to the share sheet as a file; where files
+can't be shared it saves the PNG and copies the link. No server, no function, no Vercel image cost, nothing sent to us.
+Link: `/?utm_source=share&utm_medium=collection&utm_campaign=collection-card`. Counted in Vercel as `share {kind:
+collection, how: image|text|saved|copy}`, only once it really went out.
+
+## Deals page: a share button and its own share image per region (owner, 2026-11-18: "we need more shareable artefacts")
+
+`/[region]/deals` gets a share button (kind and medium `deals`, `utm_source=share&utm_medium=deals`) and
+`[region]/deals/opengraph-image.tsx`: "Today's deals in <region>, up to N% under" with the page's own count
+(`dealsBySection`, `dealPct`, `dealsCopy.summary`), drawn by `lib/og-card.tsx` (text and the logo, no product photo).
+It lists no params, so nothing reads data at build: each region's image is drawn on its first request after a release
+and kept until the next. `pageMeta` names it as the page's image. The quick view is untouched.
+
+## The weekly Hot 100 at /<region>/hot-100 — 2026-11-18
+
+**What.** A new page per region, `/<region>/hot-100`, and its share card `/og/hot-100/<region>`: every product whose cheapest
+in-stock price rose over the last seven days (up to the newest import), biggest rise first, up to 100, each with its place on
+the chart seven days earlier (▲ / ▼ / New). Pure, from `data/public/price-history.json` alone (`lib/hot100.ts`). The weekly
+chart's rules with a lower floor: two or more stores in stock on both days, a rise of 1% or more and under 50% (a bigger jump is a
+misfiled listing). A short week is the Hot 37, never padded (RiftCompare's Hot 40 rule). Noindex under five rows.
+
+**Why.** Owner, 2026-11-18: RiftCompare's Hot chart works on Reddit as a plain link and title; every site gets one stable URL to post
+once a week (tagged `utm_source=reddit&utm_medium=social&utm_campaign=hot100-<site>-<date>`). The dated Sunday chart stays where it
+exists. Shipped with `[deploy] [urgent]` on the owner's ask for today's links. `tests/hot100.test.ts`.
+
+## 2026-11-18: The dock A/B: the phone ad dock stays up above the bottom nav for half of the visitors
+
+Owner, 2026-11-18: "right above the nav bar, we should have those ads show up … very, very visible for mobile phone users." Since
+the phone bottom nav went on (18 Nov) the eBay/TCGplayer dock (`AdDock.tsx`) yielded to it: one bar at a time, the dock only while
+scrolling down. `dockArm()` in `lib/dock-arm.ts` puts each visitor in localStorage `dock-arm` "on" or "off" (50/50; storage that
+fails is "off"). "On": the dock no longer yields to `html[data-bottomnav]`; it is lifted 57px (the nav's height) with `translate`
+while the nav shows, so both bars are visible and neither covers the other (dock 64px + nav 57px, about 15% of a phone screen,
+under Better Ads' 30% line). Every other dock rule stands: never on the first screen or a product page, yields to other ad units,
+the footer, dialogs and the keyboard, ✕ for the visit, labelled Ad, rel sponsored. "Off": unchanged. Every `buy_click` carries
+`dock_arm`. Verdict 2 Dec: buy clickers and paid buy clicks per arm. EPN's Network Agreement (Exhibit A §1.4, §2.5) puts any
+promotional method it does not expressly permit under prior written approval; the dock has run since 2026-11-06, this changes only
+when it shows. Not on Dex or MTG Compare (their phone A/B runs to 3 Dec).
