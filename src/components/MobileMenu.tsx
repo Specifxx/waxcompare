@@ -121,6 +121,7 @@ export function MobileMenu({ region, groups, built, className = "" }: { region: 
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="site-menu"
+        data-bn-menu
         onClick={() => {
           // The contents first (synchronously), so showModal() finds the close button to focus.
           if (!ready) flushSync(() => setReady(true));
