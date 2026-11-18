@@ -1805,7 +1805,7 @@ bar; otherwise a store (or TCGplayer when cheaper) keeps it. The row order does 
 ## 2026-11-18: the Amazon button is amber, and the quick view's "See full page" is a real button (owner)
 
 Owner: the Amazon row's button was the neutral `.btn-soft`, so it read like any store's. It is now `.btn-amazon` (globals.css):
-#FFA41C with #111 ink, #FA8900 on hover, a #E08A00 hairline, the same in both themes. It is the button of the priced "View deal"
+#F5A524 with #111 ink, #DC8A0B on hover, a #B7791F hairline, the same in both themes. It is the button of the priced "View deal"
 row and the unpriced "Check Amazon" row (`OfferRows`), and of the sold-out Amazon card's button (`Amazon.tsx`). `rel`, the tracking, the "Ad"/"Paid link" labels, the row order, prices and the Cheapest logic are untouched, and
 so is eBay's button. The quick view's
 pinned footer link, already a filled primary button visible without scrolling, becomes a 44px bold button reading "See full page: price history
@@ -1816,3 +1816,7 @@ Owner: sharing should be easy and rewarded, on every site. Ported from MTG Compa
 `ShareButton`; half of browsers (`share_arm` in localStorage, `pickShareArm`) see "Share · get a deal", and after a share completes
 a small card under the button (the visitor's own tap, ✕ to close) points to the region's `/deals`. The quick view never passes
 `deal`. Nothing is gated; the other half is the control. Events `share { kind, arm }`, `share_unlock { kind }`.
+
+## 2026-11-18: the amber of the Amazon button is not Amazon's own orange
+
+The first cut used #FFA41C, which is Amazon's brand orange. Amazon's Associates agreement bars styling that could pass for Amazon, so the button is now a distinct, calmer amber (#F5A524, hover #DC8A0B, border #B7791F, dark text #111): still clearly different from the site's normal buy button, not Amazon's colour.
