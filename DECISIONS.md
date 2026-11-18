@@ -1772,3 +1772,7 @@ The opt-in build passed the phone tests (iPhone SE, Pixel 7, Z Fold cover: flush
 scroll up, hidden while typing, zoomed, over the cart or menu, never over Add to cart, CLS 0, no slower scrolling) and was checked
 live with `?bn=1`, so `BOTTOM_NAV` is "on" (the owner asked for the bar on every site). `?bn=0` still opts a visitor out, and "off"
 is the rollback. It ships with the next daily release, not its own build.
+
+## 2026-11-18: llms.txt points AI agents at the free price file
+
+`/prices.json` already existed, but nothing an agent reads said so. `llms.txt` now has a "Free price data and citing" block: the file, that it is free and open to every origin, the date to quote and a suggested credit line. No new route, no spend.
