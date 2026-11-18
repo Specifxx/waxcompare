@@ -1311,3 +1311,9 @@ html[data-geo="pending"] main { visibility: hidden; }
 .bn-tab[aria-current="page"] .bn-ico { background: rgb(var(--bn-pill)); }
 .bn-badge { position: absolute; right: 6px; top: -4px; min-width: 16px; padding: 0 4px; border-radius: 999px; background: rgb(var(--bn-accent)); color: #fff; font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; }
 @media (prefers-reduced-motion: reduce) { .bn, .bn[data-bottomnav-bar="hidden"], .bn-ico { transition: none; } }
+
+/* The dock A/B (lib/dock-arm.ts, 2026-11-18): in the "on" arm the phone dock stays up while the bottom nav shows, lifted just above it
+   (the nav is 56px plus its 1px border; the dock's own safe-area padding sits under the nav). Moved with `translate` only (CLS 0). */
+html [data-dock-stack] { transition: transform 0.2s ease-out, translate 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
+html[data-bottomnav] [data-dock-stack] { translate: 0 -57px; z-index: 29; }
+@media (prefers-reduced-motion: reduce) { html [data-dock-stack] { transition: none; } }
