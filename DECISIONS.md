@@ -1801,3 +1801,12 @@ The owner withdrew the 2026-11-17 rule that an eBay ad is never "Best price": th
 badge, whichever it is. `EBAY_CAN_BE_BEST = true` (`lib/ebay-offer-row.ts`): a NEW eBay listing in the stores' currency, strictly cheaper than
 every in-stock store and not more than 25% under their median (`ebayMayBeBest`), takes the table badge, the best-price card and the sticky
 bar; otherwise a store (or TCGplayer when cheaper) keeps it. The row order does not change: eBay, TCGplayer, Amazon, then the stores.
+
+## 2026-11-18: the Amazon button is amber, and the quick view's "See full page" is a real button (owner)
+
+Owner: the Amazon row's button was the neutral `.btn-soft`, so it read like any store's. It is now `.btn-amazon` (globals.css):
+#FFA41C with #111 ink, #FA8900 on hover, a #E08A00 hairline, the same in both themes. It is the button of the priced "View deal"
+row and the unpriced "Check Amazon" row (`OfferRows`), and of the sold-out Amazon card's button (`Amazon.tsx`). `rel`, the tracking, the "Ad"/"Paid link" labels, the row order, prices and the Cheapest logic are untouched, and
+so is eBay's button. The quick view's
+pinned footer link, already a filled primary button visible without scrolling, becomes a 44px bold button reading "See full page: price history
+and details" (`data-see-full-page`); it was 42px, and the old label was "See price history and details". `tests/amazon-button.test.ts` pins both.
