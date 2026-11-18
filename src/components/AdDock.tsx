@@ -132,7 +132,7 @@ export function AdDock({ label, sides, placement, minWidth, yieldTo = "[data-ad]
           blockers: blockers.size,
           buybar: !!document.querySelector(buybar),
           // An ad-free visitor (Plus/Premium where a site has them) and a native app with its own banner: never.
-          modal: modal() || document.documentElement.matches("[data-adfree], .capacitor-native"),
+          modal: modal() || document.documentElement.matches("[data-adfree], .capacitor-native, [data-bottomnav]"),
           typing,
           dismissed: false,
         }),

@@ -1727,3 +1727,17 @@ reach every site. Applied here (reasoning in DexCompare's DECISIONS.md, same dat
 ## 2026-11-18: cart checkout opens every store or none (owner)
 
 Checkout (`openAll`, `src/lib/cart-checkout.ts`) opens one blank tab per store inside the click, and only when every one opens does it send each to its store's own tagged link. If the browser refuses any, it closes the ones that opened, visits nothing, and the drawer shows the allow-pop-ups steps and a "Try again" button. Before, the first store opened and the rest were refused, which left the visitor with one tab. Chrome 157 on dexcompare.io and on url-opener.com (the owner's model, which does the same close-and-ask) both give one tab until pop-ups are allowed for the site; with them allowed, all open. No browser API grants that permission from a click, so the steps stay.
+
+## 2026-11-18: Phone bottom nav, opt-in first (owner)
+
+The owner tried TCG Prices' bottom nav on his phone ("looks good … a bit of lag") and asked for it on every site, smoother.
+This is that bar (`src/components/BottomNav.tsx`, the same file on every site that has it; this site's tabs and switch in
+`src/lib/bottom-nav.ts`): Home (the region's home), Search (focuses the header search box: the site has no search page), Deals, Cart, Menu. Below 768px only, browser only (nothing in the server HTML, so SEO, the first paint and CLS are
+untouched). It sits flush at `bottom: 0` and moves on `transform` alone; it never measures the address bar (the cause of
+RiftCompare's deleted bar, 2026-09-18). The scroll handler reads `scrollY` and writes two attributes, nothing else: no layout
+reads, no React re-render, no backdrop blur (each repaints every scroll frame on a phone). It hides on scroll down, returns on the
+first 4px upward flick, and stays away while zoomed, typing, over a dialog, the menu or the open cart, over a buy bar, and over
+any Add to cart button in its strip. The phone ad dock yields while it shows (`html[data-bottomnav]`): one bar at a time.
+The menu tab clicks the element marked `data-bn-menu`. `BOTTOM_NAV` is the switch: "optin" (only `?bn=1`, kept in
+localStorage) until this site passes the phone tests, then "on"; "off" is the rollback. `?bn=0` always opts a visitor out.
+`tests/bottom-nav.test.ts` pins all of it.
