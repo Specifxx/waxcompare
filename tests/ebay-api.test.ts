@@ -239,9 +239,9 @@ test("the importer's secrets reach only the import step of the workflow", () => 
   // the daily slot is the FIRST one after eBay's counter resets in BOTH seasons (midnight Pacific = 07:00 UTC in summer, 08:00 in winter):
   // 08:37 UTC is 01:37 PDT / 00:37 PST, so the scheduled run is always the first of its budget day and a manual "run now" earlier in the
   // Pacific day can never starve it (review F2 / SEC-1)
-  const cron = /cron: "(\d+) (\d+) \* \* \*"/.exec(wf);
-  assert.ok(cron, "one daily cron");
-  assert.equal(`${cron![1]} ${cron![2]}`, "37 8", "37 8 * * *");
+  const cron = /cron: "(\d+) (\d+) \* \* 1"/.exec(wf);
+  assert.ok(cron, "one cron, Mondays only while idle (2026-11-19)");
+  assert.equal(`${cron![1]} ${cron![2]}`, "37 8", "37 8 * * 1");
   for (const [season, date, startsAtUtc] of [["summer (PDT)", "2026-07-15", "07:00"], ["winter (PST)", "2026-01-15", "08:00"], ["the week before the autumn change", "2026-10-30", "07:00"], ["the week after it", "2026-11-02", "08:00"]] as const) {
     const run = Date.parse(`${date}T08:37:00Z`);
     assert.equal(budgetDay(run), date, `${season}: the 08:37 UTC run belongs to the day that has just begun`);

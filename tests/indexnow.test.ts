@@ -46,7 +46,7 @@ test("the job fails loudly: a refused batch, no key file, an empty sitemap; dail
   assert.match(s, /listed no page URLs[\s\S]*?process\.exitCode = 1/);
   assert.match(s, /SiteVerificationNotCompleted/, "a new host's first answer is retried, not a failure on the spot");
   const wf = readFileSync(new URL("../.github/workflows/indexnow-submit.yml", import.meta.url), "utf8");
-  assert.match(wf, /cron: "37 22 \* \* \*"/, "after the 20:47 UTC import");
+  assert.match(wf, /cron: "37 22 \* \* 1"/, "after the Monday 20:47 UTC import (weekly while idle)");
   assert.doesNotMatch(wf, /working-directory:|apps\//, "the app is the repo root: no apps/ prefix");
   assert.doesNotMatch(wf, /HOST = "/, "the host comes from the sitemap's own URLs, never hard-coded");
 });

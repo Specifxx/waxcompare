@@ -1985,3 +1985,14 @@ US total at most about 3,600 calls a day (ScentCompare about 61%, ScentCompare a
 8,640 until about 8 Dec 2026 and a revenue-based limit after it (1 a day per US$0.05 of API-referred shipped revenue).
 
 Here both defaults are 0: no search, no price call; the Amazon row keeps its tagged search link. Raising them is the owner's call.
+
+## 2026-11-19: Idle: weekly imports, no scheduled release
+
+The owner approved the boardroom plan's capacity move ("Let's do it", 19 Nov): SportsCardCompare goes idle, like
+Bandai, Figure, Motor and Cam. The site stays live with its host and URLs untouched. `sealed-import.yml` runs on Mondays
+only and its scheduled commit no longer carries `[deploy]` (a manual run still releases); `ebay-import.yml` and the
+IndexNow submit run on Mondays too. The deployed eBay rows need no rebuild to stay inside eBay's age rule: the route
+drops any listing older than `EBAY_LISTING_MAX_AGE_HOURS` at request time, and the strip falls back to its search link.
+The eBay pass spends about a seventh of its old 1,400 calls a day; the calls freed are not moved to another site.
+Empire HQ's site watch (RiftCompare's ops monitor) still checks the live site. Why: build budget and agent time go to the
+sites that earn.

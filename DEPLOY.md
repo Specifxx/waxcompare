@@ -398,7 +398,7 @@ Three settings; nothing else changes. The strips already say how old they are, a
 reports the bound it applied (`maxAgeMs`) and the strips say "imported from eBay several times a day" instead of "about once a day" when
 it is 12 hours or less, so the copy stays true in either mode (the About, Terms and Privacy pages say "once a day, in the default setting").
 
-1. **The cron** in `.github/workflows/ebay-import.yml`: `"37 8 * * *"` becomes `"13 */4 * * *"` (every four hours, six runs a day; all six fall
+1. **The cron** in `.github/workflows/ebay-import.yml`: `"37 8 * * 1"` (weekly while the site is idle, 2026-11-19; `"37 8 * * *"` daily before) becomes `"13 */4 * * *"` (every four hours, six runs a day; all six fall
    inside one Pacific budget day in summer and in winter).
 2. **`EBAY_LISTING_MAX_AGE_HOURS=5.5`**, set in **two** places that read it:
    * **Vercel** (the route reads it and tells the browser; a changed environment variable needs a redeploy),

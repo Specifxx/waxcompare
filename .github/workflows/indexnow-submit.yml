@@ -13,7 +13,7 @@ name: IndexNow submit (Bing/Yandex) — SportsCardCompare
 # uses only Node built-ins and src/lib/indexnow.ts.
 on:
   schedule:
-    - cron: "37 22 * * *"
+    - cron: "37 22 * * 1" # Mondays only: idle since 2026-11-19
   workflow_dispatch:
 
 concurrency:

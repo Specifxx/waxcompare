@@ -111,9 +111,9 @@ test("the sealed import's data commit carries the marker; the eBay import's does
   assert.match(pub, /\[ "\$\{2:-\}" = "release" \] && MARK=" \[deploy\]"/);
   assert.match(pub, /git commit -q -m "SportsCardCompare data: [^"]*\$MARK"/);
   const wf = (f: string) => readFileSync(join(ROOT, ".github/workflows", f), "utf8");
-  // One release a day (2026-10-17): the 20:47 UTC run, a manual run and the schema sync; the 08:47 run rides it.
+  // Idle (owner, 2026-11-19): the weekly scheduled run never releases; only a manual run (the owner's) and the schema sync do.
   const sealed = wf("sealed-import.yml");
-  assert.match(sealed, /RELEASE: \$\{\{ \(github\.event_name != 'schedule' \|\| github\.event\.schedule == '47 20 \* \* \*'\) && 'release' \|\| '' \}\}/);
+  assert.match(sealed, /RELEASE: \$\{\{ github\.event_name != 'schedule' && 'release' \|\| '' \}\}/);
   assert.match(sealed, /publish-public-data\.sh "[^"]*" \$RELEASE/);
   assert.doesNotMatch(wf("ebay-import.yml"), /publish-public-data\.sh "[^"]*" release/);
 });

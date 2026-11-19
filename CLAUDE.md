@@ -30,7 +30,8 @@ so. `vercel.json` disables every branch except production (`"**": false`), so no
 Never dispatch a manual release just to ship a merge. DECISIONS.md, 2026-11-02.
 
 Production builds only a commit whose SUBJECT carries `[deploy]` (`scripts/vercel-ignore-build.sh`,
-`tests/vercel-ignore-build.test.ts`). The evening sealed import's data commit carries it: one release a day. **Never put `[deploy]`
+`tests/vercel-ignore-build.test.ts`). **IDLE since 2026-11-19 (owner):** the sealed and eBay imports run weekly (Mondays) and the scheduled data commit carries NO
+marker, so nothing builds until the owner releases by hand. No agent work here except a fix for something broken live. **Never put `[deploy]`
 in a code commit's subject on your own initiative**; code rides the next data release. "Ship it" means land on `main`. Use
 `release.yml` (or `[deploy]`) only when the owner says it is urgent, and say so. Previews build only with `[preview]` in the
 subject, only when the owner asks.
