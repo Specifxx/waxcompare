@@ -137,13 +137,13 @@ test("Header on a region page: search at every width (never in a hidden wrapper)
   assert.doesNotMatch(html, /aria-label="Sections"[^>]*class="page flex gap-1 overflow-x-auto/, "the second chip row is gone");
 });
 
-test("Header nav (lg and up): Deals · Sports · Brands · All sealed · Stores, each to its region path", () => {
+test("Header nav (xl and up): Deals · Sports · Brands · All sealed · Stores, each to its region path", () => {
   assert.deepEqual(
     HEADER_NAV.map((n) => n.label),
     ["Deals", "Sports", "Brands", "All sealed", "Stores"],
   );
   const html = render(React.createElement(Header, { region: "uk" }));
-  const nav = /<nav class="hidden items-center gap-0\.5 lg:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
+  const nav = /<nav class="hidden items-center gap-0\.5 xl:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
   for (const [href, label] of [
     ["/uk/deals", "Deals"],
     ["/uk/sport", "Sports"],
@@ -158,7 +158,7 @@ test("Header nav (lg and up): Deals · Sports · Brands · All sealed · Stores,
 test("Header with no region: the whole header, built for the default region (the browser moves it to the visitor's)", () => {
   const html = render(React.createElement(Header, { region: null }));
   assert.match(html, /role="search"/, "search from the first page");
-  const nav = /<nav class="hidden items-center gap-0\.5 lg:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
+  const nav = /<nav class="hidden items-center gap-0\.5 xl:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
   for (const h of ["/us/deals", "/us/sport", "/us/brand", "/us/sealed", "/us/stores", "/blog"]) assert.match(nav, new RegExp(`href="${h}"`), h);
   assert.doesNotMatch(nav, /data-ad="header"/, "eBay's link is a region page's only");
   assert.match(html, /aria-label="Menu"/);

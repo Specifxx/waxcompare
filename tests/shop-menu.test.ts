@@ -37,7 +37,7 @@ test("shop menu: releases in featuring order, every one a real release page, and
 
 test("header: the dropdown sits with All sealed inside the desktop nav, as plain links", () => {
   const html = render(React.createElement(Header, { region: "uk" }));
-  const nav = /<nav class="hidden items-center gap-0\.5 lg:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
+  const nav = /<nav class="hidden items-center gap-0\.5 xl:flex" aria-label="Main">([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? "";
   assert.match(nav, /<div class="group relative"><a [^>]*href="\/uk\/sealed"[^>]*>All sealed<\/a>/);
   assert.match(nav, /data-menu="shop"/);
   assert.match(nav, /href="\/uk\/type\/hobby-boxes"[^>]*>Hobby boxes<\/a>/);
