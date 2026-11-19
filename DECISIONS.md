@@ -1928,6 +1928,18 @@ content "spread across a large network of sites" and re-dating pages to look fre
 
 Black Friday and Cyber Monday pages are unchanged (in season). Judge the effect on 1 to 8 Dec against 3 to 9 Nov.
 
+## Accounts and Premium (2026-11-19)
+
+Owner, 2026-11-19: "we want accounts for every single one of our compare sites now", copying how RiftCompare does it. Ported from MTG
+Compare: sign in with Google, Discord or an emailed link (`/account`), Premium (`/premium`, US$4.99 a month or US$39.99 a year, 14
+days free), restock alerts on a product with no store in stock, `/watches`, and no ads for members (`ADFREE_BOOT_SCRIPT` stamps
+`html[data-adfree]`; the inline eBay block and the listing strips hide). The account, alerts and billing live on RiftCompare's shared
+service under the site key `wax`; this site stores nothing and holds no key. Because Sports cards sit on the other side of the network
+from RiftCompare, no page, email or privacy line names it: the copy says "our shared alert service", and the service sends this
+site's mail quietly, in its own group. My collection opens only when signed in (the list still lives in this browser); members keep
+a year of value history and can export it to a spreadsheet. The phone bottom nav's Menu tab became Collection (the header keeps its
+menu button). The cheapest price is never behind Premium.
+
 ## Amazon API allowance: mostly ScentCompare, card sites at zero (owner, 2026-11-19)
 
 Amazon's Creators API limit is per Associates account (one a country), shared by every site on it: 1 call a second and

@@ -100,7 +100,7 @@ export function InlineAds({ region, className = "" }: { region: Region; classNam
   // Settled with too little to show: no block at all.
   if (ready && shown.length < 3) return <div ref={ref} hidden />;
   return (
-    <div ref={ref} className={className} style={{ minHeight: INLINE_H }}>
+    <div ref={ref} data-inline-ad className={className} style={{ minHeight: INLINE_H }}>
       {ready && (
         <section data-ad={EBAY} role="group" aria-label="Sponsored: sealed sports cards on eBay and Amazon" className="ad-box p-4" style={{ minHeight: INLINE_H }}>
           <div className="flex items-center gap-2">

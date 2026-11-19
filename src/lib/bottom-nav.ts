@@ -30,6 +30,7 @@ export function bottomNavTabs(pathname: string): BottomNavTab[] {
     { key: "search", label: "Search", action: "search", icon: "search" },
     { key: "deals", label: "Deals", href: `/${r}/deals`, also: [`/${r}/price-moves`], icon: "deals" },
     { key: "cart", label: "Cart", action: "cart", icon: "cart" },
-    { key: "menu", label: "Menu", action: "menu", icon: "menu" },
+    // My collection in place of Menu (owner, 2026-11-19: Premium sites). The header keeps its menu button on phones.
+    { key: "collection", label: "Collection", href: "/collection", icon: "collection" },
   ];
 }

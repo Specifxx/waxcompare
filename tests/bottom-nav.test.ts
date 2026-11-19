@@ -50,13 +50,13 @@ test("the opt-in: off ignores everything, ?bn=1 keeps it, ?bn=0 clears it, optin
   assert.ok(["off", "optin", "on"].includes(BOTTOM_NAV));
 });
 
-test("the tabs: Home first, a cart and a menu, five at most, every link a path on this site, one active tab at a time", () => {
+test("the tabs: Home first, a cart and My collection (owner, 2026-11-19: in place of Menu), five at most, every link a path on this site, one active tab at a time", () => {
   for (const path of ["/", "/deals", "/search", "/about"]) {
     const tabs = bottomNavTabs(path);
     assert.ok(tabs.length >= 4 && tabs.length <= 5, path);
     assert.equal(tabs[0].key, "home");
     assert.ok(tabs.some((t) => t.action === "cart"));
-    assert.ok(tabs.some((t) => t.action === "menu"));
+    assert.ok(tabs.some((t) => t.href === "/collection"));
     assert.equal(new Set(tabs.map((t) => t.key)).size, tabs.length);
     for (const t of tabs) if (t.href) assert.match(t.href, /^\/(?!\/)/, `${t.key}: a same-host path`);
     assert.ok(tabs.filter((t) => bottomNavActive(path, t)).length <= 1, path);

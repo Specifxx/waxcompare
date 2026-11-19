@@ -20,6 +20,7 @@ import { amazonLiveFor } from "@/lib/amazon-live";
 import { ReportPrice } from "@/components/ReportForms";
 import { PriceAlertForm } from "@/components/PriceAlertForm";
 import { ALERT_SITE_KEY } from "@/lib/alert-feed";
+import { RestockAlert } from "@/components/premium/RestockAlert";
 import { ProductGrid } from "@/components/ProductGrid";
 import { ProductRail } from "@/components/ProductRail";
 import { Section } from "@/components/Section";
@@ -624,6 +625,8 @@ export default async function ProductPage({ params }: { params: { region: string
         />
         {/* RiftCompare's shared alert service emails when it drops (lib/alert-feed.ts, DECISIONS.md 2026-11-02). */}
         <PriceAlertForm site={ALERT_SITE_KEY} productId={p.id} region={r.market} priceCents={here?.lowestPriceCents ?? null} className="mt-3" buttonClassName="btn-ghost" />
+        {/* Back in stock (accounts, 2026-11-19, as MTG Compare): members tap once, everyone else gives an email. */}
+        {here?.lowestPriceCents == null && <RestockAlert site={ALERT_SITE_KEY} productId={p.id} region={r.market} />}
         {riftHref && (
           // The owner's other Pokémon site keeps what this one does not: TCGplayer's market price over time (lib/riftcompare.ts).
           <p className="mt-4 text-sm text-muted">

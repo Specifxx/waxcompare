@@ -1329,3 +1329,11 @@ html[data-bottomnav] [data-dock-stack] { translate: 0 calc(-1 * var(--bn-space) 
 .bn-tab { height: 52px; border-radius: 999px; }
 .bn-tab[aria-current="page"]::before { top: 4px; left: 32%; right: 32%; border-radius: 2px; }
 @media (prefers-reduced-motion: reduce) { html [data-dock-stack] { transition: none; } }
+
+/* Premium members (lib/premium-member.ts, 2026-11-19): no banner ads. The in-page ad block and the eBay listing strips go (the phone dock
+   stands down by itself under [data-adfree], AdDock.tsx); price tables, the stores in them, their order and their eBay and Amazon rows
+   are untouched. */
+html[data-adfree] [data-inline-ad],
+html[data-adfree] [data-ad^="listings-"] {
+  display: none !important;
+}
