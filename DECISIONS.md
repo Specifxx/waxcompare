@@ -1914,3 +1914,16 @@ The owner, 2026-11-19: "I want it for all the sites, so people have like an ad o
 2026-11-18 (`lib/dock-arm.ts`) ends early with its "on" arm for every visitor: the eBay (and, where the site has it, TCGplayer) dock is
 stacked just above the phone bottom nav whenever it shows, instead of taking turns with the nav. Its own rules are unchanged: after a
 scroll, labelled "Ad", ✕ for the visit, never Amazon. `dock_arm` on buy_click now always reads "on".
+
+## 2026-11-19: Search-engine-first audit after the November 2026 core update
+
+Google's core-update guidance asks whether a page exists mainly to help people or mainly to catch a search, and names
+content "spread across a large network of sites" and re-dating pages to look fresh as warning signs. What changed here:
+
+- **Seasonal sale pages.** The same template put Boxing Day, January sales and Lunar New Year (and Valentine's Day where
+  a site has it) pages on every Compare site, indexed all year, each listing the same deals as the Black Friday page.
+  `saleIndexable` in `lib/sale-seasons.ts`: Lunar New Year and Valentine's Day pages are never indexed, Boxing Day and
+  January sales only from three weeks before the homepage links them until a week after they end; out of season they are
+  noindex, follow and out of the sitemap (`withoutOffSeasonSales`). The URLs stay live all year (URL freeze).
+
+Black Friday and Cyber Monday pages are unchanged (in season). Judge the effect on 1 to 8 Dec against 3 to 9 Nov.
