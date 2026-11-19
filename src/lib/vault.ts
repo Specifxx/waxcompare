@@ -134,13 +134,33 @@ export function sinceAdded(items: ValuedItem[], market: string): { from: number;
   return from > 0 ? { from, to } : null;
 }
 
+const csvCell = (v: string | number) => {
+  const t = String(v);
+  // A leading = + - @ would run as a formula in a spreadsheet.
+  const safe = /^[=+\-@]/.test(t) ? `'${t}` : t;
+  return /[",\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
+};
+
+/** The collection as a spreadsheet (Premium): one row per item, today's price beside the price when added. Prices in major units. */
+export function collectionCsv(items: ValuedItem[]): string {
+  const rows = [["Name", "Market", "Currency", "Qty", "Price when added", "Price today", "Value today", "Change", "Added", "Page"]];
+  for (const i of items) {
+    const added = i.addedCents > 0 ? (i.addedCents / 100).toFixed(2) : "";
+    const now = i.nowCents != null ? (i.nowCents / 100).toFixed(2) : "";
+    const value = i.nowCents != null ? ((i.nowCents * i.qty) / 100).toFixed(2) : "";
+    const change = i.nowCents != null && i.addedCents > 0 ? (((i.nowCents - i.addedCents) * i.qty) / 100).toFixed(2) : "";
+    rows.push([i.name, i.market, i.currency, String(i.qty), added, now, value, change, i.addedAt.slice(0, 10), i.href]);
+  }
+  return rows.map((r) => r.map(csvCell).join(",")).join("\n") + "\n";
+}
+
 export const dayOf = (d: Date) => d.toISOString().slice(0, 10);
 
 /** Record today's total for a market (one entry per market and day, the newest kept). */
-export function recordDay(days: DayTotal[], market: string, cents: number, now = new Date()): DayTotal[] {
+export function recordDay(days: DayTotal[], market: string, cents: number, now = new Date(), keepDays = MAX_DAYS): DayTotal[] {
   const d = dayOf(now);
   const rest = days.filter((x) => !(x.m === market && x.d === d));
-  return [...rest, { d, m: market, c: cents }].sort((a, b) => a.d.localeCompare(b.d)).slice(-MAX_DAYS * 7);
+  return [...rest, { d, m: market, c: cents }].sort((a, b) => a.d.localeCompare(b.d)).slice(-keepDays * 7);
 }
 
 /** The newest total before today for this market: "since you last looked". */

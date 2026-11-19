@@ -29,7 +29,7 @@ export type BottomNavMode = "off" | "optin" | "on";
 export interface BottomNavTab {
   key: string;
   label: string;
-  icon: "home" | "search" | "deals" | "grid" | "trend" | "heart" | "cart" | "menu";
+  icon: "home" | "search" | "deals" | "grid" | "trend" | "heart" | "cart" | "menu" | "collection";
   href?: string;
   also?: string[];
   /** Active on `href` itself only, not on the pages under it (a region's home). */
@@ -116,6 +116,8 @@ function TabIcon({ icon }: { icon: BottomNavTab["icon"] }) {
       return <svg {...SVG}><path d="m3 17 6-6 4 4 8-8M15 7h6v6" /></svg>;
     case "heart":
       return <svg {...SVG}><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 12 5.6 5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z" /></svg>;
+    case "collection":
+      return <svg {...SVG}><rect x="7" y="3" width="13" height="17" rx="2" /><path d="M4 7v12a2 2 0 0 0 2 2h10" /></svg>;
     case "cart":
       return <CartIcon size={22} />;
     case "menu":

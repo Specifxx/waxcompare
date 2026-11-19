@@ -19,6 +19,8 @@ import "@/components/store-vote.css";
 import "@/components/vault/vault.css";
 import "@/components/site-reviews/site-reviews.css";
 import { BottomNav } from "@/components/BottomNav";
+import { AdFreeSync } from "@/components/premium/AdFreeSync";
+import { ADFREE_BOOT_SCRIPT } from "@/lib/premium-member";
 import { BOTTOM_NAV } from "@/lib/bottom-nav";
 
 // Font display is optional, not swap: both faces are preloaded, so a warm visit renders in them from the first paint, and a slow
@@ -63,6 +65,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         {/* The visitor's own region (owner, 2026-11-01): a person, never a crawler, on another region's page goes to theirs. lib/region-boot.ts. */}
         <script dangerouslySetInnerHTML={{ __html: REGION_BOOT_SCRIPT }} />
+        {/* Premium members see no ads (lib/premium-member.ts): data-adfree on <html> before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: ADFREE_BOOT_SCRIPT }} />
         {/* Product photos: 96% are on Shopify's CDN, most of the rest on TCGplayer's.
             Warming those two connections is the cheapest LCP win there is. */}
         <link rel="preconnect" href="https://cdn.shopify.com" />
@@ -88,6 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <RateCard />
         <SiteAnalytics />
         <ShareArrival />
+        <AdFreeSync />
         {/* The phone bottom nav (components/BottomNav.tsx, lib/bottom-nav.ts): browser only, phones only, BOTTOM_NAV is its switch. */}
         {BOTTOM_NAV !== "off" && <BottomNav mode={BOTTOM_NAV} />}
       </body>
