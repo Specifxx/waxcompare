@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-19T02:13:26.668Z",
+ "generatedAt": "2026-11-19T17:52:30.940Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -114,20 +114,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "US",
-   "title": "2026 Panini Prizm World Cup Pack",
-   "url": "https://sportscardcompare.com/us/p/2026-panini-prizm-world-cup-pack",
-   "cents": 399,
-   "currency": "USD",
-   "store": "Minted TCG",
-   "image": "https://cdn.shopify.com/s/files/1/0556/4717/4735/files/20260817_083110.jpg?v=1787076296",
-   "refCents": 749,
-   "refLabel": "median store price",
-   "savingPct": 47
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "US",
    "title": "2026 Topps Update Baseball Hanger Box",
    "url": "https://sportscardcompare.com/us/p/2026-topps-update-baseball-hanger-box",
    "cents": 999,
@@ -151,6 +137,20 @@
    "refCents": 2999,
    "refLabel": "median store price",
    "savingPct": 44
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "US",
+   "title": "2026 Panini Prizm World Cup Pack",
+   "url": "https://sportscardcompare.com/us/p/2026-panini-prizm-world-cup-pack",
+   "cents": 399,
+   "currency": "USD",
+   "store": "Minted TCG",
+   "image": "https://cdn.shopify.com/s/files/1/0556/4717/4735/files/20260817_083110.jpg?v=1787076296",
+   "refCents": 699,
+   "refLabel": "median store price",
+   "savingPct": 43
   },
   {
    "kind": "deal",
@@ -380,20 +380,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
-   "title": "2026 Topps Chrome Formula 1 Value Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-formula-1-value-pack",
-   "cents": 4300,
-   "currency": "EUR",
-   "store": "PokeFamily",
-   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T124806.079.png?v=1793361008",
-   "refCents": 6499,
-   "refLabel": "median store price",
-   "savingPct": 34
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
    "title": "2026 Topps Holiday Football Mega Box",
    "url": "https://sportscardcompare.com/eu/p/2026-topps-holiday-football-mega-box",
    "cents": 2790,
@@ -422,20 +408,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
-   "title": "2026-27 Topps Bundesliga Value Pack",
-   "url": "https://sportscardcompare.com/eu/p/2026-27-topps-bundesliga-value-pack",
-   "cents": 2599,
-   "currency": "EUR",
-   "store": "TobisToys",
-   "image": "https://cdn.shopify.com/s/files/1/0549/6170/1032/files/topps-flagship-bundesliga-2026-27-value-box-01.png?v=1793985447",
-   "refCents": 3490,
-   "refLabel": "median store price",
-   "savingPct": 26
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
    "title": "2026 Topps Chrome WWE Mega Box",
    "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-wwe-mega-box",
    "cents": 6990,
@@ -445,6 +417,34 @@
    "refCents": 9499,
    "refLabel": "median store price",
    "savingPct": 26
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Chrome Formula 1 Value Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-formula-1-value-pack",
+   "cents": 4999,
+   "currency": "EUR",
+   "store": "dennistheripper",
+   "image": "https://cdn.shopify.com/s/files/1/0654/3242/0590/files/IMAGENESPRODUCTOS_1920x1920px_-2026-10-30T124806.079.png?v=1793361008",
+   "refCents": 6499,
+   "refLabel": "median store price",
+   "savingPct": 23
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Chrome UFC Value Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-value-pack",
+   "cents": 2500,
+   "currency": "EUR",
+   "store": "deichcards.de",
+   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsChromeUFC2026ValueBox_c2057a85-a753-4ca8-b95a-b7b1f377adbd.png?v=1778507514",
+   "refCents": 3200,
+   "refLabel": "median store price",
+   "savingPct": 22
   }
  ]
 }
