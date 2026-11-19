@@ -80,7 +80,7 @@ export function Header({ region, listed }: { region: Region | null; listed?: Rea
         <Link href={home} className="flex h-11 shrink-0 items-center rounded-lg" aria-label={`SportsCardCompare${region ? ` ${REGIONS[region].name}` : ""} home`}>
           <Logo wordmark="hidden sm:inline" />
         </Link>
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
+        <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main">
           {region ? <HeaderNavItems items={items} /> : <SoftHeaderNavItems items={items} />}
           {/* From 1440px only: below that the row ran out of room once the side rails narrowed nothing but the page (the sidebar's
               "Guides & news" group links the blog on every screen). */}
@@ -90,16 +90,17 @@ export function Header({ region, listed }: { region: Region | null; listed?: Rea
           {/* A discreet, labelled sponsored item (xl and up only): eBay's search, tagged. Not a section of the site. */}
           {region && <EbayNavLink region={region} />}
         </nav>
-        <div className="hdr-search min-w-0 flex-1 lg:ml-auto lg:min-w-[7rem] lg:max-w-64">{region ? <SearchBox region={region} size="sm" /> : <SoftSearchBox />}</div>
+        <div className="hdr-search min-w-0 flex-1 xl:ml-auto xl:min-w-[7rem] xl:max-w-64">{region ? <SearchBox region={region} size="sm" /> : <SoftSearchBox />}</div>
         <ThemeToggle className="hidden sm:inline-flex" />
         {region ? <RegionSwitcher region={region} compact /> : <SoftRegionSwitcher />}
         {/* The cart list (components/cart, owner 2026-11-06): every width, with its count. */}
         <CartHeaderLink />
         {/* Premium and the account (owner, 2026-11-19: sign-in and Premium visible on every site): Premium from md up (phones: the menu and
-            /account), Sign in at every width. Phones give the theme switch's place to it; the switch is in the menu there. */}
-        <PremiumHeaderLink className="hidden md:inline-flex" />
+            /account), Sign in at every width. Phones give the theme switch's place to it; the switch is in the menu there. Sign in is never pushed off
+            the row: the sections start at xl (the menu button below), and the pill steps aside from lg until 1440px. */}
+        <PremiumHeaderLink className="hidden md:inline-flex lg:hidden min-[1440px]:inline-flex" />
         <AccountHeaderLink />
-        <MobileMenu region={region} groups={groups} built={built} className="lg:hidden" />
+        <MobileMenu region={region} groups={groups} built={built} className="xl:hidden" />
       </div>
     </header>
   );
