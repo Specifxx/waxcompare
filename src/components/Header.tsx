@@ -12,6 +12,7 @@ import { RegionSwitcher } from "./RegionSwitcher";
 import { HeaderNavItems, SoftHeaderNavItems, SoftRegionSwitcher, SoftSearchBox, type HeaderNavItem } from "./HeaderNav";
 import { brandsMenuColumns, shopMenuColumns, sportsMenuColumns } from "./ShopMenu";
 import { ThemeToggle } from "./ThemeToggle";
+import { AccountHeaderLink, PremiumHeaderLink } from "./premium/AccountHeaderLink";
 import { CartHeaderLink } from "./cart/CartHeaderLink";
 import { SearchBox } from "./SearchBox";
 
@@ -90,10 +91,14 @@ export function Header({ region, listed }: { region: Region | null; listed?: Rea
           {region && <EbayNavLink region={region} />}
         </nav>
         <div className="hdr-search min-w-0 flex-1 lg:ml-auto lg:min-w-[7rem] lg:max-w-64">{region ? <SearchBox region={region} size="sm" /> : <SoftSearchBox />}</div>
-        <ThemeToggle />
+        <ThemeToggle className="hidden sm:inline-flex" />
         {region ? <RegionSwitcher region={region} compact /> : <SoftRegionSwitcher />}
         {/* The cart list (components/cart, owner 2026-11-06): every width, with its count. */}
         <CartHeaderLink />
+        {/* Premium and the account (owner, 2026-11-19: sign-in and Premium visible on every site): Premium from md up (phones: the menu and
+            /account), Sign in at every width. Phones give the theme switch's place to it; the switch is in the menu there. */}
+        <PremiumHeaderLink className="hidden md:inline-flex" />
+        <AccountHeaderLink />
         <MobileMenu region={region} groups={groups} built={built} className="lg:hidden" />
       </div>
     </header>

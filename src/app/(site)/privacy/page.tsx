@@ -21,15 +21,20 @@ export default function Privacy() {
       <p className="mt-2 text-sm text-faint">Last updated {LAST_UPDATED}</p>
       <div className="prose-dex mt-6">
         <p>
-          SportsCardCompare has no accounts and asks for your email only if you set a price alert (below).{" "}
+          SportsCardCompare asks for your email only if you set a price alert or sign in (below); you can compare every price without an account.{" "}
           {ADSENSE_CLIENT ? "We show ads from Google AdSense, which uses cookies (below)." : "It sets no advertising cookies."} Here is everything we collect.
         </p>
-        <h2>Price alerts</h2>
+        <h2 id="alerts">Price alerts and accounts</h2>
         <p>
-          If you ask to be emailed when a price drops, the form sends your email address, the product, your region and your price to our
-          sister site RiftCompare&rsquo;s alert service. It keeps them only for that alert, emails you once to confirm, and deletes them when
-          you stop the alert (every email has a link) or after six months. SportsCardCompare itself never stores them. Details are in{" "}
-          <a href="https://riftcompare.com/privacy#sister-alerts">RiftCompare&rsquo;s privacy policy</a>.
+          If you ask to be emailed when a price drops or a box is back in stock, the form sends your email address, the product, your region
+          and your price to the alert service we share with our other comparison sites, in the US. It keeps them only for that alert, emails
+          you once to confirm, and deletes them when you stop the alert (every email has a link) or after six months.
+        </p>
+        <p>
+          If you sign in (with Google, Discord or an emailed link), the same shared service keeps your email address and your alerts so they
+          follow you to any device; your sign-in is kept in your browser&rsquo;s local storage, never a cookie. Premium is billed by Stripe,
+          which holds your card details; we never see them. SportsCardCompare itself stores none of this. Ask us to delete your account or
+          alerts at the address below.
         </p>
         <h2>Analytics</h2>
         <p>
