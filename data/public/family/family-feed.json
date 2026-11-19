@@ -1,7 +1,7 @@
 {
  "v": 1,
  "site": "wax",
- "generatedAt": "2026-11-18T17:48:57.987Z",
+ "generatedAt": "2026-11-19T02:13:26.668Z",
  "links": {
   "AU": {
    "deals": "https://sportscardcompare.com/au/deals"
@@ -380,20 +380,6 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
-   "title": "2026 Topps Holiday Football Mega Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-holiday-football-mega-box",
-   "cents": 2790,
-   "currency": "EUR",
-   "store": "POKEMILLON - La Tienda Pokémon",
-   "image": "https://cdn.shopify.com/s/files/1/0483/6543/7089/files/1040489_004_102026.jpg?v=1793233011",
-   "refCents": 4245,
-   "refLabel": "median store price",
-   "savingPct": 34
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
    "title": "2026 Topps Chrome Formula 1 Value Box",
    "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-formula-1-value-pack",
    "cents": 4300,
@@ -403,6 +389,20 @@
    "refCents": 6499,
    "refLabel": "median store price",
    "savingPct": 34
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
+   "title": "2026 Topps Holiday Football Mega Box",
+   "url": "https://sportscardcompare.com/eu/p/2026-topps-holiday-football-mega-box",
+   "cents": 2790,
+   "currency": "EUR",
+   "store": "POKEMILLON - La Tienda Pokémon",
+   "image": "https://cdn.shopify.com/s/files/1/0483/6543/7089/files/1040489_004_102026.jpg?v=1793233011",
+   "refCents": 3990,
+   "refLabel": "median store price",
+   "savingPct": 30
   },
   {
    "kind": "deal",
@@ -422,6 +422,20 @@
    "kind": "deal",
    "cluster": "cards",
    "region": "EU",
+   "title": "2026-27 Topps Bundesliga Value Pack",
+   "url": "https://sportscardcompare.com/eu/p/2026-27-topps-bundesliga-value-pack",
+   "cents": 2599,
+   "currency": "EUR",
+   "store": "TobisToys",
+   "image": "https://cdn.shopify.com/s/files/1/0549/6170/1032/files/topps-flagship-bundesliga-2026-27-value-box-01.png?v=1793985447",
+   "refCents": 3490,
+   "refLabel": "median store price",
+   "savingPct": 26
+  },
+  {
+   "kind": "deal",
+   "cluster": "cards",
+   "region": "EU",
    "title": "2026 Topps Chrome WWE Mega Box",
    "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-wwe-mega-box",
    "cents": 6990,
@@ -431,20 +445,6 @@
    "refCents": 9499,
    "refLabel": "median store price",
    "savingPct": 26
-  },
-  {
-   "kind": "deal",
-   "cluster": "cards",
-   "region": "EU",
-   "title": "2026 Topps Chrome UFC Value Box",
-   "url": "https://sportscardcompare.com/eu/p/2026-topps-chrome-ufc-value-pack",
-   "cents": 2500,
-   "currency": "EUR",
-   "store": "deichcards.de",
-   "image": "https://cdn.shopify.com/s/files/1/0798/3313/7485/files/ToppsChromeUFC2026ValueBox_c2057a85-a753-4ca8-b95a-b7b1f377adbd.png?v=1778507514",
-   "refCents": 3200,
-   "refLabel": "median store price",
-   "savingPct": 22
   }
  ]
 }
