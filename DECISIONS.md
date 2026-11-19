@@ -1996,3 +1996,17 @@ drops any listing older than `EBAY_LISTING_MAX_AGE_HOURS` at request time, and t
 The eBay pass spends about a seventh of its old 1,400 calls a day; the calls freed are not moved to another site.
 Empire HQ's site watch (RiftCompare's ops monitor) still checks the live site. Why: build budget and agent time go to the
 sites that earn.
+
+## The Hot 100's share card is the chart itself, with photos (2026-11-20)
+
+The owner's Rift Compare "rising cards" snapshot posts get about 2,000 Reddit views a day each, and he posts only a link and a
+title: the link's thumbnail carries the post. SportsCardCompare's Hot 100 card was text only (ported from MTG Compare) (the week, the count, the #1 rise), so a Reddit
+link post showed nothing a reader would stop for. `/og/hot-100/<region>` now draws the chart: the #1 riser large with its
+photo, #2 to #6 beside it with their photos, each with its real 7-day rise, last week's and today's cheapest in-stock price
+and its store count, all from `lib/hot100.ts` and the product files, the same rows the page lists.
+
+The photos are TCGplayer's (asked at 200 px) and the stores' own Shopify files (asked at 300 px), fetched when the card is
+drawn with a six-second timeout each, and kept only as PNG or JPEG (satori draws nothing else); a photo that fails is a plain
+tile. Because it reads the product files the route is no longer prerendered: it is `force-dynamic` and kept by Vercel's CDN
+for a day, like `/og/p` (one render per region a day). The page's og:image carries the week (`?w=<through>`), so a link
+posted after a release is never shown last week's picture from a cache.
