@@ -1066,7 +1066,7 @@ test("DEPLOY.md says what the owner must know: both prongs of 8.1(c), the whole 
   for (const needle of ["8.1(c)", "Age of Displayed eBay Content", "six (6) hours older than information displayed on the eBay Site", "twenty-four (24) hours older than content displayed on the eBay Site", "how much older your displayed item listing is", "8.1(b)(1)", "3.1(b)"]) assert.ok(doc.includes(needle), `DEPLOY.md quotes ${needle}`);
   // the switch: cron + the age variable (GitHub and Vercel) + the run cap; the copy follows by itself
   for (const needle of ['"37 8 * * *"', '"13 */4 * * *"', "EBAY_LISTING_MAX_AGE_HOURS=5.5", "EBAY_RUN_CAP", "380", "follows the bound by itself"]) assert.ok(doc.includes(needle), `DEPLOY.md's switch says ${needle}`);
-  assert.ok(wf.includes('cron: "37 8 * * *"') && wf.includes("13 */4 * * *") && wf.includes("EBAY_RUN_CAP = 380"));
+  assert.ok(wf.includes('cron: "37 8 * * 1"') && wf.includes("13 */4 * * *") && wf.includes("EBAY_RUN_CAP = 380"));
   // the shared keyset, prominently (before the first subsection), with both remedies
   const head = doc.slice(doc.indexOf("## eBay listings: the daily import"), doc.indexOf("### Why daily"));
   assert.match(head, /READ THIS FIRST/);

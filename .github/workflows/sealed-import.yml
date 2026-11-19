@@ -2,7 +2,7 @@ name: SportsCardCompare sealed import
 
 # Reads every store in src/data/stores.json into the job's own throwaway Postgres (seeded from the committed data, so it starts
 # from yesterday's rows), adds every release 2+ stores now sell to data/sets/releases.json, exports the whole database to
-# data/public/ and commits it to main. Twice a day. No eBay API calls: no eBay credentials are passed to this job at all.
+# data/public/ and commits it to main. Weekly (Mondays) while the site is idle (2026-11-19), with no deploy marker. No eBay API calls: no eBay credentials are passed to this job at all.
 #
 # No database secret: SportsCardCompare has no hosted database (DECISIONS.md 2026-11-07).
 # Secrets (Settings → Secrets and variables → Actions), optional:
@@ -14,9 +14,8 @@ name: SportsCardCompare sealed import
 
 on:
   schedule:
-    # 20:47 UTC ≈ early morning in Australia/NZ; 08:47 UTC ≈ Europe's morning.
-    - cron: "47 20 * * *"
-    - cron: "47 8 * * *"
+    # IDLE since 2026-11-19 (owner): Mondays only, 20:47 UTC, and the scheduled run never releases (no [deploy]).
+    - cron: "47 20 * * 1"
   workflow_dispatch:
     inputs:
       # Store keys and markets; "tcgplayer" (or "US") includes TCGplayer.
@@ -143,10 +142,9 @@ jobs:
         continue-on-error: true
         run: bash scripts/pull-demand.sh wax data/demand.json
       - name: Publish it to main
-        # ONE RELEASE A DAY (owner, 2026-10-17: "reduce the cost"). The 20:47 UTC run (early morning in Australia,
-        # afternoon in the Americas) and a manual run release ("release": the commit subject carries
-        # [deploy]; the build gate still holds it to one build per 12 hours); the 08:47 run commits its snapshot without the marker and it rides the next release, which carries a
-        # newer whole-database snapshot anyway. Every release empties Vercel's CDN; the 08:47 read still feeds the alerts.
+        # IDLE (owner, 2026-11-19): the weekly scheduled run commits its snapshot WITHOUT [deploy], so nothing builds; only a
+        # manual run (the owner's) releases ("release": the subject carries [deploy]; the build gate still holds it to one
+        # build per 12 hours). Before that: one release a day, the 20:47 UTC run (owner, 2026-10-17).
         env:
-          RELEASE: ${{ (github.event_name != 'schedule' || github.event.schedule == '47 20 * * *') && 'release' || '' }}
+          RELEASE: ${{ github.event_name != 'schedule' && 'release' || '' }}
         run: bash scripts/publish-public-data.sh "sealed-import.yml run ${{ github.run_id }}" $RELEASE

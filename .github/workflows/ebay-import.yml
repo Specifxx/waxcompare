@@ -59,7 +59,7 @@ name: SportsCardCompare eBay import
 
 on:
   schedule:
-    - cron: "37 8 * * *"
+    - cron: "37 8 * * 1" # Mondays only: idle since 2026-11-19
   workflow_dispatch:
     inputs:
       only:
