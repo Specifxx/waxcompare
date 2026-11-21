@@ -18,7 +18,12 @@ export function OAuthButtons({ site, google = true, className = "" }: { site: st
       /* no next: the account hub */
     }
   }, []);
-  const href = (p: string) => `${PREMIUM_SERVICE}/api/sister-premium/oauth/${p}?site=${site}${next ? `&next=${encodeURIComponent(next)}` : ""}`;
+  // Discord through this site's own /account-service/oauth rewrite (2026-11-21); Google still through RiftCompare (its callback for
+  // this site is not registered with Google yet).
+  const href = (p: string) =>
+    p === "discord"
+      ? `/account-service/oauth/discord?site=${site}&via=site${next ? `&next=${encodeURIComponent(next)}` : ""}`
+      : `${PREMIUM_SERVICE}/api/sister-premium/oauth/${p}?site=${site}${next ? `&next=${encodeURIComponent(next)}` : ""}`;
   return (
     <div className={`grid gap-2 ${className}`}>
       {google && (
