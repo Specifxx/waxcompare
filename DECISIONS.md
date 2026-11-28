@@ -2010,3 +2010,25 @@ drawn with a six-second timeout each, and kept only as PNG or JPEG (satori draws
 tile. Because it reads the product files the route is no longer prerendered: it is `force-dynamic` and kept by Vercel's CDN
 for a day, like `/og/p` (one render per region a day). The page's og:image carries the week (`?w=<through>`), so a link
 posted after a release is never shown last week's picture from a cache.
+
+## 2026-11-28 — The deals card: real Amazon and eBay products in a corner pop-up (owner)
+
+Owner, 2026-11-28: "the sites without TCGplayer … can we have some eBay or Amazon pop-ups, especially with Black Friday deals
+… with actual products … it might use a bit of the quota, but that's fine." This overrides, on the owner's explicit word, the
+family's no-pop-up line for this site. `components/DealsPopup.tsx` is a small corner card (not a modal) with up to four real
+products from our own catalogue: Amazon items the build priced (`lib/deal-picks.ts`, the same live file the product page's
+Amazon row reads), each with its price's time, dropped in the browser after 24 hours (Amazon's licence) and with Amazon's own
+deal badge only before Amazon's own end; eBay's delivered Buy It Now price from the daily import to fill. Links are the item
+itself (/dp/ or /itm/), tagged `deals-popup-amazon` / `deals-popup-ebay`, rel sponsored, labelled Ad. Never a deals or
+category page, no "was" price, no saving of ours, no countdown.
+
+Amazon's Participation Requirements (o) bar Special Links in pop-ups "except for pop-up windows in conjunction with your Site
+promoting Products closely associated with the materials on your Site": the card shows only products this site compares,
+and the owner accepted the remaining risk (as for the quick view, 2026-11-06).
+
+Prompt rules kept: once a visit, sharing the visit's one prompt slot with the rate-us card (`srv_rate_seen`); never before
+nine seconds on the page, never while typing or over another dialog; ✕ and Escape close it (for the visit during Black
+Friday, for a week after). Premium members never see it where Premium exists. 
+became "We keep ads light", so it stays true. Released urgently on the owner's word.
+
+Here the card is Amazon only: the eBay listings this site reads per strip are too old on an idle week to quote as a deal. `tests/shop-menu.test.ts` ("nothing is a pre-order without an announced date") already failed on main before this change.

@@ -95,6 +95,7 @@ export const PLACEMENTS = [
   "amazon-deals", // /[region]/deals: the same line
   "amazon-guide", // a guide: a product row's "Check price on Amazon AU" link
   "amazon-inline", // the in-page ad block: its Amazon tiles and links, tagged, no price (components/InlineAds.tsx, owner 2026-11-13); never in the phone dock
+  "deals-popup-amazon", // the deals card (components/DealsPopup.tsx, owner 2026-11-28): an Amazon item with its live price and time
 ] as const;
 export type Placement = (typeof PLACEMENTS)[number];
 
