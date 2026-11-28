@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { HolidayStrip } from "@/components/HolidayStrip";
 import { SideAds } from "@/components/SideAds";
+import { DealsPopup } from "@/components/DealsPopup";
 import { SideNav } from "@/components/SideNav";
 import { navGroups } from "@/lib/nav";
 import { regionOrNotFound } from "@/lib/regions";
@@ -42,6 +43,8 @@ export default async function RegionLayout({ children, params }: { children: Rea
       {/* Narrow screens only, drawn in the browser after a scroll: the phone dock (components/SideAds.tsx, AdDock.tsx). The side rails are gone
           (2026-11-13). Nothing in the server HTML. */}
       <SideAds region={r.region} />
+      {/* Black Friday and after: real Amazon products in a corner card, once a visit (owner, 2026-11-28). */}
+      <DealsPopup region={r.region} />
     </>
   );
 }
